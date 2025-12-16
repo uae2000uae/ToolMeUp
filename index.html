@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-theme="light" style="font-size: small;">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wheel & Tire Fitment Calculator</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">ToolMeUp • Fitment Calculator</div>
+    <div class="header-controls">
+      <button id="loadSessionBtn" type="button">Load Session</button>
+      <label class="toggle">
+        <input type="checkbox" id="themeToggle">
+        <span>Dark</span>
+      </label>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="base" class="panel">
+      <h2>1) Baseline Setup</h2>
+      <div class="preset" style="margin: 8px 0;">
+        <select id="presetSelect">
+          <option value="">Presets (common sizes)</option>
+          <option value="225/45R17">225/45R17 on 17x7.5 ET45</option>
+          <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
+          <option value="265/35R19">265/35R19 on 19x9 ET35</option>
+          <option value="31x10.5R15">31x10.5R15 on 15x8 ET-19</option>
+        </select>
+      </div>
+      <div class="grid two">
+        <div>
+          <h3>Tire</h3>
+          <div class="field"><label>Tire size<input id="base_tire" placeholder="e.g., 225/45R17 or 31x10.5R15"></label></div>
+          <div class="field"><label>Brand width correction (%)<input id="base_correction" type="number" step="0.1" value="0"></label></div>
+        </div>
+        <div>
+          <h3>Wheel</h3>
+          <div class="field"><label>Rim diameter<input id="base_rim_diam" type="number" step="0.1" placeholder="in"></label></div>
+          <div class="field"><label>Rim width<input id="base_rim_width" type="number" step="0.1" placeholder="in"></label></div>
+          <div class="field"><label>Offset ET<input id="base_offset" type="number" step="1" placeholder="mm"></label></div>
+          <div class="field"><label>Spacer<input id="base_spacer" type="number" step="0.1" value="0" placeholder="mm"></label></div>
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <h3>Vehicle Clearances (optional)</h3>
+          <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" placeholder="mm"></label></div>
+          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" placeholder="mm"></label></div>
+        </div>
+        <div>
+          <h3>Speedometer</h3>
+          <div class="field"><label>Baseline speedo error (%, +reads high)<input id="base_speedo_error" type="number" step="0.1" value="0"></label></div>
+        </div>
+      </div>
+      <div class="grid two">
+        <div>
+          <h3>Thresholds</h3>
+          <div class="field"><label>Min inner clearance<input id="th_inner" type="number" step="1" value="3" placeholder="mm"></label></div>
+          <div class="field"><label>Min outer clearance<input id="th_outer" type="number" step="1" value="3" placeholder="mm"></label></div>
+          <div class="hint">These are red-flag thresholds; calculation will not be blocked.</div>
+        </div>
+        <div>
+          <h3>Optional Scrub Radius Inputs</h3>
+          <div class="field"><label>Kingpin/steering axis inclination (deg)<input id="sr_kpi" type="number" step="0.1" placeholder="deg"></label></div>
+          <div class="field"><label>Hub face to ball-joint line at hub height (mm)<input id="sr_hub_offset" type="number" step="1" placeholder="mm"></label></div>
+          <div class="hint">Provide vehicle geometry to estimate scrub radius. Optional.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2) Compare Setups</h2>
+      <div id="setups"></div>
+      <div class="actions">
+        <button id="addSetup" type="button">+ Add Setup</button>
+        <button id="saveBaseline" type="button" class="primary">Apply</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3) Results & Visualizations</h2>
+      <div class="actions" style="justify-content: space-between;">
+        <div id="setupTabs" class="tabs"></div>
+        <div>
+          <button id="saveSessionBtn" type="button">Save Session</button>
+        </div>
+      </div>
+      <div id="alerts" class="alerts"></div>
+      <div class="grid two">
+        <div>
+          <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
+          <div class="caption">Cross-section side view (baseline vs selected)</div>
+        </div>
+        <div>
+          <canvas id="topView" width="560" height="320" class="canvas"></canvas>
+          <div class="caption">Top-down inner/outer movement vs baseline</div>
+        </div>
+      </div>
+
+      <div class="actions" style="justify-content: flex-end; margin-top: 8px;">
+        <div class="measurement">
+          <label class="toggle" style="gap:6px;">
+            <span class="small">Units</span>
+            <select id="unitToggle">
+              <option value="metric">Metric</option>
+              <option value="imperial">Imperial</option>
+              <option value="both" selected>Both</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="comparison" class="table-wrap"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>Static HTML/CSS/JS • Ready for GitHub Pages</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
