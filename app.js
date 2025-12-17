@@ -263,17 +263,17 @@
       if (checks.inner) innerBadge = badge(checks.inner.pass ? 'PASS' : 'WARN', checks.inner.pass ? 'good' : 'bad');
       if (checks.outer) outerBadge = badge(checks.outer.pass ? 'PASS' : 'WARN', checks.outer.pass ? 'good' : 'bad');
 
-      const od = displayLength(s.tireGeom.overallDiaMm, unitMode);
-      const sw = displayLength(s.tireGeom.sectionWidthMm, unitMode);
-      const sidewall = displayLength(s.tireGeom.sidewallMm, unitMode);
-      const circ = displayLength(s.tireGeom.circumferenceMm, unitMode);
-      const backspacing = displayLength(s.wheelGeom.backspacingMm, unitMode);
-      const poke = displayLength(s.wheelGeom.frontspacingMm, unitMode);
-      const wheelW = displayLength(inToMm(s.rimWidthIn), unitMode);
-      const rideH = displayDelta(cmp.rideHeightDeltaMm, unitMode);
-      const innerD = displayDelta(cmp.innerMoveMm, unitMode);
-      const outerD = displayDelta(cmp.outerMoveMm, unitMode);
-      const speedo = `${cmp.speedoErrPct.toFixed(2)} %`;
+      const od = displayLengthSmart(s.tireGeom.overallDiaMm, unitMode, 'in');
+      const sw = displayLengthSmart(s.tireGeom.sectionWidthMm, unitMode, 'mm');
+      const sidewall = displayLengthSmart(s.tireGeom.sidewallMm, unitMode, 'mm');
+      const circ = displayLengthSmart(s.tireGeom.circumferenceMm, unitMode, 'mm');
+      const backspacing = displayLengthSmart(s.wheelGeom.backspacingMm, unitMode, 'in');
+      const poke = displayLengthSmart(s.wheelGeom.frontspacingMm, unitMode, 'in');
+      const wheelW = displayLengthSmart(inToMm(s.rimWidthIn), unitMode, 'in');
+      const rideH = displayDeltaSmart(cmp.rideHeightDeltaMm, unitMode, 'mm');
+      const innerD = displayDeltaSmart(cmp.innerMoveMm, unitMode, 'mm');
+      const outerD = displayDeltaSmart(cmp.outerMoveMm, unitMode, 'mm');
+      const speedo = `${(-cmp.speedoErrPct).toFixed(2)} %`;
 
       rows.push([
         s.tireStr || '-', od, sw, sidewall, circ, revsMi.toFixed(0),
@@ -300,6 +300,26 @@
     if (unitMode === 'metric') return `${sign}${mm.toFixed(1)} mm`;
     if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(2)} in`;
     return `${sign}${mm.toFixed(0)} mm (${sign}${mmToIn(mm).toFixed(2)} in)`;
+  }
+
+  // Smart display: when unitMode === 'both', show only the commonly used unit per field
+  // preferUnit: 'mm' or 'in'
+  function displayLengthSmart(mm, unitMode, preferUnit) {
+    if (mm == null || isNaN(mm)) return '';
+    if (unitMode === 'metric') return `${mm.toFixed(1)} mm`;
+    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(2)} in`;
+    // both: pick preferred unit
+    if (preferUnit === 'in') return `${mmToIn(mm).toFixed(2)} in`;
+    return `${mm.toFixed(1)} mm`;
+  }
+  function displayDeltaSmart(mm, unitMode, preferUnit) {
+    if (mm == null || isNaN(mm)) return '';
+    const sign = mm >= 0 ? '+' : '';
+    if (unitMode === 'metric') return `${sign}${mm.toFixed(1)} mm`;
+    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(2)} in`;
+    // both: pick preferred unit
+    if (preferUnit === 'in') return `${sign}${mmToIn(mm).toFixed(2)} in`;
+    return `${sign}${mm.toFixed(1)} mm`;
   }
 
   // Visualizations using canvas
@@ -329,8 +349,8 @@
     drawTire(selected, c.width * 0.66, '#22c55e');
   }
 
-  function drawTopView(base, selected) {
-    const c = $("#topView");
+  function drawRimView(base, selected) {
+    const c = $("#RimView");
     const ctx = c.getContext('2d');
     ctx.clearRect(0, 0, c.width, c.height);
     if (!base?.wheelGeom || !selected?.wheelGeom) return;
@@ -382,9 +402,14 @@
       ctx.save();
       ctx.globalAlpha = .3;
       ctx.imageSmoothingEnabled = true;
+      // In dark theme, invert only the hub image to improve contrast
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) ctx.filter = 'invert(1)';
       try {
         ctx.drawImage(hubImg, xImg, yImg, targetW, targetH);
       } catch (_) { /* ignore draw errors */ }
+      // Reset filter so other drawings are unaffected
+      if (isDark) ctx.filter = 'none';
       ctx.restore();
     }
 
@@ -546,8 +571,7 @@
   const presetMap = {
     '225/45R17': { rim_d: 17, rim_w: 7.5, et: 45, spacer: 0 },
     '205/55R16': { rim_d: 16, rim_w: 6.5, et: 50, spacer: 0 },
-    '265/35R19': { rim_d: 19, rim_w: 9, et: 35, spacer: 0 },
-    '31x10.5R15': { rim_d: 15, rim_w: 8, et: -19, spacer: 0 }
+    '265/35R19': { rim_d: 19, rim_w: 9, et: 35, spacer: 0 }
   };
 
   function applyPresetTo(prefixRoot, tire) {
@@ -599,9 +623,17 @@
     // Speedo baseline correction
     const cmp = compareSetups(base, selected);
     if (cmp) {
-      const corrected = cmp.speedoErrPct + (baseline?.baseSpeedoError || 0);
+      const corrected = (-cmp.speedoErrPct) + (baseline?.baseSpeedoError || 0);
       const cls = Math.abs(corrected) > 2 ? 'warn' : 'good';
-      alerts.push({ text: `Speedometer change vs baseline: ${corrected.toFixed(2)}%`, cls });
+      // Append example conversion at 100 km/h
+      const actual100 = 100;
+      const indicated100 = actual100 * (1 + corrected / 100);
+      const fmt1 = (n) => {
+        const s = n.toFixed(1);
+        return s.endsWith('.0') ? s.slice(0, -2) : s;
+      };
+      const example = ` Actual speed: ${fmt1(actual100)} km/h, Speedometer: ${fmt1(indicated100)} km/h`;
+      alerts.push({ text: `Speedometer change vs baseline: ${corrected.toFixed(2)}%` + example, cls });
     }
 
     // Clearance checks
@@ -662,7 +694,7 @@
     // Selected setup for visuals/alerts
     const selected = setups.find(s => s.id === selectedSetupId) || setups[0];
     drawSideView(baseline, selected, unitMode);
-    drawTopView(baseline, selected);
+    drawRimView(baseline, selected);
 
     // Build alerts: hard errors for any invalid setups + dynamic alerts for selected
     const alerts = [];
@@ -674,6 +706,8 @@
     }
     for (const a of calcAlerts(baseline, selected)) alerts.push(a);
     renderAlerts(alerts);
+    // Autosave current state after each render so reload restores it
+    if (typeof saveAutoState === 'function') saveAutoState();
   }
 
   // Theme toggle
@@ -681,6 +715,9 @@
     const toggle = $("#themeToggle");
     toggle.addEventListener('change', () => {
       document.documentElement.setAttribute('data-theme', toggle.checked ? 'dark' : 'light');
+      if (typeof saveAutoState === 'function') saveAutoState();
+      // Redraw views so RimView image updates with inverted colors in dark mode
+      if (typeof renderAll === 'function') renderAll();
     });
   }
 
@@ -703,11 +740,34 @@
     });
   }
 
+  // Update dynamic hint for baseline speedometer error
+  function updateSpeedoHint() {
+    const el = document.getElementById('base_speedo_hint');
+    if (!el) return;
+    const val = parseFloat(document.getElementById('base_speedo_error')?.value);
+    if (isNaN(val)) { el.textContent = ''; return; }
+    const actual = 100; // km/h
+    const indicated = actual * (1 + val / 100);
+    const fmt1 = n => {
+      const s = n.toFixed(1);
+      return s.endsWith('.0') ? s.slice(0, -2) : s;
+    };
+    el.textContent = `Actual speed: ${fmt1(actual)} km/h, Speedometer: ${fmt1(indicated)} km/h`;
+  }
+
   // Baseline save
   function initBaseline() {
     $("#saveBaseline").addEventListener('click', saveBaseline);
-    // Recompute on input changes for live feedback
-    $$('#base input').forEach(inp => inp.addEventListener('input', debounce(() => { if (baseline) saveBaseline(); }, 150)));
+    // Recompute on input changes for live feedback and autosave raw inputs
+    $$('#base input').forEach(inp => inp.addEventListener('input', debounce(() => {
+      if (baseline) saveBaseline();
+      if (typeof saveAutoState === 'function') saveAutoState();
+    }, 150)));
+    // Keep speedo hint in sync while typing
+    const sp = document.getElementById('base_speedo_error');
+    if (sp) sp.addEventListener('input', updateSpeedoHint);
+    // Initialize hint on load
+    updateSpeedoHint();
   }
 
   // Add setups
@@ -721,9 +781,17 @@
     });
     // expose a helper to programmatically add cards by simulating clicks
     window.__addSetupCard = function () { addBtn.click(); };
+
+    // Autosave when any setup input changes
+    const observer = new MutationObserver(() => {
+      if (typeof saveAutoState === 'function') saveAutoState();
+    });
+    observer.observe(document.getElementById('setups'), { childList: true, subtree: true });
   }
 
   // Session save/load
+  const AUTO_KEY = 'tmu_autosave_v1';
+
   function serializeSession() {
     const base = {
       tire: $('#base_tire').value,
@@ -779,6 +847,8 @@
       $('#th_outer').value = sess.base.th_outer || '';
       $('#sr_kpi').value = sess.base.sr_kpi || '';
       $('#sr_hub_offset').value = sess.base.sr_hub || '';
+      // Refresh speedo hint to reflect loaded value
+      updateSpeedoHint();
     }
 
     // Rebuild setups
@@ -840,6 +910,23 @@
     applySession(arr[idx].data);
   }
 
+  // Autosave current working state to restore on reload
+  function saveAutoState() {
+    try {
+      const data = serializeSession();
+      localStorage.setItem(AUTO_KEY, JSON.stringify(data));
+    } catch (_) { /* ignore quota or serialization errors */ }
+  }
+
+  function tryAutoLoad() {
+    try {
+      const raw = localStorage.getItem(AUTO_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data) applySession(data);
+    } catch (_) { /* ignore parse errors */ }
+  }
+
   function initSessionIO() {
     const saveBtn = document.getElementById('saveSessionBtn');
     const loadBtn = document.getElementById('loadSessionBtn');
@@ -860,6 +947,8 @@
     initBaseline();
     initSetups();
     initSessionIO();
+    // Try to auto-load last working state after wiring handlers
+    tryAutoLoad();
   }
 
   document.addEventListener('DOMContentLoaded', init);

@@ -25,11 +25,10 @@
       <h2>1) Baseline Setup</h2>
       <div class="preset" style="margin: 8px 0;">
         <select id="presetSelect">
-          <option value="">Presets (common sizes)</option>
+          <option value="">Preset samples sizes</option>
           <option value="225/45R17">225/45R17 on 17x7.5 ET45</option>
           <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
           <option value="265/35R19">265/35R19 on 19x9 ET35</option>
-          <option value="31x10.5R15">31x10.5R15 on 15x8 ET-19</option>
         </select>
       </div>
       <div class="grid two">
@@ -49,19 +48,20 @@
       <div class="grid two">
         <div>
           <h3>Vehicle Clearances (optional)</h3>
-          <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" placeholder="mm"></label></div>
-          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" placeholder="mm"></label></div>
+          <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
+          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
         </div>
         <div>
           <h3>Speedometer</h3>
           <div class="field"><label>Baseline speedo error (%, +reads high)<input id="base_speedo_error" type="number" step="0.1" value="0"></label></div>
+          <div class="hint" id="base_speedo_hint"></div>
         </div>
       </div>
       <div class="grid two">
         <div>
           <h3>Thresholds</h3>
-          <div class="field"><label>Min inner clearance<input id="th_inner" type="number" step="1" value="3" placeholder="mm"></label></div>
-          <div class="field"><label>Min outer clearance<input id="th_outer" type="number" step="1" value="3" placeholder="mm"></label></div>
+          <div class="field"><label>Min inner clearance<input id="th_inner" type="number" step="1" value="15" placeholder="mm"></label></div>
+          <div class="field"><label>Min outer clearance<input id="th_outer" type="number" step="1" value="15" placeholder="mm"></label></div>
           <div class="hint">These are red-flag thresholds; calculation will not be blocked.</div>
         </div>
         <div>
@@ -97,7 +97,7 @@
           <div class="caption">Cross-section side view (baseline vs selected)</div>
         </div>
         <div>
-          <canvas id="topView" width="560" height="320" class="canvas"></canvas>
+          <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
           <div class="caption">Top-down inner/outer movement vs baseline</div>
         </div>
       </div>
