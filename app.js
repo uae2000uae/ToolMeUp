@@ -723,7 +723,9 @@
 
   // Unit toggle
   function initUnits() {
-    $("#unitToggle").addEventListener('change', renderAll);
+    const unitSel = $("#unitToggle");
+    if (!unitSel) return;
+    unitSel.addEventListener('change', renderAll);
   }
 
   // Preset handling
@@ -827,9 +829,8 @@
 
   function applySession(sess) {
     if (!sess) return;
-    // Theme and units
-    $('#themeToggle').checked = !!sess.themeDark;
-    document.documentElement.setAttribute('data-theme', sess.themeDark ? 'dark' : 'light');
+    // Units only. Theme is a site-wide preference managed by shared.js
+    // (persisted across pages), so we intentionally do not override it here.
     if (sess.unit) $('#unitToggle').value = sess.unit;
 
     // Baseline
@@ -942,14 +943,22 @@
   // Initialize
   function init() {
     initTheme();
-    initUnits();
-    initPresets();
-    initBaseline();
-    initSetups();
-    initSessionIO();
-    // Try to auto-load last working state after wiring handlers
-    tryAutoLoad();
+    const hasFitment = !!document.getElementById('base');
+    if (hasFitment) {
+      initUnits();
+      initPresets();
+      initBaseline();
+      initSetups();
+      initSessionIO();
+    } else {
+      // Minimal wiring for pages without the fitment UI
+      initSessionIO();
+    }
+    // Try to auto-load last working state only on the fitment page
+    if (hasFitment) tryAutoLoad();
   }
+
+
 
   document.addEventListener('DOMContentLoaded', init);
 })();

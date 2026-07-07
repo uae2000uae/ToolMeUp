@@ -94,3 +94,38 @@ button:hover { filter: brightness(1.1); }
 .setup-card h4 { margin: 0 0 8px; }
 .remove { color: var(--bad); border-color: var(--bad); }
 .small { font-size: 12px; color: var(--muted); }
+
+/* Compact density for tool pages (was inline font-size: small) */
+html.compact { font-size: 87.5%; }
+
+/* Header nav links (rendered by shared.js) */
+.header-controls a { color: var(--muted); text-decoration: none; padding: 6px 8px; border-radius: 8px; font-weight: 500; }
+.header-controls a:hover { color: var(--fg); background: color-mix(in oklab, var(--fg) 8%, transparent); }
+
+/* Layout utilities (replacing former inline styles) */
+.preset { margin: 8px 0; }
+.actions--between { justify-content: space-between; }
+.actions--end { justify-content: flex-end; margin-top: 8px; }
+.actions--wrap { gap: 12px; flex-wrap: wrap; }
+.btn-row { display: flex; gap: 8px; align-items: center; }
+.wget-progress { width: 240px; height: 10px; }
+.mt-6 { margin-top: 6px; }
+.measurement label { gap: 6px; }
+
+/* Wget legal/usage disclaimer */
+.disclaimer { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--warn) 8%, transparent); color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+/* Landing hub */
+.hero { padding: 24px 4px 8px; }
+.hero__title { margin: 0 0 6px; font-size: 28px; }
+.hero__lead { margin: 0; color: var(--muted); max-width: 640px; }
+
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.tool-card { display: flex; gap: 14px; align-items: flex-start; text-decoration: none; color: var(--fg); background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; transition: border-color .15s, transform .15s, box-shadow .15s; }
+.tool-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px color-mix(in oklab, var(--accent) 18%, transparent); }
+.tool-card__icon { flex: 0 0 auto; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.tool-card__body { display: flex; flex-direction: column; gap: 4px; }
+.tool-card__title { font-weight: 600; }
+.tool-card__desc { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.tool-card__go { margin-left: auto; color: var(--muted); font-size: 18px; }
+.tool-card:hover .tool-card__go { color: var(--accent); }
