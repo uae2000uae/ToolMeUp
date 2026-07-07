@@ -1,0 +1,71 @@
+# Cloud Build pipeline — build the container and deploy to Cloud Run on every
+# commit. Wire this file to a Cloud Build trigger connected to your GitHub repo.
+#
+# ── One-time setup ────────────────────────────────────────────────────────────
+# 1. Create the Artifact Registry repo (once):
+#      gcloud artifacts repositories create toolmeup \
+#        --repository-format=docker --location=us-central1
+#
+# 2. Connect GitHub + create the trigger (or use Console → Cloud Build → Triggers):
+#      gcloud builds triggers create github \
+#        --name=toolmeup-deploy \
+#        --repo-owner=YOUR_GITHUB_USER --repo-name=ToolMeUp \
+#        --branch-pattern="^main$" \
+#        --build-config=cloudbuild.yaml
+#
+# 3. Let the Cloud Build service account deploy to Cloud Run and act as the
+#    runtime service account (the trigger UI offers to do this; or run):
+#      PROJECT_NUMBER=654599832567
+#      gcloud projects add-iam-policy-binding $PROJECT_ID \
+#        --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+#        --role="roles/run.admin"
+#      gcloud projects add-iam-policy-binding $PROJECT_ID \
+#        --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+#        --role="roles/iam.serviceAccountUser"
+#
+# Note: WHEEL_SIZE_KEY is intentionally NOT set below — `gcloud run deploy`
+# without env flags preserves the value already configured on the service.
+
+substitutions:
+  _REGION: us-central1
+  _SERVICE: toolmeup
+  _REPO: toolmeup
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+images:
+  - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$COMMIT_SHA"
+
+steps:
+  # 1) Build the image from the Dockerfile (tag with commit SHA + latest)
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$COMMIT_SHA"
+      - -t
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:latest"
+      - .
+
+  # 2) Push both tags to Artifact Registry
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - --all-tags
+      - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}"
+
+  # 3) Deploy to Cloud Run (preserves existing env vars, incl. WHEEL_SIZE_KEY)
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - "${_SERVICE}"
+      - "--image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$COMMIT_SHA"
+      - "--region=${_REGION}"
+      - "--platform=managed"
+      - "--allow-unauthenticated"
