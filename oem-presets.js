@@ -10,8 +10,8 @@
            -> /api/wheel-size/years/
            -> /api/wheel-size/search/by_model/   (trims + OE fitments)
 
-  The API has no vehicle body-clearance data (no OEM database does),
-  so the Clearances section is captured manually in the wizard.
+  Applies the factory wheel (rim diameter/width/offset) and tire size to
+  the baseline setup.
 */
 (function () {
   "use strict";
@@ -92,12 +92,6 @@
         '<div class="oem-capture__title">Capture into baseline</div>' +
         '<label class="toggle"><input type="checkbox" id="oemApplyWheel" checked> <span>Wheel (rim diameter, width, offset)</span></label>' +
         '<label class="toggle"><input type="checkbox" id="oemApplyTire" checked> <span>Tire (size)</span></label>' +
-        '<label class="toggle"><input type="checkbox" id="oemApplyClear"> <span>Vehicle clearances (manual)</span></label>' +
-        '<div id="oemClearFields" class="oem-clear" hidden>' +
-          '<label class="oem-field">Inner clearance (mm)<input type="number" id="oemInner" step="1"></label>' +
-          '<label class="oem-field">Outer clearance (mm)<input type="number" id="oemOuter" step="1"></label>' +
-          '<div class="hint">OEM databases don\'t include body clearances; enter your measured values to capture them.</div>' +
-        '</div>' +
       '</div>';
 
     var footer = el("div", { class: "modal__foot" });
@@ -123,10 +117,6 @@
       fitments: overlay.querySelector("#oemFitments"),
       applyWheel: overlay.querySelector("#oemApplyWheel"),
       applyTire: overlay.querySelector("#oemApplyTire"),
-      applyClear: overlay.querySelector("#oemApplyClear"),
-      clearFields: overlay.querySelector("#oemClearFields"),
-      inner: overlay.querySelector("#oemInner"),
-      outer: overlay.querySelector("#oemOuter"),
       apply: apply
     };
 
@@ -145,9 +135,6 @@
     ui.model.addEventListener("change", onModel);
     ui.year.addEventListener("change", onYear);
     ui.trim.addEventListener("change", onTrim);
-    ui.applyClear.addEventListener("change", function () {
-      ui.clearFields.hidden = !ui.applyClear.checked;
-    });
     ui.apply.addEventListener("click", applyToBaseline);
   }
 
@@ -301,10 +288,6 @@
     ui.fitments.innerHTML = "";
     ui.fitments.appendChild(wrap);
 
-    // Prefill manual clearance fields from current baseline values
-    ui.inner.value = valOf("base_inner_clear", 15);
-    ui.outer.value = valOf("base_outer_clear", 15);
-
     // Auto-select first
     var first = wrap.querySelector('input[type="radio"]');
     if (first) { first.checked = true; first.dispatchEvent(new Event("change")); }
@@ -325,10 +308,6 @@
       if (f.rim_width != null) { setVal("base_rim_width", f.rim_width); changed.push("base_rim_width"); }
       if (f.rim_offset != null) { setVal("base_offset", f.rim_offset); changed.push("base_offset"); }
     }
-    if (ui.applyClear.checked) {
-      if (ui.inner.value !== "") { setVal("base_inner_clear", ui.inner.value); changed.push("base_inner_clear"); }
-      if (ui.outer.value !== "") { setVal("base_outer_clear", ui.outer.value); changed.push("base_outer_clear"); }
-    }
 
     // Fire input/change so any listeners react, then click Apply to recompute.
     changed.forEach(function (id) {
@@ -343,7 +322,6 @@
 
   // ---- misc ------------------------------------------------------------
   function enc(s) { return encodeURIComponent(s); }
-  function valOf(id, dflt) { var e = document.getElementById(id); return e && e.value !== "" ? e.value : dflt; }
   function setVal(id, v) { var e = document.getElementById(id); if (e) e.value = v; }
   function err(e) { setStatus((e && e.message) || "Something went wrong.", "bad"); }
 

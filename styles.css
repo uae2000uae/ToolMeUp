@@ -196,5 +196,3 @@ html.compact { font-size: 87.5%; }
 
 .oem-capture { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); display: grid; gap: 8px; }
 .oem-capture .toggle { color: var(--fg); font-size: 14px; }
-.oem-clear { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; padding-left: 26px; }
-@media (max-width: 560px) { .oem-clear { grid-template-columns: 1fr; padding-left: 0; } }
