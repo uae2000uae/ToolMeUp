@@ -29,7 +29,6 @@
 substitutions:
   _REGION: us-central1
   _SERVICE: ToolMeUp
-  _REPO: toolmeup
 
 options:
   logging: CLOUD_LOGGING_ONLY
