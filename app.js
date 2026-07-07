@@ -633,7 +633,7 @@
         return s.endsWith('.0') ? s.slice(0, -2) : s;
       };
       const example = `When your GPS speed is ${fmt1(actual100)} km/h, Speedometer shows ${fmt1(indicated100)} km/h`;
-      alerts.push({ text: `Speedometer change vs baseline: ${corrected.toFixed(2)}%` + example, cls });
+      alerts.push({ text: `Speedometer vs GPS Speed: ${corrected.toFixed(2)}% So, ` + example, cls });
     }
 
     // Clearance checks
@@ -754,7 +754,7 @@
       const s = n.toFixed(1);
       return s.endsWith('.0') ? s.slice(0, -2) : s;
     };
-    el.textContent = `When your GPS speed is ${fmt1(actual)} km/h, Speedometer shows ${fmt1(indicated)} km/h`;
+    el.textContent = `when your GPS speed is ${fmt1(actual)} km/h, Speedometer shows ${fmt1(indicated)} km/h`;
   }
 
   // Baseline save

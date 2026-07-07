@@ -39,7 +39,7 @@ body {
   align-items: center;
   padding: 12px 20px;
   background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 5px solid var(--border);
 }
 /* Keep header visible while scrolling */
 .app-header { position: sticky; top: 0; z-index: 1000; }
@@ -60,6 +60,7 @@ h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
 .field label { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .field input { width: 260px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%); color: var(--fg); }
 .hint { color: var(--muted); font-size: 12px; }
+.hint-bold { color: var(--muted); font-size: 12px; font-weight: 600; }
 
 .actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 button { font-size: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: green; color: white; cursor: pointer; }
@@ -68,7 +69,7 @@ button:hover { filter: brightness(1.1); }
 
 /* Tabs for Results & Visualizations */
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
-.tab { padding: 6px 10px; border: 1px solid var(--border); border-bottom: 2px solid transparent; border-radius: 8px; background: transparent; color: var(--fg); cursor: pointer; }
+.tab { padding: 6px 10px; border: 1px solid var(--muted); border-bottom: 2px solid var(--muted); border-radius: 8px; background: transparent; color: var(--fg); cursor: pointer; }
 .tab.active { background: color-mix(in oklab, var(--accent) 12%, transparent); border-color: var(--accent); }
 .tab.bad { border-color: var(--bad); color: var(--bad); }
 
@@ -78,7 +79,7 @@ button:hover { filter: brightness(1.1); }
 .alert.bad { background: color-mix(in oklab, var(--bad) 10%, transparent); border-color: var(--bad); }
 .alert.good { background: color-mix(in oklab, var(--good) 10%, transparent); border-color: var(--good); }
 
-.canvas { width: 100%; height: auto; background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 95%, var(--fg) 5%), var(--panel)); border: 1px solid var(--border); border-radius: 8px; }
+.canvas { width: 100%; height: auto; background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 95%, var(--fg) 5%), var(--panel)); border: 2px solid var(--border); border-radius: 8px; }
 .caption { color: var(--muted); text-align: center; font-size: 12px; margin: 4px 0 0; }
 
 .table-wrap { overflow-x: auto; margin-top: 12px; }
@@ -90,9 +91,9 @@ button:hover { filter: brightness(1.1); }
 .badge.bad { background: color-mix(in oklab, var(--bad) 15%, transparent); color: var(--bad); }
 .badge.good { background: color-mix(in oklab, var(--good) 15%, transparent); color: var(--good); }
 
-.setup-card { border: 1px dashed var(--border); border-radius: 10px; padding: 12px; margin: 10px 0; }
+.setup-card { border: 2px dashed var(--border); border-radius: 10px; padding: 12px; margin: 10px 0; }
 .setup-card h4 { margin: 0 0 8px; }
-.remove { color: var(--bad); border-color: var(--bad); }
+.remove { background-color: gray; color: white; }
 .small { font-size: 12px; color: var(--muted); }
 
 /* Compact density for tool pages (was inline font-size: small) */
@@ -132,6 +133,22 @@ html.compact { font-size: 87.5%; }
 
 /* Preset row (dropdown + OEM button) */
 .preset-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Collapsible "Advanced settings" disclosure */
+.advanced { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.advanced__summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 600; color: var(--accent);
+  padding: 6px 0;
+}
+.advanced__summary::-webkit-details-marker { display: none; }
+.advanced__summary::before {
+  content: "▸"; display: inline-block; transition: transform .15s ease; color: var(--muted);
+}
+.advanced[open] > .advanced__summary::before { transform: rotate(90deg); }
+.advanced__summary:hover { filter: brightness(1.1); }
+.advanced > .grid.two:first-of-type { margin-top: 10px; }
 
 /* ---- Modal / wizard ---- */
 .modal-overlay {
