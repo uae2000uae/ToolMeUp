@@ -1,9 +1,37 @@
+# DNS resolver so proxy_pass can resolve the upstream at runtime.
+# (Google's internal resolver is available inside Cloud Run.)
+resolver 8.8.8.8 1.1.1.1 ipv6=off valid=300s;
+
 server {
     listen       ${PORT};
     server_name  _;
 
     root   /usr/share/nginx/html;
     index  index.html;
+
+    # ---- Wheel-Size fitment API proxy -------------------------------------
+    # The browser calls same-origin /api/wheel-size/<endpoint>?<query>.
+    # We forward to https://api.wheel-size.com/v2/<endpoint> and append the
+    # secret user_key server-side, so the key is NEVER exposed to the client
+    # and there are no CORS issues. WHEEL_SIZE_KEY is injected by envsubst at
+    # container start (from a Cloud Run secret / env var).
+    location ~ ^/api/wheel-size/(?<ws_path>.*)$ {
+        # Build the upstream query string with the key appended.
+        set $ws_query "user_key=${WHEEL_SIZE_KEY}";
+        if ($args) { set $ws_query "$args&user_key=${WHEEL_SIZE_KEY}"; }
+
+        proxy_pass https://api.wheel-size.com/v2/$ws_path?$ws_query;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.wheel-size.com;
+        proxy_set_header Accept "application/json";
+
+        # Cache-friendly: fitment catalog data changes rarely.
+        proxy_set_header Accept-Encoding "";
+        add_header Cache-Control "public, max-age=3600";
+
+        # Keep the client from seeing upstream infra headers.
+        proxy_hide_header Set-Cookie;
+    }
 
     # SPA-ish fallback is not needed; this is a multi-page static site.
     location / {
