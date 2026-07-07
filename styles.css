@@ -62,7 +62,7 @@ h3 { margin: 12px 0 8px; color: var(--muted); font-weight: 600; }
 .hint { color: var(--muted); font-size: 12px; }
 
 .actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-button { font-size: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--fg); cursor: pointer; }
+button { font-size: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: green; color: white; cursor: pointer; }
 button.primary { background: var(--accent); border-color: var(--accent); color: white; }
 button:hover { filter: brightness(1.1); }
 

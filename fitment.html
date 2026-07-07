@@ -25,15 +25,18 @@
   <header class="app-header">
     <div class="brand">ToolMeUp • Fitment Calculator</div>
     <div class="header-controls" data-nav data-active="fitment">
-      <button id="loadSessionBtn" type="button">Load Session</button>
-      <label class="toggle">
-        <input type="checkbox" id="themeToggle">
+<label class="toggle">
+      <input type="checkbox" id="themeToggle">
         <span>Dark</span>
       </label>
     </div>
   </header>
 
   <main class="container">
+    <div class="actions">
+	   <button id="loadSessionBtn" type="button">Load Session</button>
+    </div>
+	  <br>
     <section id="base" class="panel">
       <h2>1) Baseline Setup</h2>
       <div class="preset">
@@ -46,18 +49,34 @@
       </div>
       <div class="grid two">
         <div>
+          <h3>Wheel</h3>
+          <div class="field">
+            <label>Rim diameter
+              <input id="base_rim_diam" type="number" step="0.1" placeholder="in">
+            </label>
+          </div>
+          <div class="field">
+            <label>Rim width
+              <input id="base_rim_width" type="number" step="0.1" placeholder="in">
+            </label>
+          </div>
+          <div class="field">
+            <label>Offset ET
+              <input id="base_offset" type="number" step="1" placeholder="mm">
+            </label>
+          </div>
+          <div class="field">
+            <label>Spacer
+              <input id="base_spacer" type="number" step="0.1" value="0" placeholder="mm">
+            </label>
+          </div>
+        </div>
+        <div>
           <h3>Tire</h3>
           <div class="field"><label>Tire size<input id="base_tire" placeholder="e.g., 225/45R17 or 31x10.5R15"></label></div>
           <div class="field"><label>Brand width correction (%)<input id="base_correction" type="number" step="0.1" value="0"></label></div>
         </div>
-        <div>
-          <h3>Wheel</h3>
-          <div class="field"><label>Rim diameter<input id="base_rim_diam" type="number" step="0.1" placeholder="in"></label></div>
-          <div class="field"><label>Rim width<input id="base_rim_width" type="number" step="0.1" placeholder="in"></label></div>
-          <div class="field"><label>Offset ET<input id="base_offset" type="number" step="1" placeholder="mm"></label></div>
-          <div class="field"><label>Spacer<input id="base_spacer" type="number" step="0.1" value="0" placeholder="mm"></label></div>
-        </div>
-      </div>
+</div>
       <div class="grid two">
         <div>
           <h3>Vehicle Clearances (optional)</h3>
@@ -66,8 +85,8 @@
         </div>
         <div>
           <h3>Speedometer</h3>
-          <div class="field"><label>Baseline speedo error (%, +reads high)<input id="base_speedo_error" type="number" step="0.1" value="0"></label></div>
-          <div class="hint" id="base_speedo_hint"></div>
+          <div class="field"><label>Baseline speedo error (%, +reads high)<input id="base_speedo_error" type="number" step="1" value="5"></label></div>
+          <div class="hint" id="base_speedo_hint">When GPS speed: 100 km/h, Speedometer reads: 100 km/h</div>
         </div>
       </div>
       <div class="grid two">
