@@ -1,0 +1,18 @@
+server {
+    listen       ${PORT};
+    server_name  _;
+
+    root   /usr/share/nginx/html;
+    index  index.html;
+
+    # SPA-ish fallback is not needed; this is a multi-page static site.
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Light caching for static assets; HTML stays fresh.
+    location ~* \.(?:css|js|png|jpg|jpeg|svg|ico|webmanifest|json)$ {
+        expires 1h;
+        add_header Cache-Control "public";
+    }
+}

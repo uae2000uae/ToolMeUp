@@ -1,0 +1,19 @@
+# Keep the build context (and image) small and free of local cruft.
+.git
+.gitignore
+.idea
+*.iml
+.venv
+**/__pycache__
+**/*.pyc
+node_modules
+**/node_modules
+
+# Source/design files not needed to serve the site
+fitment calculator.xlsx
+Dualshock-tool/scripts
+Dualshock-tool/.github
+Dualshock-tool/dev-server.js
+Dualshock-tool/gulpfile.js
+Dualshock-tool/setup-dev.sh
+Dualshock-tool/package-lock.json
