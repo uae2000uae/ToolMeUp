@@ -75,8 +75,8 @@
         <div>
           <h3>Tire</h3>
           <div class="field"><label>Tire size<input id="base_tire" placeholder="e.g., 225/45R17 or 31x10.5R15"></label></div>
-          <div class="field"><label>Brand width correction (%)<input id="base_correction" type="number" step="0.1" value="0"></label></div>
-			 <div class="hint" id="base_speedo_hint">Some tire typs run wider, leave it 0 if you don't know, it's 0 by default</div>
+          <div class="field"><label>Brand width correction (%)<input id="base_correction" type="number" step="1" value="0"></label></div>
+			 <div class="hint">Some tire typs run wider, leave it 0 if you don't know, it's 0 by default</div>
         </div>
 </div>
       <div class="grid two">
@@ -84,13 +84,13 @@
           <h3>Vehicle Clearances (optional)</h3>
           <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
           <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
-			 <div class="hint" id="base_speedo_hint">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div>
+			 <div class="hint">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div>
         </div>
         <div>
           <h3>Speedometer</h3>
           <div class="field"><label>Baseline speedo error (%, +reads high)<input id="base_speedo_error" type="number" step="1" value="5"></label></div>
-          <div class="hint" id="base_speedo_hint">The majority of OEM installations will make speedometer give you faster reading than GPS or Radar speed. This calculator helps provide insight about what the reading is going to be. <br><br>
-          As per your settings, <strong>when GPS speed is 100 km/h, Speedometer reads: 100 km/h</strong></div>
+          <div class="hint">The majority of OEM installations will make speedometer give you faster reading than GPS or Radar speed. This calculator helps provide insight about what the reading is going to be. <br><br>
+          As per your settings, <div id="base_speedo_hint">When GPS speed is 100 km/h, Speedometer reads: 100 km/h</div></div>
         </div>
       </div>
       <div class="grid two">

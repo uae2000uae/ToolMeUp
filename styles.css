@@ -1,7 +1,7 @@
 :root {
   --bg: #0b0d10;
   --fg: #e9eef5;
-  --muted: #1dadff;
+  --muted: #226594;
   --panel: #151922;
   --accent: #4aa3ff;
   --accent-2: #22c55e;
@@ -14,7 +14,7 @@
 html[data-theme="light"] {
   --bg: #f7f9fc;
   --fg: #0e1521;
-  --muted: #5b6b7e;
+  --muted: #226594;
   --panel: #ffffff;
   --accent: #2563eb;
   --accent-2: #16a34a;
@@ -55,7 +55,7 @@ body {
 @media (max-width: 900px) { .grid.two { grid-template-columns: 1fr; } }
 
 h2 { margin: 0 0 12px; }
-h3 { margin: 12px 0 8px; color: var(--muted); font-weight: 600; }
+h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
 .field { margin-bottom: 8px; }
 .field label { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .field input { width: 260px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%); color: var(--fg); }
