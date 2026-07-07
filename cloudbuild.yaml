@@ -28,7 +28,7 @@
 
 substitutions:
   _REGION: us-central1
-  _SERVICE: toolmeup
+  _SERVICE: ToolMeUp
   _REPO: toolmeup
 
 options:
