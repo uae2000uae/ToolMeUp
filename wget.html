@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" data-theme="light" class="compact">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wget Downloader — ToolMeUp</title>
+  <meta name="description" content="Fetch a URL with a custom method, headers and body, or mirror a same-origin static site to a ZIP — entirely in your browser.">
+  <meta name="theme-color" content="#2563eb">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Wget Downloader — ToolMeUp">
+  <meta property="og:description" content="Fetch a URL or mirror a same-origin static site to a ZIP, right from the browser.">
+  <meta property="og:image" content="web-app-icon-512.png">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">ToolMeUp • Wget Downloader</div>
+    <div class="header-controls" data-nav data-active="wget">
+      <label class="toggle">
+        <input type="checkbox" id="themeToggle">
+        <span>Dark</span>
+      </label>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Wget Downloader</h2>
+      <div class="grid two">
+        <div>
+          <div class="field"><label>URL<input id="wget_url" placeholder="https://example.com/"></label></div>
+          <div class="field">
+            <label>Method
+              <select id="wget_method">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+              </select>
+            </label>
+          </div>
+          <div class="field"><label>Filename (optional)<input id="wget_filename" placeholder="leave empty to auto-detect"></label></div>
+        </div>
+        <div>
+          <div class="field"><label>Headers (JSON object)<textarea id="wget_headers" rows="4" placeholder='{"Authorization":"Bearer ..."}'></textarea></label></div>
+          <div class="field"><label>Body (text)<textarea id="wget_body" rows="4" placeholder="Optional request body (single-file only)"></textarea></label></div>
+        </div>
+      </div>
+      <div class="grid three">
+        <div class="field"><label>Max depth<input id="wget_max_depth" type="number" min="0" step="1" value="2"></label></div>
+        <div class="field"><label>Max files<input id="wget_max_files" type="number" min="1" step="1" value="200"></label></div>
+        <div class="field"><label class="toggle"><input type="checkbox" id="wget_same_origin" checked> <span>Same origin only</span></label></div>
+      </div>
+      <div class="actions actions--wrap">
+        <div class="btn-row">
+          <button id="wget_download" type="button" class="primary">Download File</button>
+          <button id="wget_site_zip" type="button">Download Site as ZIP</button>
+        </div>
+        <progress id="wget_progress" max="100" value="0" class="wget-progress"></progress>
+        <span id="wget_status" class="hint"></span>
+      </div>
+      <div class="hint mt-6">
+        Note: Site ZIP works best for same-origin URLs and static content. CORS and login-protected resources cannot be mirrored from the browser.
+      </div>
+      <p class="disclaimer">
+        Only download content you own or have the right to access. Requests run from your browser using your network and any
+        credentials or headers you supply — you are responsible for how you use this tool and for complying with the target
+        site's terms of service and applicable law. Do not use it to access material you are not authorized to retrieve.
+      </p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script src="wget.js"></script>
+</body>
+</html>

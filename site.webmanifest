@@ -1,0 +1,14 @@
+{
+  "name": "ToolMeUp",
+  "short_name": "ToolMeUp",
+  "description": "A small collection of free, browser-based utilities.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f9fc",
+  "theme_color": "#2563eb",
+  "icons": [
+    { "src": "web-app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "web-app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
