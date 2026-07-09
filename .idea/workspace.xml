@@ -7,15 +7,7 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.0.1">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitment calculator.xlsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/CV98-20090-6550-31MB-1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/CV98-D22095-6550-24BM-1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/CV98B-22090-6550-24B-1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/hub_assembly.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
-    </list>
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.0" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -122,7 +114,7 @@
       <workItem from="1763490194471" duration="7000" />
       <workItem from="1765926938300" duration="5252000" />
       <workItem from="1767522051742" duration="30488000" />
-      <workItem from="1783625047171" duration="1372000" />
+      <workItem from="1783625047171" duration="1689000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -140,7 +132,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765932320578</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Version 1.1.0">
+      <option name="closed" value="true" />
+      <created>1783626566715</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1783626566715</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Version 1.1.0">
+      <option name="closed" value="true" />
+      <created>1783626594609</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1783626594609</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,6 +167,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Version 1.0.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.0.1" />
+    <MESSAGE value="Version 1.1.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.0" />
   </component>
 </project>
