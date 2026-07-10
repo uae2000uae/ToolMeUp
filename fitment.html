@@ -140,7 +140,13 @@
           <div class="caption">Cross-section side view (baseline vs selected)</div>
         </div>
         <div>
-          <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
+          <div class="canvas-wrap">
+            <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
+            <div class="canvas-controls">
+              <label class="cv-toggle cv-base"><input type="checkbox" id="rv_show_base" checked> Base</label>
+              <label class="cv-toggle cv-setup"><input type="checkbox" id="rv_show_setup" checked> Setup</label>
+            </div>
+          </div>
           <div class="caption">Wheel &amp; tire cross-section: inner/outer movement vs baseline</div>
         </div>
       </div>

@@ -502,10 +502,16 @@
 
     const y = c.height / 2; // overlay both rectangles vertically centered
 
+    // Hub image scale factor (keeps the rim's relative size vs the image)
+    const imgK = scale / rimOnlyScale;
+    // Spacer rectangle height: matches the hub flange in the image (~27% of image height),
+    // with a geometry-based fallback if the image is unavailable
+    const HUB_FLANGE_FRAC = 0.15;
+    const HUB_IMG_NATURAL_H = 630; // hub_assembly.png natural height, used before the image loads
+    const hubFlangeH = ((hubImgLoaded && hubImg.height) ? hubImg.height : HUB_IMG_NATURAL_H) * HUB_FLANGE_FRAC * imgK;
+
     // Draw hub assembly image centered at the hub face.
-    // Scaled by (scale / rimOnlyScale) so the rim keeps its relative size vs the image.
     if (hubImgLoaded && hubImg && hubImg.width && hubImg.height) {
-      const imgK = scale / rimOnlyScale;
       const targetW = hubImg.width * imgK;
       const targetH = hubImg.height * imgK;
       const xImg = hubFaceX - targetW / 2;
@@ -527,6 +533,28 @@
     function drawWheelRect(set, color) {
       const innerMm = set.wheelGeom.backspacingMm;
       const outerMm = set.wheelGeom.frontspacingMm;
+
+      // Spacer: rectangle from the hub face outward, plus a gray anchor line
+      // at the new (pushed-out) mounting face
+      const spacerMmVal = set.spacerMm || 0;
+      if (spacerMmVal > 0) {
+        const spacerPx = spacerMmVal * scale;
+        const rectH = Math.min(hubFlangeH, c.height - marginY * 2);
+        ctx.fillStyle = color + '55';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(hubFaceX, y - rectH / 2, spacerPx, rectH);
+        ctx.fill();
+        ctx.stroke();
+        // New mounting-face anchor line (gray, like the hub line)
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(hubFaceX + spacerPx, marginY);
+        ctx.lineTo(hubFaceX + spacerPx, c.height - marginY);
+        ctx.stroke();
+      }
 
       // Rim rectangle anchored at the hub face (backspacing/frontspacing placement)
       const rimLeftX = hubFaceX - innerMm * scale;
@@ -623,9 +651,11 @@
     ctx.lineTo(hubFaceX, c.height - marginY);
     ctx.stroke();
 
-    // Draw baseline then selected on top (overlay)
-    drawWheelRect(base, '#4aa3ff');
-    drawWheelRect(selected, '#22c55e');
+    // Draw baseline then selected on top (overlay), honoring visibility toggles
+    const showBase = document.getElementById('rv_show_base')?.checked ?? true;
+    const showSetup = document.getElementById('rv_show_setup')?.checked ?? true;
+    if (showBase) drawWheelRect(base, '#4aa3ff');
+    if (showSetup) drawWheelRect(selected, '#22c55e');
 
     // Draw current clearance lines vs fixed vehicle references (if baseline clearances provided)
     let xStrutLabel = null;
@@ -931,6 +961,13 @@
     unitSel.addEventListener('change', renderAll);
   }
 
+  // RimView base/setup visibility toggles
+  function initRimViewToggles() {
+    ['rv_show_base', 'rv_show_setup'].forEach(id => {
+      document.getElementById(id)?.addEventListener('change', renderAll);
+    });
+  }
+
   // Preset handling
   function initPresets() {
     const sel = $("#presetSelect");
@@ -1193,6 +1230,7 @@
     const hasFitment = !!document.getElementById('base');
     if (hasFitment) {
       initUnits();
+      initRimViewToggles();
       initPresets();
       initBaseline();
       initSetups();
