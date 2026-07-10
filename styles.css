@@ -12,10 +12,10 @@
 }
 
 html[data-theme="light"] {
-  --bg: #f7f9fc;
+  --bg: #f3f5fa;
   --fg: #0e1521;
   --muted: #44769a;
-  --panel: #dfdfdf;
+  --panel: #ffffff;
   --accent: #b45309;
   --accent-2: #16a34a;
   --warn: #b45309;
