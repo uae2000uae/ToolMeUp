@@ -34,7 +34,8 @@
 
   <main class="container">
     <div class="actions">
-	   <button id="loadSessionBtn" type="button">Load Session</button>
+	   <button id="loadSessionBtn" type="button" class="primary">Load Session</button>
+	   <button id="resetFieldsBtn" type="button">Reset All Fields</button>
     </div>
 	  <br>
     <section id="base" class="panel">
@@ -46,7 +47,7 @@
           <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
           <option value="265/35R19">265/35R19 on 19x9 ET35</option>
         </select>
-        <button id="oemPresetBtn" type="button" title="Load factory wheel/tire specs from the OEM database">OEM Presets…</button>
+        <button id="oemPresetBtn" type="button" class="primary" title="Load factory wheel/tire specs from the OEM database">OEM Presets…</button>
       </div>
       <div class="grid two">
         <div>
@@ -74,9 +75,12 @@
         </div>
         <div>
           <h3>Tire</h3>
-          <div class="field"><label>Tire size<input id="base_tire" placeholder="e.g., 225/45R17 or 31x10.5R15"></label></div>
-          <div class="field"><label>Brand width correction (%)<input id="base_correction" type="number" step="1" placeholder="%"></label></div>
-			 <div class="hint">Some tire typs run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
+          <div class="field"><label>Tire size<span class="tire-wrap" ><input id="base_tire" placeholder="e.g., 235/45" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label></div>
+          <div class="field"><label>Width correction (%)
+          <input id="base_correction" type="number" step="1" min="-20" max="20" placeholder="%"></label></div>
+			 <div class="hint">Some tire types run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
+          <div class="field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="20" value="10"></label></div>
+			 <div class="hint">Sidewall bulge past the rim edge, shown in the drawing. 10% is typical.</div>
         </div>
 </div>
       <details class="advanced">
@@ -90,7 +94,7 @@
         </div>
         <div>
           <h3>Speedometer</h3>
-          <div class="field"><label>Baseline speedo error (%)<input id="base_speedo_error" type="number" step="1" value="5"></label></div>
+          <div class="field"><label>Baseline speedo error (%)<input id="base_speedo_error" type="number" placeholder="%" step="1"></label></div>
           <div class="hint">The majority of OEM installations will make speedometer give you faster reading than GPS or Radar speed. This calculator helps provide insight about what the reading is going to be using the new fitment. <br><br>
           As per your settings, <div class="hint-bold" id="base_speedo_hint">When GPS speed is 100 km/h, Speedometer reads 100 km/h</div></div>
         </div>
@@ -116,7 +120,7 @@
       <h2>2) Compare Setups</h2>
       <div id="setups"></div>
       <div class="actions">
-        <button id="addSetup" type="button">+ Add Setup</button>
+        <button id="addSetup" type="button" class="green">+ Add Setup</button>
         <button id="saveBaseline" type="button" class="primary">Apply</button>
       </div>
     </section>
@@ -126,7 +130,7 @@
       <div class="actions actions--between">
         <div id="setupTabs" class="tabs"></div>
         <div>
-          <button id="saveSessionBtn" type="button">Save Session</button>
+          <button id="saveSessionBtn" type="button" class="primary">Save Session</button>
         </div>
       </div>
       <div id="alerts" class="alerts"></div>
@@ -137,7 +141,7 @@
         </div>
         <div>
           <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
-          <div class="caption">Top-down inner/outer movement vs baseline</div>
+          <div class="caption">Wheel &amp; tire cross-section: inner/outer movement vs baseline</div>
         </div>
       </div>
 

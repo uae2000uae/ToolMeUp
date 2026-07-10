@@ -31,10 +31,12 @@
   hubImg.onerror = function () { hubImgLoaded = false; };
   hubImg.src = HUB_IMG_SRC;
 
-  // Parse tire sizes: metric (e.g., 225/45R17, 225/45-17) and flotation (31x10.5R15, 33x12.50-20)
-  function parseTireSize(raw) {
+  // Parse tire sizes: metric (e.g., 225/45R17, 225/45-17) and flotation (31x10.5R15, 33x12.50-20).
+  // Partial sizes without the rim value (e.g., 235/45 or 31x10.5) take R from rimDiamIn (the wheel's rim diameter input).
+  function parseTireSize(raw, rimDiamIn) {
     if (!raw) return null;
     const s = String(raw).trim().toUpperCase().replace(/\s+/g, "");
+    const hasRim = rimDiamIn != null && !isNaN(rimDiamIn) && rimDiamIn > 0;
 
     // Metric: 225/45R17 or 225/45-17
     let m = s.match(/^(\d{3})\/(\d{2,3})(?:R|\-)?(\d{2})$/);
@@ -45,6 +47,14 @@
       return { type: 'metric', sw_mm, ar, rim_in };
     }
 
+    // Partial metric: 235/45 (rim diameter from wheel input)
+    m = s.match(/^(\d{3})\/(\d{2,3})(?:R|\-)?$/);
+    if (m && hasRim) {
+      const sw_mm = parseInt(m[1], 10);
+      const ar = parseInt(m[2], 10);
+      return { type: 'metric', sw_mm, ar, rim_in: rimDiamIn };
+    }
+
     // Flotation: 31x10.5R15, 31X10.5-15, 35X12.50R20
     m = s.match(/^(\d{2,3}(?:\.\d)?)X(\d{1,2}(?:\.\d{1,2})?)(?:R|\-)?(\d{2})$/);
     if (m) {
@@ -52,6 +62,14 @@
       const sec_in = parseFloat(m[2]); // section width inches
       const rim_in = parseInt(m[3], 10);
       return { type: 'flotation', od_in, sec_in, rim_in };
+    }
+
+    // Partial flotation: 31x10.5 (rim diameter from wheel input)
+    m = s.match(/^(\d{2,3}(?:\.\d)?)X(\d{1,2}(?:\.\d{1,2})?)(?:R|\-)?$/);
+    if (m && hasRim) {
+      const od_in = parseFloat(m[1]);
+      const sec_in = parseFloat(m[2]);
+      return { type: 'flotation', od_in, sec_in, rim_in: rimDiamIn };
     }
 
     return null; // unsupported
@@ -142,9 +160,12 @@
     const rimWidthIn = parseFloat($(`#${prefixRoot}_rim_width`).value);
     const etMm = parseFloat($(`#${prefixRoot}_offset`).value);
     const spacerMm = parseFloat($(`#${prefixRoot}_spacer`).value) || 0;
-    const correction = parseFloat($(`#${prefixRoot}_correction`)?.value || '0') || 0;
+    const correction = clamp(parseFloat($(`#${prefixRoot}_correction`)?.value || '0') || 0, -20, 20);
+    let bulgePct = parseFloat($(`#${prefixRoot}_bulge`)?.value);
+    if (isNaN(bulgePct)) bulgePct = 5;
+    bulgePct = clamp(bulgePct, 0, 20);
 
-    const tireParsed = parseTireSize(tireStr);
+    const tireParsed = parseTireSize(tireStr, rimDiamIn);
     const tireGeom = tireGeometry(tireParsed, correction, rimWidthIn);
     const wheelGeom = wheelGeometry2(rimWidthIn, etMm, spacerMm);
     const diamError = diameterMismatch(tireParsed, rimDiamIn);
@@ -157,6 +178,7 @@
       etMm,
       spacerMm,
       correction,
+      bulgePct,
       tireParsed,
       tireGeom,
       wheelGeom,
@@ -276,7 +298,7 @@
       const speedo = `${(-cmp.speedoErrPct).toFixed(2)} %`;
 
       rows.push([
-        s.tireStr || '-', od, sw, sidewall, circ, revsMi.toFixed(0),
+        tireLabel(s) || '-', od, sw, sidewall, circ, revsMi.toFixed(0),
         wheelW, `${(s.etMm ?? 0).toFixed(0)} mm`, backspacing, poke,
         rideH, `${innerD} ${innerBadge}`, `${outerD} ${outerBadge}`, speedo
       ]);
@@ -333,17 +355,87 @@
     const maxDia = Math.max(base.tireGeom.overallDiaMm, selected.tireGeom.overallDiaMm);
     const scale = (c.height - margin * 2) / maxDia;
 
+    // Vector wheel side profile (line-art style: treaded tire + spoked rim)
     function drawTire(set, x, color) {
       const r = (set.tireGeom.overallDiaMm / 2) * scale;
       const rimR = (set.tireGeom.rim_in * MM_PER_IN / 2) * scale;
       const cx = x, cy = c.height - margin - r;
-      // tire circle
-      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.stroke();
-      // rim
-      ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
-      // ground line
-      ctx.strokeStyle = '#888'; ctx.beginPath(); ctx.moveTo(margin, c.height - margin); ctx.lineTo(c.width - margin, c.height - margin); ctx.stroke();
+
+      ctx.strokeStyle = color;
+
+      // --- Tire ---
+      // Outer circle
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.stroke();
+
+      // Tread hatch ticks around the outer edge
+      const tickLen = Math.max(3, (r - rimR) * 0.3);
+      const ticks = 72;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < ticks; i++) {
+        const a = (i / ticks) * 2 * PI;
+        const ca = Math.cos(a), sa = Math.sin(a);
+        ctx.beginPath();
+        ctx.moveTo(cx + ca * r, cy + sa * r);
+        ctx.lineTo(cx + ca * (r - tickLen), cy + sa * (r - tickLen));
+        ctx.stroke();
+      }
+      // Inner tread circle
+      ctx.beginPath(); ctx.arc(cx, cy, r - tickLen, 0, 2 * PI); ctx.stroke();
+
+      // --- Rim ---
+      const lipR = rimR * 0.92;                 // rim lip (spoke outer end)
+      const hubR = Math.max(6, rimR * 0.28);    // hub plate
+
+      // Rim outer edge (tire bead)
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
+      // Rim lip
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, lipR, 0, 2 * PI); ctx.stroke();
+
+      // Spokes (thin double-line spokes)
+      const spokes = 9;
+      const dHub = 0.28; // half-angle at hub (rad)
+      const dRim = 0.10; // half-angle at rim lip (rad)
+      for (let i = 0; i < spokes; i++) {
+        const a = (i / spokes) * 2 * PI - PI / 2;
+        for (const s of [-1, 1]) {
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(a + s * dHub) * hubR, cy + Math.sin(a + s * dHub) * hubR);
+          ctx.lineTo(cx + Math.cos(a + s * dRim) * lipR, cy + Math.sin(a + s * dRim) * lipR);
+          ctx.stroke();
+        }
+      }
+
+      // Hub plate, lug holes and center bore
+      ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, 2 * PI); ctx.stroke();
+      const lugCircleR = hubR * 0.62;
+      const lugHoleR = Math.max(1.5, hubR * 0.14);
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * 2 * PI - PI / 2;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * lugCircleR, cy + Math.sin(a) * lugCircleR, lugHoleR, 0, 2 * PI);
+        ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(cx, cy, Math.max(2, hubR * 0.22), 0, 2 * PI); ctx.stroke();
+
+      // Valve stem at the bottom of the rim lip
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + lipR);
+      ctx.lineTo(cx, cy + lipR - Math.max(4, rimR * 0.06));
+      ctx.stroke();
+      ctx.lineWidth = 1;
     }
+
+    // Ground line
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(margin, c.height - margin);
+    ctx.lineTo(c.width - margin, c.height - margin);
+    ctx.stroke();
 
     drawTire(base, c.width * 0.33, '#4aa3ff');
     drawTire(selected, c.width * 0.66, '#22c55e');
@@ -357,6 +449,11 @@
 
     const marginX = 40;
     const marginY = 24;
+    // Per-setup tire bulge as fraction of section width (input %, default 5, max 20)
+    function bulgeFrac(set) {
+      const p = (set.bulgePct != null && !isNaN(set.bulgePct)) ? set.bulgePct : 5;
+      return clamp(p, 0, 20) / 100;
+    }
 
     // Helper to get rim diameter in mm (prefer explicit wheel input)
     function rimMm(set) {
@@ -379,10 +476,22 @@
     const selWidthMm = wheelWidthMm(selected);
     const maxWidthMm = Math.max(baseWidthMm, selWidthMm, 1);
 
+    // Tire extents (fall back to rim/wheel when tire geometry is missing)
+    function tireODMm(set) { return set.tireGeom?.overallDiaMm || rimMm(set); }
+    function tireWMm(set) { return set.tireGeom?.sectionWidthMm || wheelWidthMm(set); }
+    function tireWWithBulgeMm(set) { return tireWMm(set) * (1 + 2 * bulgeFrac(set)); }
+    const maxTireODMm = Math.max(tireODMm(base), tireODMm(selected), maxRimMm);
+    const maxTireWMm = Math.max(tireWWithBulgeMm(base), tireWWithBulgeMm(selected), maxWidthMm);
+
     // Use a single uniform mm->px scale so width and height are in the same units visually
     const headroom = 1.05; // small headroom to avoid clipping
-    const scaleX = (c.width - marginX * 2) / (maxWidthMm * headroom);
-    const scaleY = (c.height - marginY * 2) / (maxRimMm * headroom);
+    // Legacy rim-only scale: preserves the rim's relative size vs the hub image
+    const rimScaleX = (c.width - marginX * 2) / (maxWidthMm * headroom);
+    const rimScaleY = (c.height - marginY * 2) / (maxRimMm * headroom);
+    const rimOnlyScale = Math.min(rimScaleX, rimScaleY);
+    // Full scale including tire so the whole drawing stays inside the canvas
+    const scaleX = (c.width - marginX * 2) / (maxTireWMm * headroom);
+    const scaleY = (c.height - marginY * 2) / (maxTireODMm * headroom);
     const scale = Math.min(scaleX, scaleY);
 
     const minPxH = 8; // ensure visibility for very small diameters
@@ -393,10 +502,12 @@
 
     const y = c.height / 2; // overlay both rectangles vertically centered
 
-    // Draw hub assembly image at its original pixel size, centered at the hub face
+    // Draw hub assembly image centered at the hub face.
+    // Scaled by (scale / rimOnlyScale) so the rim keeps its relative size vs the image.
     if (hubImgLoaded && hubImg && hubImg.width && hubImg.height) {
-      const targetW = hubImg.width;
-      const targetH = hubImg.height;
+      const imgK = scale / rimOnlyScale;
+      const targetW = hubImg.width * imgK;
+      const targetH = hubImg.height * imgK;
       const xImg = hubFaceX - targetW / 2;
       const yImg = y - targetH / 2;
       ctx.save();
@@ -416,22 +527,92 @@
     function drawWheelRect(set, color) {
       const innerMm = set.wheelGeom.backspacingMm;
       const outerMm = set.wheelGeom.frontspacingMm;
-      const rectX = hubFaceX - innerMm * scale;
-      const rectW = (innerMm + outerMm) * scale; // true wheel width in px
+
+      // Rim rectangle anchored at the hub face (backspacing/frontspacing placement)
+      const rimLeftX = hubFaceX - innerMm * scale;
+      const rimWidthPx = (innerMm + outerMm) * scale; // true wheel width in px
+      const rimRightX = rimLeftX + rimWidthPx;
 
       const rimDiamMm = rimMm(set) || maxRimMm;
-      let rectH = rimDiamMm * scale; // height equals wheel (rim) diameter in px
-      if (rectH < minPxH) rectH = minPxH;
+      let rimDiamPx = rimDiamMm * scale; // height equals wheel (rim) diameter in px
+      if (rimDiamPx < minPxH) rimDiamPx = minPxH;
+      const rimTopY = y - rimDiamPx / 2;
+      const rimBottomY = y + rimDiamPx / 2;
 
-      // wheel rectangle (standing tall)
-      ctx.fillStyle = color + '33';
+      // Draw rim
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
+      ctx.strokeRect(rimLeftX, rimTopY, rimWidthPx, rimDiamPx);
+
+      // Tire profile (requires tire geometry)
+      if (!set.tireGeom) return;
+
+      const tireWidthPx = set.tireGeom.sectionWidthMm * scale;
+      const sidewallPx = set.tireGeom.sidewallMm * scale;
+      const bulgePx = set.tireGeom.sectionWidthMm * bulgeFrac(set) * scale;
+
+      const tireCenterX = (rimLeftX + rimRightX) / 2;
+      const tireLeftX = tireCenterX - tireWidthPx / 2;
+      const tireRightX = tireCenterX + tireWidthPx / 2;
+
+      const tireTopY = rimTopY - sidewallPx;
+      const tireBottomY = rimBottomY + sidewallPx;
+
+      // Draw tire top line
       ctx.beginPath();
-      ctx.rect(rectX, y - rectH / 2, rectW, rectH);
-      ctx.fill();
+      ctx.moveTo(tireLeftX, tireTopY);
+      ctx.lineTo(tireRightX, tireTopY);
       ctx.stroke();
 
+      // Top left C-curve
+      ctx.beginPath();
+      ctx.moveTo(tireLeftX, tireTopY);
+      ctx.quadraticCurveTo(
+        tireLeftX - bulgePx,
+        rimTopY - sidewallPx / 2,
+        rimLeftX,
+        rimTopY
+      );
+      ctx.stroke();
+
+      // Top right C-curve
+      ctx.beginPath();
+      ctx.moveTo(tireRightX, tireTopY);
+      ctx.quadraticCurveTo(
+        tireRightX + bulgePx,
+        rimTopY - sidewallPx / 2,
+        rimRightX,
+        rimTopY
+      );
+      ctx.stroke();
+
+      // Draw tire bottom line
+      ctx.beginPath();
+      ctx.moveTo(tireLeftX, tireBottomY);
+      ctx.lineTo(tireRightX, tireBottomY);
+      ctx.stroke();
+
+      // Bottom left C-curve
+      ctx.beginPath();
+      ctx.moveTo(rimLeftX, rimBottomY);
+      ctx.quadraticCurveTo(
+        tireLeftX - bulgePx,
+        rimBottomY + sidewallPx / 2,
+        tireLeftX,
+        tireBottomY
+      );
+      ctx.stroke();
+
+      // Bottom right C-curve
+      ctx.beginPath();
+      ctx.moveTo(rimRightX, rimBottomY);
+      ctx.quadraticCurveTo(
+        tireRightX + bulgePx,
+        rimBottomY + sidewallPx / 2,
+        tireRightX,
+        tireBottomY
+      );
+      ctx.stroke();
     }
 
     // Draw hub face reference line (parallel to wheel height)
@@ -547,14 +728,15 @@
       <h4>Setup ${idx}</h4>
       <div class="grid two">
         <div>
-          <div class="field"><label>Tire size<input id="${id}_tire" placeholder="e.g., 225/40R18"></label></div>
-          <div class="field"><label>Brand width correction (%)<input id="${id}_correction" type="number" step="0.1" value="0"></label></div>
+          <div class="field"><label>Rim diameter<input id="${id}_rim_diam" type="number" step="1" placeholder="in"></label></div>
+          <div class="field"><label>Rim width<input id="${id}_rim_width" type="number" step="1" placeholder="in"></label></div>
+          <div class="field"><label>Offset ET<input id="${id}_offset" type="number" step="1" placeholder="mm"></label></div>
+          <div class="field"><label>Spacer<input id="${id}_spacer" type="number" step="1" placeholder="mm"></label></div>
         </div>
         <div>
-          <div class="field"><label>Rim diameter<input id="${id}_rim_diam" type="number" step="0.1" placeholder="in"></label></div>
-          <div class="field"><label>Rim width<input id="${id}_rim_width" type="number" step="0.1" placeholder="in"></label></div>
-          <div class="field"><label>Offset ET<input id="${id}_offset" type="number" step="1" placeholder="mm"></label></div>
-          <div class="field"><label>Spacer<input id="${id}_spacer" type="number" step="0.1" value="0" placeholder="mm"></label></div>
+          <div class="field"><label>Tire size<span class="tire-wrap"><input id="${id}_tire" maxlength="6" placeholder="e.g., 235/45"><span class="tire-suffix" id="${id}_tire_suffix">R—</span></span></label></div>
+          <div class="field"><label>Width correction (%)<input id="${id}_correction" type="number" placeholder="%" step="1" min="-20" max="20"></label></div>
+          <div class="field"><label>Bulge (%)<input id="${id}_bulge" type="number" placeholder="%" step="1" min="0" max="20" value="10"></label></div>
         </div>
       </div>
       <div class="actions"><button class="remove" type="button">Remove</button></div>
@@ -563,6 +745,15 @@
       wrap.remove();
       renderAll();
     });
+    // Keep the R-suffix in the tire box synced with this card's rim diameter
+    const rimInp = wrap.querySelector(`#${id}_rim_diam`);
+    const suffixEl = wrap.querySelector(`#${id}_tire_suffix`);
+    const updSuffix = () => {
+      const v = parseFloat(rimInp.value);
+      suffixEl.textContent = (!isNaN(v) && v > 0) ? `R${v}` : 'R—';
+    };
+    rimInp.addEventListener('input', updSuffix);
+    updSuffix();
     $$('#setups .field input', wrap).forEach(inp => inp.addEventListener('input', debounce(renderAll, 50)));
     return wrap;
   }
@@ -656,6 +847,17 @@
     wrap.innerHTML = alerts.map(a => `<div class="alert ${a.cls}">${a.text}</div>`).join('');
   }
 
+  // Full tire size label: appends R{rim} from the wheel's rim diameter when the typed size is partial
+  function tireLabel(s) {
+    const str = (s.tireStr || '').trim();
+    if (!str) return s.id;
+    const rim = s.tireParsed?.rim_in;
+    if (rim != null && !/(?:R|-)\s*\d{2}(?:\.\d+)?$/i.test(str)) {
+      return `${str.replace(/(?:R|-)$/i, '')}R${rim}`;
+    }
+    return str;
+  }
+
   function renderTabs(setups) {
     const tabsWrap = document.getElementById('setupTabs');
     if (!tabsWrap) return;
@@ -670,7 +872,7 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'tab' + (s.id === selectedSetupId ? ' active' : '');
-      btn.textContent = s.tireStr || s.id;
+      btn.textContent = tireLabel(s);
       btn.dataset.id = s.id;
       btn.addEventListener('click', () => {
         selectedSetupId = s.id;
@@ -682,6 +884,7 @@
 
   function renderAll() {
     const unitMode = $("#unitToggle").value;
+    updateTireSuffixes();
     const all = getSetups();
     const invalids = all.filter(s => s.diamMismatch);
     const setups = all.filter(s => !s.diamMismatch && s.tireGeom && s.wheelGeom);
@@ -742,6 +945,16 @@
     });
   }
 
+  // Sync all tire-box R-suffixes with their rim diameter inputs
+  // (covers programmatic changes: presets, session load)
+  function updateTireSuffixes() {
+    $$('.tire-suffix').forEach(span => {
+      const prefix = span.id.replace('_tire_suffix', '');
+      const v = parseFloat(document.getElementById(`${prefix}_rim_diam`)?.value);
+      span.textContent = (!isNaN(v) && v > 0) ? `R${v}` : 'R—';
+    });
+  }
+
   // Update dynamic hint for baseline speedometer error
   function updateSpeedoHint() {
     const el = document.getElementById('base_speedo_hint');
@@ -768,8 +981,12 @@
     // Keep speedo hint in sync while typing
     const sp = document.getElementById('base_speedo_error');
     if (sp) sp.addEventListener('input', updateSpeedoHint);
-    // Initialize hint on load
+    // Keep baseline tire R-suffix in sync while typing rim diameter
+    const rd = document.getElementById('base_rim_diam');
+    if (rd) rd.addEventListener('input', updateTireSuffixes);
+    // Initialize hints on load
     updateSpeedoHint();
+    updateTireSuffixes();
   }
 
   // Add setups
@@ -798,6 +1015,7 @@
     const base = {
       tire: $('#base_tire').value,
       correction: parseFloat($('#base_correction').value || '0') || 0,
+      bulge: $('#base_bulge')?.value ?? '5',
       rim_diam: $('#base_rim_diam').value,
       rim_width: $('#base_rim_width').value,
       offset: $('#base_offset').value,
@@ -816,6 +1034,7 @@
       setups.push({
         tire: get('input[id$="_tire"]'),
         correction: get('input[id$="_correction"]'),
+        bulge: get('input[id$="_bulge"]'),
         rim_diam: get('input[id$="_rim_diam"]'),
         rim_width: get('input[id$="_rim_width"]'),
         offset: get('input[id$="_offset"]'),
@@ -837,6 +1056,7 @@
     if (sess.base) {
       $('#base_tire').value = sess.base.tire || '';
       $('#base_correction').value = sess.base.correction ?? 0;
+      if ($('#base_bulge')) $('#base_bulge').value = (sess.base.bulge === '' || sess.base.bulge == null) ? 5 : sess.base.bulge;
       $('#base_rim_diam').value = sess.base.rim_diam || '';
       $('#base_rim_width').value = sess.base.rim_width || '';
       $('#base_offset').value = sess.base.offset || '';
@@ -867,6 +1087,7 @@
       };
       set('tire', s.tire);
       set('correction', s.correction);
+      set('bulge', (s.bulge === '' || s.bulge == null) ? 5 : s.bulge);
       set('rim_diam', s.rim_diam);
       set('rim_width', s.rim_width);
       set('offset', s.offset);
@@ -928,11 +1149,37 @@
     } catch (_) { /* ignore parse errors */ }
   }
 
+  // Reset all fields: clear text boxes, restore HTML defaults, remove setups
+  function resetAllFields() {
+    if (!confirm('Reset all fields to their defaults?')) return;
+    // Remove all setup cards
+    const setupsWrap = document.getElementById('setups');
+    if (setupsWrap) setupsWrap.innerHTML = '';
+    // Restore every baseline-panel input to its HTML default value
+    $$('#base input').forEach(inp => {
+      if (inp.type === 'checkbox') return;
+      inp.value = inp.defaultValue;
+    });
+    // Speedometer error intentionally has no default value
+    const spd = document.getElementById('base_speedo_error');
+    if (spd) spd.value = '';
+    const preset = document.getElementById('presetSelect');
+    if (preset) preset.selectedIndex = 0;
+    // Clear computed state and autosave
+    baseline = null;
+    selectedSetupId = null;
+    try { localStorage.removeItem(AUTO_KEY); } catch (_) { /* ignore */ }
+    updateSpeedoHint();
+    renderAll();
+  }
+
   function initSessionIO() {
     const saveBtn = document.getElementById('saveSessionBtn');
     const loadBtn = document.getElementById('loadSessionBtn');
+    const resetBtn = document.getElementById('resetFieldsBtn');
     if (saveBtn) saveBtn.addEventListener('click', saveSession);
     if (loadBtn) loadBtn.addEventListener('click', loadSession);
+    if (resetBtn) resetBtn.addEventListener('click', resetAllFields);
   }
 
   // Utilities
