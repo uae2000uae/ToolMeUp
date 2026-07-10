@@ -7,11 +7,7 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.0">
-      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.1">
       <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,7 +138,7 @@
       <workItem from="1783625047171" duration="9793000" />
       <workItem from="1783637590356" duration="42000" />
       <workItem from="1783637644751" duration="14000" />
-      <workItem from="1783637671307" duration="4880000" />
+      <workItem from="1783637671307" duration="5316000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -184,7 +180,23 @@
       <option name="project" value="LOCAL" />
       <updated>1783626766367</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Version 1.1.1">
+      <option name="closed" value="true" />
+      <created>1783643433858</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1783643433858</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Version 1.1.1">
+      <option name="closed" value="true" />
+      <created>1783643586170</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1783643586170</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -204,6 +216,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Version 1.0.1" />
     <MESSAGE value="Version 1.1.0" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.0" />
+    <MESSAGE value="Version 1.1.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.1" />
   </component>
 </project>
