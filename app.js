@@ -262,86 +262,142 @@
     return `<span class="badge ${cls}">${label}</span>`;
   }
 
-  // Build comparison table
+  // Structured fitment report (per "Report AI Guide") — one column per setup
   function renderComparison(base, setups, unitMode) {
     const wrap = $("#comparison");
     if (!base?.tireGeom) { wrap.innerHTML = '<div class="small">Enter and save a valid baseline to view results.</div>'; return; }
-    if (setups.length === 0) { wrap.innerHTML = '<div class="small">Add setups to compare.</div>'; return; }
+    const valid = (setups || []).filter(s => s.tireGeom && s.wheelGeom);
+    if (!valid.length) { wrap.innerHTML = '<div class="small">Add setups to compare.</div>'; return; }
+    // Baseline as first column, then each setup
+    const allSets = [base, ...valid];
+    const cols = allSets.map(s => ({ s, cmp: compareSetups(base, s), checks: clearanceChecks(base, s, { inner: 3, outer: 3 }) }));
 
-    const headers = [
-      'Setup', 'OD', 'SW', 'Sidewall', 'Circ', 'Revs/mi',
-      'Wheel W', 'ET', 'Backspacing', 'Poke',
-      'Ride H Δ', 'Inner Δ', 'Outer Δ', 'Speedo Δ'
-    ];
+    // Main header row on top (outside the section tables)
+    const headCells = allSets.map((s, i) => {
+      const name = i === 0 ? 'Baseline' : `Setup ${i}`;
+      return `<th>${name}<div class="report-col-sub">${tireLabel(s)}</div></th>`;
+    }).join('');
+    const headHtml = `<div class="report-head-wrap"><table class="report-table"><thead><tr><th></th>${headCells}</tr></thead></table></div>`;
 
-    const rows = [];
-    for (const s of setups) {
-      if (!s.tireGeom || !s.wheelGeom) continue;
-      const cmp = compareSetups(base, s);
-      const revsMi = s.tireGeom.revsPerMile;
-      const checks = clearanceChecks(base, s, { inner: 3, outer: 3 });
+    // Color the value instead of showing PASS/WARN text
+    const mark = (valueHtml, pass) => `<span class="${pass ? 'val-good' : 'val-bad'}">${valueHtml}</span>`;
+    const sign = (n, unit, digits = 1) => `${n >= 0 ? '+' : ''}${n.toFixed(digits)}${unit}`;
 
-      let innerBadge = '', outerBadge = '';
-      if (checks.inner) innerBadge = badge(checks.inner.pass ? 'PASS' : 'WARN', checks.inner.pass ? 'good' : 'bad');
-      if (checks.outer) outerBadge = badge(checks.outer.pass ? 'PASS' : 'WARN', checks.outer.pass ? 'good' : 'bad');
-
-      const od = displayLengthSmart(s.tireGeom.overallDiaMm, unitMode, 'in');
-      const sw = displayLengthSmart(s.tireGeom.sectionWidthMm, unitMode, 'mm');
-      const sidewall = displayLengthSmart(s.tireGeom.sidewallMm, unitMode, 'mm');
-      const circ = displayLengthSmart(s.tireGeom.circumferenceMm, unitMode, 'mm');
-      const backspacing = displayLengthSmart(s.wheelGeom.backspacingMm, unitMode, 'in');
-      const poke = displayLengthSmart(s.wheelGeom.frontspacingMm, unitMode, 'in');
-      const wheelW = displayLengthSmart(inToMm(s.rimWidthIn), unitMode, 'in');
-      const rideH = displayDeltaSmart(cmp.rideHeightDeltaMm, unitMode, 'mm');
-      const innerD = displayDeltaSmart(cmp.innerMoveMm, unitMode, 'mm');
-      const outerD = displayDeltaSmart(cmp.outerMoveMm, unitMode, 'mm');
-      const speedo = `${(-cmp.speedoErrPct).toFixed(2)} %`;
-
-      rows.push([
-        tireLabel(s) || '-', od, sw, sidewall, circ, revsMi.toFixed(0),
-        wheelW, `${(s.etMm ?? 0).toFixed(0)} mm`, backspacing, poke,
-        rideH, `${innerD} ${innerBadge}`, `${outerD} ${outerBadge}`, speedo
-      ]);
+    // defs: [label, desc, (col) => cellHtml | null]
+    function sectionTable(defs) {
+      let html = '<table class="report-table"><tbody>';
+      for (const [label, desc, fn] of defs) {
+        const cells = cols.map(fn);
+        if (cells.every(v => v == null)) continue; // hide rows with no data at all
+        html += `<tr><td class="report-label">${label}<div class="report-desc">${desc}</div></td>`
+          + cells.map(v => `<td class="report-value">${v ?? ''}</td>`).join('')
+          + '</tr>';
+      }
+      return html + '</tbody></table>';
     }
 
-    let html = '<table class="table"><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
-    for (const r of rows) html += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>';
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
+    // --- Fitment Differences (not collapsible) ---
+    const diffDefs = [
+      ['Ride Height Change', 'How much the vehicle height changes due to tire diameter difference',
+        c => displayDeltaSmart(c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
+      ['Wheel Arch Clearance Change', 'Change in clearance of the tire to the wheel arch',
+        c => displayDeltaSmart(-c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
+      ['Inner Clearance Change', 'Change in clearance toward suspension',
+        c => {
+          if (c.cmp.innerMoveMm == null) return null;
+          const v = displayDeltaSmart(-c.cmp.innerMoveMm, unitMode, 'mm');
+          return c.checks.inner ? mark(v, c.checks.inner.pass) : v;
+        }],
+      ['Outer Clearance Change', 'Change in clearance toward fender',
+        c => {
+          if (c.cmp.outerMoveMm == null) return null;
+          const v = displayDeltaSmart(-c.cmp.outerMoveMm, unitMode, 'mm');
+          return c.checks.outer ? mark(v, c.checks.outer.pass) : v;
+        }],
+      ['Final Outer Clearance', 'Clearance from the fender. Positive = out of fender line',
+        c => {
+          if (!c.checks.outer) return null;
+          const f = -c.checks.outer.value; // positive = out of fender line (warning)
+          return mark(displayDeltaSmart(f, unitMode, 'mm'), f <= 0);
+        }],
+      ['Speedometer Error Change', 'Difference in speedometer reading due to tire circumference change',
+        c => sign(-c.cmp.speedoErrPct, ' %')],
+      ['Final Speedometer Error', 'Speedometer reading error. Negative = reads slower than actual',
+        c => {
+          const f = -c.cmp.speedoErrPct + (base.baseSpeedoError || 0);
+          return mark(sign(f, ' %'), f >= 0);
+        }]
+    ];
+
+    // --- Wheel Geometry (collapsible) ---
+    const wheelDefs = [
+      ['Wheel Width', 'Rim width', c => displayLengthSmart(inToMm(c.s.rimWidthIn), unitMode, 'in')],
+      ['Wheel Diameter', 'Rim diameter', c => displayLengthSmart(inToMm(c.s.rimDiamIn), unitMode, 'in')],
+      ['Offset', 'Distance from wheel centerline to mounting face. Positive = wheel sits further inward',
+        c => displayLengthSmart(c.s.etMm, unitMode, 'mm')],
+      ['Backspacing', 'Distance from hub mounting face to inner wheel lip',
+        c => displayLengthSmart(c.s.wheelGeom.backspacingMm, unitMode, 'mm')],
+      ['Poke', 'How far the wheel sticks outward past the mounting face',
+        c => displayLengthSmart(c.s.wheelGeom.frontspacingMm, unitMode, 'mm')]
+    ];
+
+    // --- Tire Geometry (collapsible) ---
+    const revsDesc = (unitMode === 'imperial') ? 'How many times the tire rotates per mile' : 'How many times the tire rotates per km';
+    const tireDefs = [
+      ['Overall Diameter', 'Total tire height from ground to top',
+        c => displayLengthSmart(c.s.tireGeom.overallDiaMm, unitMode, 'mm')],
+      ['Section Width', 'Maximum width of the tire (incl. bulge)',
+        c => displayLengthSmart(c.s.tireGeom.sectionWidthMm * (1 + (c.s.bulgePct || 0) / 100), unitMode, 'mm')],
+      ['Sidewall Height', 'Height of the tire’s sidewall',
+        c => displayLengthSmart(c.s.tireGeom.sidewallMm, unitMode, 'mm')],
+      ['Circumference', 'Perimeter length of the tire',
+        c => displayLengthSmart(c.s.tireGeom.circumferenceMm, unitMode, 'mm')],
+      ['Revolutions', revsDesc,
+        c => (unitMode === 'imperial')
+          ? `${c.s.tireGeom.revsPerMile.toFixed(0)} RpM`
+          : `${(1000000 / c.s.tireGeom.circumferenceMm).toFixed(0)} RpK`]
+    ];
+
+    wrap.innerHTML = `
+      ${headHtml}
+      <section class="report-section"><h3 class="report-title">Fitment Differences</h3>${sectionTable(diffDefs)}</section>
+      <details class="report-section"><summary class="report-title">Wheel Geometry</summary>${sectionTable(wheelDefs)}</details>
+      <details class="report-section"><summary class="report-title">Tire Geometry</summary>${sectionTable(tireDefs)}</details>
+    `;
   }
 
   function displayLength(mm, unitMode) {
-    if (unitMode === 'metric') return `${mm.toFixed(1)} mm`;
-    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(2)} in`;
+    if (unitMode === 'metric') return `${mm.toFixed(0)} mm`;
+    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(1)} in`;
     // both
-    return `${mm.toFixed(0)} mm (${mmToIn(mm).toFixed(2)} in)`;
+    return `${mm.toFixed(0)} mm (${mmToIn(mm).toFixed(1)} in)`;
   }
   function displayDelta(mm, unitMode) {
     if (mm == null || isNaN(mm)) return '';
     const sign = mm >= 0 ? '+' : '';
-    if (unitMode === 'metric') return `${sign}${mm.toFixed(1)} mm`;
-    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(2)} in`;
-    return `${sign}${mm.toFixed(0)} mm (${sign}${mmToIn(mm).toFixed(2)} in)`;
+    if (unitMode === 'metric') return `${sign}${mm.toFixed(0)} mm`;
+    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(1)} in`;
+    return `${sign}${mm.toFixed(0)} mm (${sign}${mmToIn(mm).toFixed(1)} in)`;
   }
 
   // Smart display: when unitMode === 'both', show only the commonly used unit per field
   // preferUnit: 'mm' or 'in'
   function displayLengthSmart(mm, unitMode, preferUnit) {
     if (mm == null || isNaN(mm)) return '';
-    if (unitMode === 'metric') return `${mm.toFixed(1)} mm`;
-    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(2)} in`;
-    // both: pick preferred unit
-    if (preferUnit === 'in') return `${mmToIn(mm).toFixed(2)} in`;
-    return `${mm.toFixed(1)} mm`;
+    if (unitMode === 'metric') return `${mm.toFixed(0)} mm`;
+    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(1)} in`;
+    // international: pick preferred unit
+    if (preferUnit === 'in') return `${mmToIn(mm).toFixed(1)} in`;
+    return `${mm.toFixed(0)} mm`;
   }
   function displayDeltaSmart(mm, unitMode, preferUnit) {
     if (mm == null || isNaN(mm)) return '';
     const sign = mm >= 0 ? '+' : '';
-    if (unitMode === 'metric') return `${sign}${mm.toFixed(1)} mm`;
-    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(2)} in`;
-    // both: pick preferred unit
-    if (preferUnit === 'in') return `${sign}${mmToIn(mm).toFixed(2)} in`;
-    return `${sign}${mm.toFixed(1)} mm`;
+    if (unitMode === 'metric') return `${sign}${mm.toFixed(0)} mm`;
+    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(1)} in`;
+    // international: pick preferred unit
+    if (preferUnit === 'in') return `${sign}${mmToIn(mm).toFixed(1)} in`;
+    return `${sign}${mm.toFixed(0)} mm`;
   }
 
   // Visualizations using canvas
@@ -1087,7 +1143,7 @@
     if (!sess) return;
     // Units only. Theme is a site-wide preference managed by shared.js
     // (persisted across pages), so we intentionally do not override it here.
-    if (sess.unit) $('#unitToggle').value = sess.unit;
+    if (sess.unit) $('#unitToggle').value = sess.unit === 'both' ? 'international' : sess.unit;
 
     // Baseline
     if (sess.base) {

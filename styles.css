@@ -94,6 +94,24 @@ button:hover { filter: brightness(1.3); }
 .cv-base input { accent-color: #4aa3ff; }
 .cv-setup { color: #22c55e; }
 .cv-setup input { accent-color: #22c55e; }
+/* Structured fitment report (setups as columns) */
+.report-section { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; overflow-x: auto; }
+.report-title { margin: 0; color: var(--warn); font-weight: 600; font-size: 15px; }
+details.report-section > summary { cursor: pointer; list-style-position: outside; }
+.report-table { width: 100%; border-collapse: collapse; margin-top: 6px; table-layout: fixed; }
+.report-table th { text-align: right; padding: 6px 8px; font-weight: 700; }
+.report-table th:first-child { text-align: left; }
+.report-table th:first-child, .report-table td:first-child { width: 36%; }
+.report-table td { padding: 8px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: break-word; }
+/* Main setups header row above the section tables (padding matches section border+padding) */
+.report-head-wrap { padding: 0 15px; margin-top: 10px; }
+.report-head-wrap .report-table { margin-top: 0; }
+.report-col-sub { color: var(--muted); font-size: 12px; font-weight: 500; }
+.report-label { font-weight: 600; }
+.report-desc { color: var(--muted); font-size: 12px; font-weight: 400; max-width: 320px; }
+.report-value { font-weight: 600; text-align: right; }
+.val-good { color: #22c55e; }
+.val-bad { color: #ef4444; }
 .caption { color: var(--muted); text-align: center; font-size: 12px; margin: 4px 0 0; }
 
 .table-wrap { overflow-x: auto; margin-top: 12px; }

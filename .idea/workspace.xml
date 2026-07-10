@@ -7,7 +7,12 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.1" />
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.2">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +22,10 @@
     <persistenceIdMap>
       <entry key="_C:/Users/shiha/OneDrive/Documents/PythonProjects/WebApps/ToolMeUp" value="35Zkzu7VWQWREvgxuzXR654caDC" />
     </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="133" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -44,6 +53,69 @@
     &quot;accountId&quot;: &quot;56903bda-99ae-490e-94bd-174342c893bf&quot;
   }
 }</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000000786488004" />
+      <entry key="MS500" value="1.0379435901373453" />
+      <entry key="S2" value="1.4413514981453275" />
+      <entry key="S5" value="1.7209644357301124" />
+      <entry key="S10" value="1.8490962464468397" />
+      <entry key="S30" value="1.9469323938029466" />
+      <entry key="S60" value="1.9731045132990324" />
+      <entry key="M2" value="1.986460598959245" />
+      <entry key="M5" value="1.9945620814795648" />
+      <entry key="M10" value="1.997277334285486" />
+      <entry key="M15" value="1.998184064868876" />
+      <entry key="M30" value="1.9990916198571962" />
+      <entry key="H1" value="1.9995457067374138" />
+      <entry key="H2" value="1.9997728275650495" />
+      <entry key="H4" value="1.9998864073308775" />
+      <entry key="D1" value="1.9999810669923552" />
+      <entry key="W1" value="1.9999972952626757" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.6285066883607993" />
+      <entry key="MS500" value="0.927454885891016" />
+      <entry key="S2" value="1.3335535183493985" />
+      <entry key="S5" value="1.6527075123224837" />
+      <entry key="S10" value="1.808971426981346" />
+      <entry key="S30" value="1.9320036872375537" />
+      <entry key="S60" value="1.9654304655926493" />
+      <entry key="M2" value="1.9825699235568501" />
+      <entry key="M5" value="1.9929927748159748" />
+      <entry key="M10" value="1.9964904947340951" />
+      <entry key="M15" value="1.9976590183391687" />
+      <entry key="M30" value="1.9988288529269684" />
+      <entry key="H1" value="1.9994142623088567" />
+      <entry key="H2" value="1.9997070901040188" />
+      <entry key="H4" value="1.9998535347879376" />
+      <entry key="D1" value="1.9999755877056324" />
+      <entry key="W1" value="1.9999965124944596" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -67,34 +139,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JavaScript Debug.Tyre drawing test.html.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/shiha/OneDrive - University of Sharjah/Desktop/DBA/2025 S2/2 Quantitative Business Research Method II/Assignment 2&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;junie.project.settings&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JavaScript Debug.Tyre drawing test.html.executor": "Run",
+    "JavaScript Debug.index.html.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "master",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/shiha/OneDrive - University of Sharjah/Desktop/DBA/2025 S2/2 Quantitative Business Research Method II/Assignment 2",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "junie.project.settings",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\shiha\OneDrive\Documents\PythonProjects\WebApps\ToolMeUp\Drawing" />
@@ -136,7 +209,8 @@
       <workItem from="1783625047171" duration="9793000" />
       <workItem from="1783637590356" duration="42000" />
       <workItem from="1783637644751" duration="14000" />
-      <workItem from="1783637671307" duration="6175000" />
+      <workItem from="1783637671307" duration="6836000" />
+      <workItem from="1783647541561" duration="3324000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -218,7 +292,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783644042790</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Version 1.1.2">
+      <option name="closed" value="true" />
+      <created>1783645919391</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1783645919391</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -239,6 +321,7 @@
     <MESSAGE value="Version 1.0.1" />
     <MESSAGE value="Version 1.1.0" />
     <MESSAGE value="Version 1.1.1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.1" />
+    <MESSAGE value="Version 1.1.2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.2" />
   </component>
 </project>
