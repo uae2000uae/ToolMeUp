@@ -497,11 +497,46 @@
     drawTire(selected, c.width * 0.66, '#22c55e');
   }
 
+  // Sidewall C-curve profile (tuned in Drawing/Tyre drawing test.html).
+  // Baseline is the straight line (chord) from the tread edge to the rim
+  // corner. Each point: h = position along that line (0 = tread edge,
+  // 1 = rim corner), b = outward bulge from the line as fraction of max
+  // bulge (negative = inward).
+  const SIDEWALL_PROFILE = [
+    { h: 0.05, b: 0.05 },
+    { h: 0.25, b: 0.90 },
+    { h: 0.50, b: 1.25 },   // max bulge
+    { h: 0.75, b: 0.90 },
+    { h: 0.92, b: 0.00 },
+    { h: 0.96, b: 0.25 },
+    { h: 0.98, b: -0.25 },
+    { h: 1.00, b: -0.25 }   // bead: tucks inside rim corner
+  ];
+  const TREAD_GROOVES = { count: 8, depth: 10 }; // depth in px
+
   function drawRimView(base, selected) {
     const c = $("#RimView");
     const ctx = c.getContext('2d');
     ctx.clearRect(0, 0, c.width, c.height);
     if (!base?.wheelGeom || !selected?.wheelGeom) return;
+
+    // Catmull-Rom spline through points, rendered as beziers
+    function smoothPath(pts) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[i + 2] || p2;
+        ctx.bezierCurveTo(
+          p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+          p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+          p2.x, p2.y
+        );
+      }
+      ctx.stroke();
+    }
 
     const marginX = 40;
     const marginY = 24;
@@ -535,7 +570,8 @@
     // Tire extents (fall back to rim/wheel when tire geometry is missing)
     function tireODMm(set) { return set.tireGeom?.overallDiaMm || rimMm(set); }
     function tireWMm(set) { return set.tireGeom?.sectionWidthMm || wheelWidthMm(set); }
-    function tireWWithBulgeMm(set) { return tireWMm(set) * (1 + 2 * bulgeFrac(set)); }
+    const maxProfileB = Math.max(...SIDEWALL_PROFILE.map(p => p.b), 1);
+    function tireWWithBulgeMm(set) { return tireWMm(set) * (1 + 2 * bulgeFrac(set) * maxProfileB); }
     const maxTireODMm = Math.max(tireODMm(base), tireODMm(selected), maxRimMm);
     const maxTireWMm = Math.max(tireWWithBulgeMm(base), tireWWithBulgeMm(selected), maxWidthMm);
 
@@ -642,61 +678,50 @@
       const tireTopY = rimTopY - sidewallPx;
       const tireBottomY = rimBottomY + sidewallPx;
 
-      // Draw tire top line
+      // Draw tire top line (tread)
       ctx.beginPath();
       ctx.moveTo(tireLeftX, tireTopY);
       ctx.lineTo(tireRightX, tireTopY);
       ctx.stroke();
 
-      // Top left C-curve
-      ctx.beginPath();
-      ctx.moveTo(tireLeftX, tireTopY);
-      ctx.quadraticCurveTo(
-        tireLeftX - bulgePx,
-        rimTopY - sidewallPx / 2,
-        rimLeftX,
-        rimTopY
-      );
-      ctx.stroke();
-
-      // Top right C-curve
-      ctx.beginPath();
-      ctx.moveTo(tireRightX, tireTopY);
-      ctx.quadraticCurveTo(
-        tireRightX + bulgePx,
-        rimTopY - sidewallPx / 2,
-        rimRightX,
-        rimTopY
-      );
-      ctx.stroke();
-
-      // Draw tire bottom line
+      // Draw tire bottom line (tread)
       ctx.beginPath();
       ctx.moveTo(tireLeftX, tireBottomY);
       ctx.lineTo(tireRightX, tireBottomY);
       ctx.stroke();
 
-      // Bottom left C-curve
+      // Tread grooves: short lines from the tread surface into the tire
+      // (top line -> down, bottom line -> up)
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(rimLeftX, rimBottomY);
-      ctx.quadraticCurveTo(
-        tireLeftX - bulgePx,
-        rimBottomY + sidewallPx / 2,
-        tireLeftX,
-        tireBottomY
-      );
+      for (let g = 1; g <= TREAD_GROOVES.count; g++) {
+        const gx = tireLeftX + (tireWidthPx * g) / (TREAD_GROOVES.count + 1);
+        ctx.moveTo(gx, tireTopY);
+        ctx.lineTo(gx, tireTopY + TREAD_GROOVES.depth);
+        ctx.moveTo(gx, tireBottomY);
+        ctx.lineTo(gx, tireBottomY - TREAD_GROOVES.depth);
+      }
       ctx.stroke();
+      ctx.lineWidth = 2; // restore for sidewalls
 
-      // Bottom right C-curve
-      ctx.beginPath();
-      ctx.moveTo(rimRightX, rimBottomY);
-      ctx.quadraticCurveTo(
-        tireRightX + bulgePx,
-        rimBottomY + sidewallPx / 2,
-        tireRightX,
-        tireBottomY
-      );
-      ctx.stroke();
+      // Sidewall C-curves: one continuous curve from tread edge to rim
+      // corner. Each profile point sits on the tread->rim chord at
+      // fraction h, pushed outward by its bulge value.
+      function drawSidewall(treadX, treadY, rimX, rimY, outwardSign) {
+        const pts = [{ x: treadX, y: treadY }];
+        for (const p of SIDEWALL_PROFILE) {
+          pts.push({
+            x: treadX + (rimX - treadX) * p.h + outwardSign * bulgePx * p.b,
+            y: treadY + (rimY - treadY) * p.h
+          });
+        }
+        smoothPath(pts);
+      }
+
+      drawSidewall(tireLeftX,  tireTopY,    rimLeftX,  rimTopY,    -1);
+      drawSidewall(tireRightX, tireTopY,    rimRightX, rimTopY,    +1);
+      drawSidewall(tireLeftX,  tireBottomY, rimLeftX,  rimBottomY, -1);
+      drawSidewall(tireRightX, tireBottomY, rimRightX, rimBottomY, +1);
     }
 
     // Draw hub face reference line (parallel to wheel height)
