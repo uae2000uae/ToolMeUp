@@ -7,8 +7,7 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.2">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 fixed the drawing profile and added tread grooves">
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -57,23 +56,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000786488004" />
-      <entry key="MS500" value="1.0379435901373453" />
-      <entry key="S2" value="1.4413514981453275" />
-      <entry key="S5" value="1.7209644357301124" />
-      <entry key="S10" value="1.8490962464468397" />
-      <entry key="S30" value="1.9469323938029466" />
-      <entry key="S60" value="1.9731045132990324" />
-      <entry key="M2" value="1.986460598959245" />
-      <entry key="M5" value="1.9945620814795648" />
-      <entry key="M10" value="1.997277334285486" />
-      <entry key="M15" value="1.998184064868876" />
-      <entry key="M30" value="1.9990916198571962" />
-      <entry key="H1" value="1.9995457067374138" />
-      <entry key="H2" value="1.9997728275650495" />
-      <entry key="H4" value="1.9998864073308775" />
-      <entry key="D1" value="1.9999810669923552" />
-      <entry key="W1" value="1.9999972952626757" />
+      <entry key="MS100" value="1.0000107166088033" />
+      <entry key="MS500" value="1.120731309925524" />
+      <entry key="S2" value="2.369643864779354" />
+      <entry key="S5" value="4.2261979559451675" />
+      <entry key="S10" value="5.640533189622742" />
+      <entry key="S30" value="7.070385899836009" />
+      <entry key="S60" value="7.514156282009099" />
+      <entry key="M2" value="7.751546439021462" />
+      <entry key="M5" value="7.8992543422627195" />
+      <entry key="M10" value="7.949396671147455" />
+      <entry key="M15" value="7.966212990770027" />
+      <entry key="M30" value="7.983080708175542" />
+      <entry key="H1" value="7.991533896220428" />
+      <entry key="H2" value="7.9957653322580455" />
+      <entry key="H4" value="7.997882261992675" />
+      <entry key="D1" value="7.999646987520683" />
+      <entry key="W1" value="7.999949568270647" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -95,23 +94,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.6285066883607993" />
-      <entry key="MS500" value="0.927454885891016" />
-      <entry key="S2" value="1.3335535183493985" />
-      <entry key="S5" value="1.6527075123224837" />
-      <entry key="S10" value="1.808971426981346" />
-      <entry key="S30" value="1.9320036872375537" />
-      <entry key="S60" value="1.9654304655926493" />
-      <entry key="M2" value="1.9825699235568501" />
-      <entry key="M5" value="1.9929927748159748" />
-      <entry key="M10" value="1.9964904947340951" />
-      <entry key="M15" value="1.9976590183391687" />
-      <entry key="M30" value="1.9988288529269684" />
-      <entry key="H1" value="1.9994142623088567" />
-      <entry key="H2" value="1.9997070901040188" />
-      <entry key="H4" value="1.9998535347879376" />
-      <entry key="D1" value="1.9999755877056324" />
-      <entry key="W1" value="1.9999965124944596" />
+      <entry key="MS100" value="0.9460678557641868" />
+      <entry key="MS500" value="1.1085038943016565" />
+      <entry key="S2" value="2.3567814325760073" />
+      <entry key="S5" value="4.1982217222434395" />
+      <entry key="S10" value="5.612709317927796" />
+      <entry key="S30" value="7.055446519063297" />
+      <entry key="S60" value="7.505726419479095" />
+      <entry key="M2" value="7.747067767440538" />
+      <entry key="M5" value="7.897396302278385" />
+      <entry key="M10" value="7.948456272477499" />
+      <entry key="M15" value="7.965583508340579" />
+      <entry key="M30" value="7.982764686584282" />
+      <entry key="H1" value="7.9913755643173525" />
+      <entry key="H2" value="7.995686085902665" />
+      <entry key="H4" value="7.9978426186981295" />
+      <entry key="D1" value="7.999640377509568" />
+      <entry key="W1" value="7.999948623914869" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -209,7 +208,7 @@
       <workItem from="1783637644751" duration="14000" />
       <workItem from="1783637671307" duration="6836000" />
       <workItem from="1783647541561" duration="3365000" />
-      <workItem from="1783889853738" duration="2719000" />
+      <workItem from="1783889853738" duration="3210000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -307,7 +306,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783653672401</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Version 1.1.3 fixed the drawing profile and added tread grooves">
+      <option name="closed" value="true" />
+      <created>1783900112068</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1783900112068</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -329,6 +336,7 @@
     <MESSAGE value="Version 1.1.0" />
     <MESSAGE value="Version 1.1.1" />
     <MESSAGE value="Version 1.1.2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.2" />
+    <MESSAGE value="Version 1.1.3 fixed the drawing profile and added tread grooves" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 fixed the drawing profile and added tread grooves" />
   </component>
 </project>

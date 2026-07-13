@@ -876,16 +876,38 @@
     '265/35R19': { rim_d: 19, rim_w: 9, et: 35, spacer: 0 }
   };
 
+  // Normalize a full/old-format tire size ("225/45R17", "225/45ZR17 91Y",
+  // "31x10.5R15") to the partial field format ("225/45", "31X10.5") plus
+  // the rim diameter it carried. The rim goes into the rim-diameter field;
+  // the tire field never shows the old format.
+  function stripRimFromTireSize(raw) {
+    const s = String(raw || '').trim().toUpperCase().replace(/\s+/g, '');
+    // Metric: 225/45R17, 225/45ZR17, 225/45-17 (optional load/speed suffix)
+    let m = s.match(/^(\d{3}\/\d{2,3})(?:Z?R|-)(\d{2}(?:\.\d)?)[A-Z0-9]*$/);
+    if (m) return { size: m[1], rimIn: parseFloat(m[2]) };
+    // Flotation: 31x10.5R15, 35X12.50-20
+    m = s.match(/^(\d{2,3}(?:\.\d)?X\d{1,2}(?:\.\d{1,2})?)(?:Z?R|-)(\d{2}(?:\.\d)?)[A-Z0-9]*$/);
+    if (m) return { size: m[1], rimIn: parseFloat(m[2]) };
+    return { size: s, rimIn: null };
+  }
+  // Expose for other scripts (e.g., OEM presets modal)
+  window.TMU = window.TMU || {};
+  window.TMU.stripRimFromTireSize = stripRimFromTireSize;
+
   function applyPresetTo(prefixRoot, tire) {
     if (!tire) return;
-    $(`#${prefixRoot}_tire`).value = tire;
+    const norm = stripRimFromTireSize(tire);
+    $(`#${prefixRoot}_tire`).value = norm.size;
     const p = presetMap[tire];
     if (p) {
       $(`#${prefixRoot}_rim_diam`).value = p.rim_d;
       $(`#${prefixRoot}_rim_width`).value = p.rim_w;
       $(`#${prefixRoot}_offset`).value = p.et;
       $(`#${prefixRoot}_spacer`).value = p.spacer;
+    } else if (norm.rimIn != null) {
+      $(`#${prefixRoot}_rim_diam`).value = norm.rimIn;
     }
+    updateTireSuffixes();
   }
 
   // State

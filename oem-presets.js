@@ -300,8 +300,19 @@
     var changed = [];
 
     if (ui.applyTire.checked && f.tire) {
-      setVal("base_tire", String(f.tire).replace(/\s+/g, ""));
+      // Normalize to the partial tire-field format (no rim suffix);
+      // the rim diameter goes into the wheel field instead.
+      var norm = (window.TMU && window.TMU.stripRimFromTireSize)
+        ? window.TMU.stripRimFromTireSize(f.tire)
+        : { size: String(f.tire).replace(/\s+/g, ""), rimIn: null };
+      setVal("base_tire", norm.size);
       changed.push("base_tire");
+      // If the wheel isn't being applied (or has no diameter), still set the
+      // rim diameter from the tire size so the R-suffix stays correct.
+      if (norm.rimIn != null && !(ui.applyWheel.checked && f.rim_diameter != null)) {
+        setVal("base_rim_diam", norm.rimIn);
+        changed.push("base_rim_diam");
+      }
     }
     if (ui.applyWheel.checked) {
       if (f.rim_diameter != null) { setVal("base_rim_diam", f.rim_diameter); changed.push("base_rim_diam"); }
