@@ -163,7 +163,7 @@
     const correction = clamp(parseFloat($(`#${prefixRoot}_correction`)?.value || '0') || 0, -20, 20);
     let bulgePct = parseFloat($(`#${prefixRoot}_bulge`)?.value);
     if (isNaN(bulgePct)) bulgePct = 5;
-    bulgePct = clamp(bulgePct, 0, 20);
+    bulgePct = clamp(bulgePct, 0, 10);
 
     const tireParsed = parseTireSize(tireStr, rimDiamIn);
     const tireGeom = tireGeometry(tireParsed, correction, rimWidthIn);
@@ -540,7 +540,7 @@
 
     const marginX = 40;
     const marginY = 24;
-    // Per-setup tire bulge as fraction of section width (input %, default 5, max 20)
+    // Per-setup tire bulge as fraction of section width (input %, default 5, max 10)
     function bulgeFrac(set) {
       const p = (set.bulgePct != null && !isNaN(set.bulgePct)) ? set.bulgePct : 5;
       return clamp(p, 0, 20) / 100;
@@ -836,7 +836,10 @@
     const wrap = document.createElement('div');
     wrap.className = 'setup-card';
     wrap.innerHTML = `
-      <h4>Setup ${idx}</h4>
+      <div class="setup-card-head">
+        <h4>Setup ${idx}</h4>
+        <button class="copy-baseline" type="button" title="Copy all values from the baseline setup">Get from baseline</button>
+      </div>
       <div class="grid two">
         <div>
           <div class="field"><label>Rim diameter<input id="${id}_rim_diam" type="number" step="1" placeholder="in"></label></div>
@@ -847,13 +850,23 @@
         <div>
           <div class="field"><label>Tire size<span class="tire-wrap"><input id="${id}_tire" maxlength="6" placeholder="e.g., 235/45"><span class="tire-suffix" id="${id}_tire_suffix">R—</span></span></label></div>
           <div class="field"><label>Width correction (%)<input id="${id}_correction" type="number" placeholder="%" step="1" min="-20" max="20"></label></div>
-          <div class="field"><label>Bulge (%)<input id="${id}_bulge" type="number" placeholder="%" step="1" min="0" max="20" value="10"></label></div>
+          <div class="field"><label>Bulge (%)<input id="${id}_bulge" type="number" placeholder="%" step="1" min="0" max="10" value="5"></label></div>
         </div>
       </div>
       <div class="actions"><button class="remove" type="button">Remove</button></div>
     `;
     wrap.querySelector('.remove').addEventListener('click', () => {
       wrap.remove();
+      renderAll();
+    });
+    // Copy all values from the baseline entries into this card
+    wrap.querySelector('.copy-baseline').addEventListener('click', () => {
+      ['rim_diam', 'rim_width', 'offset', 'spacer', 'tire', 'correction', 'bulge'].forEach(suffix => {
+        const src = $(`#base_${suffix}`);
+        const dst = wrap.querySelector(`#${id}_${suffix}`);
+        if (src && dst) dst.value = src.value;
+      });
+      updSuffix();
       renderAll();
     });
     // Keep the R-suffix in the tire box synced with this card's rim diameter
