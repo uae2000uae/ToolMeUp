@@ -27,10 +27,10 @@
   const HUB_IMG_W = 1159; // Wheel_Assembly.svg viewBox width
   const HUB_IMG_H = 727;  // Wheel_Assembly.svg viewBox height
   // Hub face (wheel mounting flange) inside the artwork: it spans y 328.6-400.2
-  // in viewBox units and represents 7 inches of real height. This calibrates
+  // in viewBox units and represents 4.7 inches of real height. This calibrates
   // the drawing to the same physical scale as the wheels.
   const HUB_FACE_ART_H = 71.6;          // artwork units
-  const HUB_FACE_MM = 7 * MM_PER_IN;    // 177.8 mm
+  const HUB_FACE_MM = 4.7 * MM_PER_IN;  // 119.4 mm
   const hubImg = new Image();
   let hubImgLoaded = false;
   hubImg.onload = function () {
