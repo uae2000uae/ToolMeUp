@@ -29,6 +29,10 @@
       <input type="checkbox" id="themeToggle">
         <span>Dark</span>
       </label>
+      <label class="toggle">
+      <input type="checkbox" id="langToggle">
+        <span>العربية</span>
+      </label>
     </div>
   </header>
 
@@ -38,11 +42,12 @@
 	   <button id="resetFieldsBtn" type="button">Reset All Fields</button>
     </div>
 	  <br>
+    <div id="sessionNameBar" class="session-name" hidden></div>
     <section id="base" class="panel">
       <h2>1) Baseline Setup</h2>
       <div class="preset preset-row">
         <select id="presetSelect">
-          <option value="">Preset samples sizes</option>
+          <option value="">Preset samples</option>
           <option value="225/45R17">225/45R17 on 17x7.5 ET45</option>
           <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
           <option value="265/35R19">265/35R19 on 19x9 ET35</option>
@@ -66,21 +71,26 @@
             <label>Offset ET
               <input id="base_offset" type="number" step="1" placeholder="mm">
             </label>
+			 <div class="hint" data-i18n="hint_offset">The distance (mm) from the wheel's mounting face to its centerline: a higher number tucks the wheel further inward, a lower or negative number pushes it outward.</div>
           </div>
           <div class="field">
             <label>Spacer
               <input id="base_spacer" type="number" step="1" placeholder="mm">
             </label>
+			 <div class="hint" data-i18n="hint_spacer">A plate (mm) fitted between the hub and wheel that pushes the whole wheel outward. Leave it empty if no spacer fitted.</div>
           </div>
         </div>
         <div>
           <h3>Tire</h3>
-          <div class="field"><label>Tire size<span class="tire-wrap" ><input id="base_tire" placeholder="e.g., 235/45" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label></div>
+          <div class="field"><label>Tire size<span class="tire-wrap" ><input id="base_tire" placeholder="e.g., 235/45" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label>
+			 <div class="hint" data-i18n="hint_tire_size">The first number is the tire width in (mm); the second is  sidewall height as a (%) of that width. The R number is taken from your rim diameter.</div></div>
           <div class="field"><label>Width correction (%)
-          <input id="base_correction" type="number" step="1" min="-20" max="20" placeholder="%"></label></div>
-			 <div class="hint">Some tire types run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
-          <div class="field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label></div>
-			 <div class="hint">Sidewall bulge past the rim edge, shown in the drawing. 5% is typical.</div>
+          <input id="base_correction" type="number" step="1" min="-20" max="20" placeholder="%"></label>
+			 <div class="hint" data-i18n="hint_correction">Some tire types run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
+		  </div>
+          <div class="field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label>
+			 <div class="hint" data-i18n="hint_bulge">Sidewall bulge past the rim edge, shown in the drawing. 5% is typical.</div>
+		  </div>
         </div>
 </div>
       <details class="advanced">
@@ -90,13 +100,28 @@
           <h3>Vehicle Clearances (optional)</h3>
           <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
           <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
-			 <div class="hint">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div>
+			 <div class="hint" data-i18n="hint_clearance">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div>
         </div>
         <div>
           <h3>Speedometer</h3>
           <div class="field"><label>Baseline speedo error (%)<input id="base_speedo_error" type="number" placeholder="%" step="1"></label></div>
-          <div class="hint">The majority of OEM installations will make speedometer give you faster reading than GPS or Radar speed. This calculator helps provide insight about what the reading is going to be using the new fitment. <br><br>
-          As per your settings, <div class="hint-bold" id="base_speedo_hint">When GPS speed is 100 km/h, Speedometer reads 100 km/h</div></div>
+<div class="hint">
+
+    <div data-i18n="hint_speedo_intro">
+        The majority of OEM installations will make speedometer give you faster reading than GPS or Radar speed. 
+        This calculator helps provide insight about what the reading is going to be using the new fitment.
+    </div>
+	<br>
+    <div data-i18n="hint_speedo_asper">
+        As per your settings,
+    </div>
+
+    <div class="hint-bold" id="base_speedo_hint">
+        When GPS speed is 100 km/h, Speedometer reads 100 km/h
+    </div>
+
+</div>
+
         </div>
       </div>
       <div class="grid two">
@@ -104,13 +129,13 @@
           <h3>Thresholds</h3>
           <div class="field"><label>Min inner clearance<input id="th_inner" type="number" step="1" value="10" placeholder="mm"></label></div>
           <div class="field"><label>Min outer clearance<input id="th_outer" type="number" step="1" value="0" placeholder="mm"></label></div>
-          <div class="hint">These are red-flag thresholds. We will calculate the clearance based on your provided current settings and will warn you if lines are crossed. Calculation will not be blocked.</div>
+          <div class="hint" data-i18n="hint_thresholds">These are red-flag thresholds. We will calculate the clearance based on your provided current settings and will warn you if lines are crossed. Calculation will not be blocked.</div>
         </div>
         <div>
           <h3>Optional Scrub Radius Inputs</h3>
           <div class="field"><label>Kingpin/steering axis inclination (deg)<input id="sr_kpi" type="number" step="0.1" placeholder="deg"></label></div>
           <div class="field"><label>Hub face to ball-joint line at hub height (mm)<input id="sr_hub_offset" type="number" step="1" placeholder="mm"></label></div>
-          <div class="hint">Extra geometric parameters you can enter when doing a tire/wheel fitment or suspension geometry calculation. They help you compute a more accurate scrub radius instead of relying on generic factory values</div>
+          <div class="hint" data-i18n="hint_scrub">Extra geometric parameters you can enter when doing a tire/wheel fitment or suspension geometry calculation. They help you compute a more accurate scrub radius instead of relying on generic factory values</div>
         </div>
       </div>
       </details>
@@ -131,14 +156,10 @@
         <div id="setupTabs" class="tabs"></div>
         <div>
           <button id="saveSessionBtn" type="button" class="primary">Save Session</button>
+          <button id="overwriteSessionBtn" type="button" hidden>Overwrite Session</button>
         </div>
       </div>
-      <div id="alerts" class="alerts"></div>
       <div class="grid two">
-        <div>
-          <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
-          <div class="caption">Cross-section side view (baseline vs selected)</div>
-        </div>
         <div>
           <div class="canvas-wrap">
             <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
@@ -149,7 +170,12 @@
           </div>
           <div class="caption">Wheel &amp; tire cross-section: inner/outer movement vs baseline</div>
         </div>
+        <div>
+          <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
+          <div class="caption">Cross-section side view (baseline vs selected)</div>
+        </div>
       </div>
+      <div id="alerts" class="alerts"></div>
 
       <div class="actions actions--end">
         <div class="measurement">

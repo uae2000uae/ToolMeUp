@@ -7,10 +7,11 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 fixed tire size format">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,23 +60,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000000000002" />
-      <entry key="MS500" value="1.0007395908119474" />
-      <entry key="S2" value="1.2392659772149304" />
-      <entry key="S5" value="1.9854630679905263" />
-      <entry key="S10" value="2.8097336417878847" />
-      <entry key="S30" value="3.9864939253765015" />
-      <entry key="S60" value="4.443813398548456" />
-      <entry key="M2" value="4.800813834993226" />
-      <entry key="M5" value="6.229632555829211" />
-      <entry key="M10" value="8.225791393971392" />
-      <entry key="M15" value="9.380434344740214" />
-      <entry key="M30" value="10.926784246490664" />
-      <entry key="H1" value="11.887429549968385" />
-      <entry key="H2" value="12.423291241428808" />
-      <entry key="H4" value="12.706348793943532" />
-      <entry key="D1" value="12.950305672872592" />
-      <entry key="W1" value="12.992882159870234" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0" />
+      <entry key="S60" value="1.0000000000013796" />
+      <entry key="M2" value="1.000004082819434" />
+      <entry key="M5" value="1.0343635610673503" />
+      <entry key="M10" value="1.7751024359094787" />
+      <entry key="M15" value="3.2491968858140687" />
+      <entry key="M30" value="7.641534893102683" />
+      <entry key="H1" value="12.495639520743797" />
+      <entry key="H2" value="16.152947563775527" />
+      <entry key="H4" value="18.405713777798045" />
+      <entry key="D1" value="20.541757809491102" />
+      <entry key="W1" value="20.933873467462004" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -97,23 +98,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9592641193252646" />
-      <entry key="MS500" value="0.9924481970736632" />
-      <entry key="S2" value="1.23655039937389" />
-      <entry key="S5" value="1.983591060491502" />
-      <entry key="S10" value="2.8083670234217184" />
-      <entry key="S30" value="3.985835468929496" />
-      <entry key="S60" value="4.443443861206483" />
-      <entry key="M2" value="4.800564264299367" />
-      <entry key="M5" value="6.229233797961562" />
-      <entry key="M10" value="8.22536150220371" />
-      <entry key="M15" value="9.38005748775606" />
-      <entry key="M30" value="10.926535010844532" />
-      <entry key="H1" value="11.887285972954647" />
-      <entry key="H2" value="12.423214155921798" />
-      <entry key="H4" value="12.706308851016308" />
-      <entry key="D1" value="12.950298814491877" />
-      <entry key="W1" value="12.992881175083264" />
+      <entry key="MS100" value="0.28917204597632185" />
+      <entry key="MS500" value="0.7802454801737034" />
+      <entry key="S2" value="0.9398484194174427" />
+      <entry key="S5" value="0.9754906838779647" />
+      <entry key="S10" value="0.9876693190931694" />
+      <entry key="S30" value="0.9958727623752247" />
+      <entry key="S60" value="0.9979342475223392" />
+      <entry key="M2" value="0.9989706719085862" />
+      <entry key="M5" value="1.0339471553356079" />
+      <entry key="M10" value="1.774855284544279" />
+      <entry key="M15" value="3.2489739332178025" />
+      <entry key="M30" value="7.641328467624828" />
+      <entry key="H1" value="12.495480493955716" />
+      <entry key="H2" value="16.152846340129596" />
+      <entry key="H4" value="18.40565637041637" />
+      <entry key="D1" value="20.541747156867252" />
+      <entry key="W1" value="20.93387191706273" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -212,7 +213,7 @@
       <workItem from="1783637671307" duration="6836000" />
       <workItem from="1783647541561" duration="3365000" />
       <workItem from="1783889853738" duration="3577000" />
-      <workItem from="1783960810312" duration="559000" />
+      <workItem from="1783960810312" duration="5645000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -326,7 +327,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783900878496</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality">
+      <option name="closed" value="true" />
+      <created>1783961497989</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1783961497989</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -350,6 +359,19 @@
     <MESSAGE value="Version 1.1.2" />
     <MESSAGE value="Version 1.1.3 fixed the drawing profile and added tread grooves" />
     <MESSAGE value="Version 1.1.3 fixed tire size format" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 fixed tire size format" />
+    <MESSAGE value="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app.js</url>
+          <line>1299</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -19,8 +19,18 @@
 
   function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-  // Preload hub assembly image for top-view overlay
-  const HUB_IMG_SRC = 'static/images/hub_assembly.png';
+  // Preload wheel assembly drawing for top-view overlay.
+  // The SVG has no intrinsic width/height (viewBox only), so we always draw it
+  // using its viewBox dimensions below. The hub center sits at the midpoint of
+  // the file, same as the previous image.
+  const HUB_IMG_SRC = 'static/images/Wheel_Assembly.svg';
+  const HUB_IMG_W = 1159; // Wheel_Assembly.svg viewBox width
+  const HUB_IMG_H = 727;  // Wheel_Assembly.svg viewBox height
+  // Hub face (wheel mounting flange) inside the artwork: it spans y 328.6-400.2
+  // in viewBox units and represents 7 inches of real height. This calibrates
+  // the drawing to the same physical scale as the wheels.
+  const HUB_FACE_ART_H = 71.6;          // artwork units
+  const HUB_FACE_MM = 7 * MM_PER_IN;    // 177.8 mm
   const hubImg = new Image();
   let hubImgLoaded = false;
   hubImg.onload = function () {
@@ -30,6 +40,21 @@
   };
   hubImg.onerror = function () { hubImgLoaded = false; };
   hubImg.src = HUB_IMG_SRC;
+
+  // Preload rim face drawing for the side view. The SVG is 720x720 with the
+  // rim's outer edge at r=353.81 from the center, so we scale it so that edge
+  // lands exactly on the drawn rim circle.
+  const RIM_IMG_SRC = 'static/images/Rim.svg';
+  const RIM_IMG_SIZE = 720;    // Rim.svg viewBox width/height
+  const RIM_IMG_EDGE_R = 353.81; // outer rim radius inside the artwork
+  const rimImg = new Image();
+  let rimImgLoaded = false;
+  rimImg.onload = function () {
+    rimImgLoaded = true;
+    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+  };
+  rimImg.onerror = function () { rimImgLoaded = false; };
+  rimImg.src = RIM_IMG_SRC;
 
   // Parse tire sizes: metric (e.g., 225/45R17, 225/45-17) and flotation (31x10.5R15, 33x12.50-20).
   // Partial sizes without the rim value (e.g., 235/45 or 31x10.5) take R from rimDiamIn (the wheel's rim diameter input).
@@ -420,6 +445,10 @@
       ctx.strokeStyle = color;
 
       // --- Tire ---
+      // Filled disc in very dark gray (actual tire rubber color); the rim
+      // drawing is painted over its center, leaving a dark tire ring visible
+      ctx.fillStyle = '#1a1a1c';
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.fill();
       // Outer circle
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.stroke();
@@ -440,48 +469,22 @@
       ctx.beginPath(); ctx.arc(cx, cy, r - tickLen, 0, 2 * PI); ctx.stroke();
 
       // --- Rim ---
-      const lipR = rimR * 0.92;                 // rim lip (spoke outer end)
-      const hubR = Math.max(6, rimR * 0.28);    // hub plate
+      // Rim face drawing (Rim.svg), scaled so its outer edge matches rimR
+      if (rimImgLoaded && rimImg) {
+        const k = rimR / RIM_IMG_EDGE_R;
+        const targetSize = RIM_IMG_SIZE * k;
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        try {
+          ctx.drawImage(rimImg, cx - targetSize / 2, cy - targetSize / 2, targetSize, targetSize);
+        } catch (_) { /* ignore draw errors */ }
+        ctx.restore();
+        ctx.strokeStyle = color;
+      }
 
-      // Rim outer edge (tire bead)
+      // Rim outer edge (tire bead) — colored line kept on top of the drawing
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
-      // Rim lip
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(cx, cy, lipR, 0, 2 * PI); ctx.stroke();
-
-      // Spokes (thin double-line spokes)
-      const spokes = 9;
-      const dHub = 0.28; // half-angle at hub (rad)
-      const dRim = 0.10; // half-angle at rim lip (rad)
-      for (let i = 0; i < spokes; i++) {
-        const a = (i / spokes) * 2 * PI - PI / 2;
-        for (const s of [-1, 1]) {
-          ctx.beginPath();
-          ctx.moveTo(cx + Math.cos(a + s * dHub) * hubR, cy + Math.sin(a + s * dHub) * hubR);
-          ctx.lineTo(cx + Math.cos(a + s * dRim) * lipR, cy + Math.sin(a + s * dRim) * lipR);
-          ctx.stroke();
-        }
-      }
-
-      // Hub plate, lug holes and center bore
-      ctx.beginPath(); ctx.arc(cx, cy, hubR, 0, 2 * PI); ctx.stroke();
-      const lugCircleR = hubR * 0.62;
-      const lugHoleR = Math.max(1.5, hubR * 0.14);
-      for (let i = 0; i < 5; i++) {
-        const a = (i / 5) * 2 * PI - PI / 2;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(a) * lugCircleR, cy + Math.sin(a) * lugCircleR, lugHoleR, 0, 2 * PI);
-        ctx.stroke();
-      }
-      ctx.beginPath(); ctx.arc(cx, cy, Math.max(2, hubR * 0.22), 0, 2 * PI); ctx.stroke();
-
-      // Valve stem at the bottom of the rim lip
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy + lipR);
-      ctx.lineTo(cx, cy + lipR - Math.max(4, rimR * 0.06));
-      ctx.stroke();
       ctx.lineWidth = 1;
     }
 
@@ -577,10 +580,6 @@
 
     // Use a single uniform mm->px scale so width and height are in the same units visually
     const headroom = 1.05; // small headroom to avoid clipping
-    // Legacy rim-only scale: preserves the rim's relative size vs the hub image
-    const rimScaleX = (c.width - marginX * 2) / (maxWidthMm * headroom);
-    const rimScaleY = (c.height - marginY * 2) / (maxRimMm * headroom);
-    const rimOnlyScale = Math.min(rimScaleX, rimScaleY);
     // Full scale including tire so the whole drawing stays inside the canvas
     const scaleX = (c.width - marginX * 2) / (maxTireWMm * headroom);
     const scaleY = (c.height - marginY * 2) / (maxTireODMm * headroom);
@@ -594,22 +593,22 @@
 
     const y = c.height / 2; // overlay both rectangles vertically centered
 
-    // Hub image scale factor (keeps the rim's relative size vs the image)
-    const imgK = scale / rimOnlyScale;
-    // Spacer rectangle height: matches the hub flange in the image (~27% of image height),
-    // with a geometry-based fallback if the image is unavailable
-    const HUB_FLANGE_FRAC = 0.15;
-    const HUB_IMG_NATURAL_H = 630; // hub_assembly.png natural height, used before the image loads
-    const hubFlangeH = ((hubImgLoaded && hubImg.height) ? hubImg.height : HUB_IMG_NATURAL_H) * HUB_FLANGE_FRAC * imgK;
+    // Physical calibration: the wheel-assembly drawing is scaled with the same
+    // mm->px scale as the wheels (it does NOT zoom for larger wheels). The hub
+    // face in the artwork is HUB_FACE_ART_H units tall and represents 3 inches.
+    const imgK = (HUB_FACE_MM * scale) / HUB_FACE_ART_H; // canvas px per artwork unit
+    // Spacer rectangle height: matches the physical hub face height
+    const hubFlangeH = HUB_FACE_MM * scale;
 
-    // Draw hub assembly image centered at the hub face.
-    if (hubImgLoaded && hubImg && hubImg.width && hubImg.height) {
-      const targetW = hubImg.width * imgK;
-      const targetH = hubImg.height * imgK;
+    // Draw wheel assembly drawing centered at the hub face (hub center is at
+    // the midpoint of the SVG file). Use viewBox dims, not img.width/height,
+    // because the SVG has no intrinsic size.
+    if (hubImgLoaded && hubImg) {
+      const targetW = HUB_IMG_W * imgK;
+      const targetH = HUB_IMG_H * imgK;
       const xImg = hubFaceX - targetW / 2;
       const yImg = y - targetH / 2;
       ctx.save();
-      ctx.globalAlpha = .3;
       ctx.imageSmoothingEnabled = true;
       // In dark theme, invert only the hub image to improve contrast
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -837,7 +836,7 @@
     wrap.className = 'setup-card';
     wrap.innerHTML = `
       <div class="setup-card-head">
-        <h4>Setup ${idx}</h4>
+        <h4>Setup</h4>
         <button class="copy-baseline" type="button" title="Copy all values from the baseline setup">Get from baseline</button>
       </div>
       <div class="grid two">
@@ -857,6 +856,7 @@
     `;
     wrap.querySelector('.remove').addEventListener('click', () => {
       wrap.remove();
+      renumberSetups();
       renderAll();
     });
     // Copy all values from the baseline entries into this card
@@ -1120,7 +1120,14 @@
       const s = n.toFixed(1);
       return s.endsWith('.0') ? s.slice(0, -2) : s;
     };
-    el.textContent = `when your GPS speed is ${fmt1(actual)} km/h, Speedometer shows ${fmt1(indicated)} km/h`;
+    const isAr = window.ToolMeUp?.lang?.() === 'ar';
+    if (isAr) {
+      el.textContent = `عندما تكون سرعة GPS لديك ${fmt1(actual)} كم/س، يعرض عداد السرعة ${fmt1(indicated)} كم/س`;
+      el.setAttribute('dir', 'rtl');
+    } else {
+      el.textContent = `when your GPS speed is ${fmt1(actual)} km/h, Speedometer shows ${fmt1(indicated)} km/h`;
+      el.removeAttribute('dir');
+    }
   }
 
   // Baseline save
@@ -1134,12 +1141,19 @@
     // Keep speedo hint in sync while typing
     const sp = document.getElementById('base_speedo_error');
     if (sp) sp.addEventListener('input', updateSpeedoHint);
+    // Re-render dynamic hint when the hint language changes
+    document.addEventListener('toolmeup:langchange', updateSpeedoHint);
     // Keep baseline tire R-suffix in sync while typing rim diameter
     const rd = document.getElementById('base_rim_diam');
     if (rd) rd.addEventListener('input', updateTireSuffixes);
     // Initialize hints on load
     updateSpeedoHint();
     updateTireSuffixes();
+  }
+
+  // Renumber visible setup headings by position (display only, not stored)
+  function renumberSetups() {
+    $$('#setups .setup-card h4').forEach((h, i) => { h.textContent = `Setup ${i + 1}`; });
   }
 
   // Add setups
@@ -1149,6 +1163,7 @@
     addBtn.addEventListener('click', () => {
       const card = makeSetupCard(idx++);
       $("#setups").appendChild(card);
+      renumberSetups();
       renderAll();
     });
     // expose a helper to programmatically add cards by simulating clicks
@@ -1157,6 +1172,7 @@
     // Autosave when any setup input changes
     const observer = new MutationObserver(() => {
       if (typeof saveAutoState === 'function') saveAutoState();
+      if (typeof updateSessionUI === 'function') updateSessionUI();
     });
     observer.observe(document.getElementById('setups'), { childList: true, subtree: true });
   }
@@ -1261,28 +1277,141 @@
     renderAll();
   }
 
+  const SESSIONS_KEY = 'tmu_sessions';
+  let loadedSession = null; // { id, name } of the currently loaded saved session
+
+  function readSessions() {
+    try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]'); }
+    catch (_) { return []; }
+  }
+  function writeSessions(arr) {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(arr));
+  }
+
+  function updateSessionUI() {
+    const bar = document.getElementById('sessionNameBar');
+    if (bar) {
+      if (loadedSession) {
+        bar.textContent = `Session: ${loadedSession.name}`;
+        bar.hidden = false;
+      } else {
+        bar.textContent = '';
+        bar.hidden = true;
+      }
+    }
+    const owBtn = document.getElementById('overwriteSessionBtn');
+    if (owBtn) owBtn.hidden = !loadedSession;
+    // Save Session requires at least one setup
+    const saveBtn = document.getElementById('saveSessionBtn');
+    if (saveBtn) {
+      const hasSetups = !!document.querySelector('#setups .setup-card');
+      saveBtn.disabled = !hasSetups;
+      saveBtn.title = hasSetups ? '' : 'Add at least one setup before saving a session';
+    }
+  }
+
+  function setLoadedSession(sess) {
+    loadedSession = sess ? { id: sess.id, name: sess.name } : null;
+    updateSessionUI();
+  }
+
   function saveSession() {
     const data = serializeSession();
     const name = prompt('Save session as (name):', new Date().toLocaleString());
     if (!name) return;
     const item = { id: Date.now(), name, ts: Date.now(), data };
-    const key = 'tmu_sessions';
-    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    const arr = readSessions();
     arr.push(item);
-    localStorage.setItem(key, JSON.stringify(arr));
+    writeSessions(arr);
+    setLoadedSession(item);
     alert('Session saved.');
   }
 
+  function overwriteSession() {
+    if (!loadedSession) return;
+    const arr = readSessions();
+    const item = arr.find(it => it.id === loadedSession.id);
+    if (!item) {
+      alert('The loaded session no longer exists. Use Save Session instead.');
+      setLoadedSession(null);
+      return;
+    }
+    if (!confirm(`Overwrite session "${item.name}" with the current values?`)) return;
+    item.data = serializeSession();
+    item.ts = Date.now();
+    writeSessions(arr);
+    alert('Session overwritten.');
+  }
+
+  // Modal listing saved sessions with load / rename / delete
   function loadSession() {
-    const key = 'tmu_sessions';
-    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    const arr = readSessions();
     if (!arr.length) { alert('No saved sessions.'); return; }
-    let menu = 'Select session to load:\n';
-    arr.forEach((it, i) => { menu += `${i + 1}) ${it.name}\n`; });
-    const choice = prompt(menu, '1');
-    const idx = parseInt(choice, 10) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= arr.length) return;
-    applySession(arr[idx].data);
+
+    let overlay = document.getElementById('sessionModal');
+    if (overlay) overlay.remove();
+    overlay = document.createElement('div');
+    overlay.id = 'sessionModal';
+    overlay.className = 'modal-overlay is-open';
+    overlay.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Saved sessions">
+        <div class="modal__head">
+          <h3 class="modal__title">Saved Sessions</h3>
+          <button class="modal__close" type="button" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal__body">
+          <div class="hint"${window.ToolMeUp?.lang?.() === 'ar' ? ' dir="rtl"' : ''}>${window.ToolMeUp?.hintText?.('hint_sessions') || 'Click a session name to load it.'}</div>
+          <ul class="session-list"></ul>
+        </div>
+      </div>`;
+
+    const close = () => overlay.remove();
+    overlay.querySelector('.modal__close').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    const list = overlay.querySelector('.session-list');
+    const rebuild = () => {
+      const sessions = readSessions();
+      if (!sessions.length) { close(); return; }
+      list.innerHTML = '';
+      sessions.forEach(it => {
+        const li = document.createElement('li');
+        li.className = 'session-item';
+        li.innerHTML = `
+          <button class="session-load" type="button" title="Load this session"></button>
+          <span class="session-date"></span>
+          <button class="session-icon rename" type="button" title="Rename">&#9998;</button>
+          <button class="session-icon delete" type="button" title="Delete">&#128465;</button>`;
+        li.querySelector('.session-load').textContent = it.name;
+        li.querySelector('.session-date').textContent = new Date(it.ts).toLocaleDateString();
+        li.querySelector('.session-load').addEventListener('click', () => {
+          applySession(it.data);
+          setLoadedSession(it);
+          close();
+        });
+        li.querySelector('.rename').addEventListener('click', () => {
+          const newName = prompt('Rename session:', it.name);
+          if (!newName || newName === it.name) return;
+          const all = readSessions();
+          const target = all.find(x => x.id === it.id);
+          if (target) { target.name = newName; writeSessions(all); }
+          if (loadedSession && loadedSession.id === it.id) {
+            loadedSession.name = newName;
+            updateSessionUI();
+          }
+          rebuild();
+        });
+        li.querySelector('.delete').addEventListener('click', () => {
+          if (!confirm(`Delete session "${it.name}"?`)) return;
+          writeSessions(readSessions().filter(x => x.id !== it.id));
+          if (loadedSession && loadedSession.id === it.id) setLoadedSession(null);
+          rebuild();
+        });
+        list.appendChild(li);
+      });
+    };
+    rebuild();
+    document.body.appendChild(overlay);
   }
 
   // Autosave current working state to restore on reload
@@ -1321,6 +1450,7 @@
     // Clear computed state and autosave
     baseline = null;
     selectedSetupId = null;
+    setLoadedSession(null);
     try { localStorage.removeItem(AUTO_KEY); } catch (_) { /* ignore */ }
     updateSpeedoHint();
     renderAll();
@@ -1328,11 +1458,14 @@
 
   function initSessionIO() {
     const saveBtn = document.getElementById('saveSessionBtn');
+    const overwriteBtn = document.getElementById('overwriteSessionBtn');
     const loadBtn = document.getElementById('loadSessionBtn');
     const resetBtn = document.getElementById('resetFieldsBtn');
     if (saveBtn) saveBtn.addEventListener('click', saveSession);
+    if (overwriteBtn) overwriteBtn.addEventListener('click', overwriteSession);
     if (loadBtn) loadBtn.addEventListener('click', loadSession);
     if (resetBtn) resetBtn.addEventListener('click', resetAllFields);
+    updateSessionUI();
   }
 
   // Utilities

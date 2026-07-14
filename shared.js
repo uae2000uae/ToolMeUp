@@ -46,6 +46,24 @@
   ];
 
   const THEME_KEY = "toolmeup:theme";
+  const LANG_KEY = "toolmeup:lang";
+
+  // ---- Hint translations (Arabic) --------------------------------------
+  // Only elements marked with data-i18n are translated; layout and page
+  // direction are untouched — hints get dir="rtl" for correct Arabic flow.
+  const AR = {
+    hint_offset: "المسافة (مم) من سطح تثبيت الجنط إلى خط منتصفه: الرقم الأعلى يُدخل الجنط أكثر إلى الداخل، والرقم الأقل أو السالب يدفعه إلى الخارج.",
+    hint_spacer: "صفيحة (مم) تُركّب بين الصرة والجنط لتدفع الجنط بالكامل إلى الخارج. اتركه فارغاً إذا لم يكن هناك فاصل (سبيسر) مركّباً.",
+    hint_tire_size: "الرقم الأول هو عرض الإطار (مم)؛ والثاني هو ارتفاع الجدار الجانبي كنسبة (%) من ذلك العرض. رقم R يؤخذ من قطر الجنط لديك.",
+    hint_correction: "بعض أنواع الإطارات تكون أعرض من المذكور، وهذا يساعدنا على التأكد من أن إطارك لا يلامس أي شيء. اتركه 0 إذا كنت لا تعرف قيمته.",
+    hint_bulge: "انتفاخ الجدار الجانبي خارج حافة الجنط، كما هو موضح في الرسم. النسبة المعتادة 5%.",
+    hint_clearance: "هذا مفيد لمعرفة مقدار المساحة المتوفرة خلف الجنط لاستخدام جنوط أعرض، وللتأكد من أن الإطارات لا تلامس الجهة الداخلية للجنط أو الرفرف الخارجي. إدخال هذه القيم مع تحديد الحدود الدنيا يساعدنا على تحذيرك عندما تكون قريباً جداً أو أكثر.",
+    hint_speedo_intro: "معظم تركيبات المصنع تجعل عداد السرعة يعطي قراءة أعلى من سرعة GPS أو الرادار. تساعدك هذه الحاسبة على معرفة القراءة المتوقعة باستخدام التركيب الجديد.",
+    hint_speedo_asper: "بحسب إعداداتك، ",
+    hint_thresholds: "هذه حدود التحذير. سنحسب الخلوص بناءً على إعداداتك الحالية المُدخلة وسنحذّرك عند تجاوز الحدود. لن يتم إيقاف الحساب.",
+    hint_scrub: "معاملات هندسية إضافية يمكنك إدخالها عند حساب تركيب الإطارات/الجنوط أو هندسة نظام التعليق، وتساعدك على حساب نصف قطر الاحتكاك (scrub radius) بدقة أعلى بدلاً من الاعتماد على قيم المصنع العامة.",
+    hint_sessions: "انقر على اسم الجلسة لتحميلها."
+  };
 
   // ---- Theme -----------------------------------------------------------
   function storedTheme() {
@@ -71,6 +89,43 @@
       const theme = toggle.checked ? "dark" : "light";
       applyTheme(theme);
       saveTheme(theme);
+    });
+  }
+
+  // ---- Language (hints only) --------------------------------------------
+  function storedLang() {
+    try { return localStorage.getItem(LANG_KEY); } catch (_) { return null; }
+  }
+  function saveLang(lang) {
+    try { localStorage.setItem(LANG_KEY, lang); } catch (_) { /* ignore */ }
+  }
+  function currentLang() {
+    return storedLang() === "ar" ? "ar" : "en";
+  }
+  function applyLang(lang) {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      const key = el.getAttribute("data-i18n");
+      // Remember the original English text the first time we touch the node.
+      if (el.dataset.en === undefined) el.dataset.en = el.textContent;
+      if (lang === "ar" && AR[key]) {
+        el.textContent = AR[key];
+        el.setAttribute("dir", "rtl");
+      } else {
+        el.textContent = el.dataset.en;
+        el.removeAttribute("dir");
+      }
+    });
+    // Let pages refresh any dynamically generated hints (e.g. speedo hint).
+    document.dispatchEvent(new CustomEvent("toolmeup:langchange", { detail: { lang: lang } }));
+  }
+  function wireLangToggle() {
+    const toggle = document.getElementById("langToggle");
+    if (!toggle) return;
+    toggle.checked = currentLang() === "ar";
+    toggle.addEventListener("change", function () {
+      const lang = toggle.checked ? "ar" : "en";
+      saveLang(lang);
+      applyLang(lang);
     });
   }
 
@@ -116,8 +171,10 @@
 
   function init() {
     wireThemeToggle();
+    wireLangToggle();
     renderNav();
     renderCards();
+    if (currentLang() === "ar") applyLang("ar");
   }
 
   if (document.readyState === "loading") {
@@ -126,6 +183,8 @@
     init();
   }
 
-  // Expose for any page that wants the list
-  window.ToolMeUp = { tools: TOOLS };
+  // Expose for any page that wants the list or current hint language
+  window.ToolMeUp = { tools: TOOLS, lang: currentLang, hintText: function (key) {
+    return currentLang() === "ar" && AR[key] ? AR[key] : null;
+  } };
 })();

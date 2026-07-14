@@ -63,15 +63,17 @@ h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
 .tire-wrap { position: relative; display: inline-flex; align-items: center; }
 .tire-wrap input { padding-right: 52px; }
 .tire-suffix { position: absolute; right: 10px; font-weight: 600; font-size: 13px; pointer-events: none; user-select: none; }
-.hint { color: var(--muted); font-size: 12px; }
-.hint-bold { color: var(--muted); font-size: 12px; font-weight: 600; }
+.hint { color: var(--muted); font-size: 12px; padding-top: 6px; }
+.hint-bold { color: var(--fg); font-size: 12px; }
 
-.actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; margin-bottom: 8px; }
 button { font-size: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: gray; color: white; cursor: pointer; }
 button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 button.green { background-color: green; border-color: green; color: white; }
 
 button:hover { filter: brightness(1.3); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+button:disabled:hover { filter: none; }
 
 /* Tabs for Results & Visualizations */
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
@@ -184,6 +186,18 @@ html.compact { font-size: 87.5%; }
 .advanced[open] > .advanced__summary::before { transform: rotate(90deg); }
 .advanced__summary:hover { filter: brightness(1.1); }
 .advanced > .grid.two:first-of-type { margin-top: 10px; }
+
+/* ---- Sessions ---- */
+.session-name { margin-top: 6px; font-size: 16px; color: var(--warn); background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;}
+.session-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.session-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.session-item:last-child { border-bottom: none; }
+.session-load { flex: 1; text-align: left; background: transparent; border: none; color: var(--fg); cursor: pointer; padding: 6px 4px; font-size: 14px; }
+.session-load:hover { color: var(--accent); filter: none; }
+.session-date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.session-icon { background: transparent; border: none; cursor: pointer; font-size: 15px; padding: 4px 6px; color: var(--muted); }
+.session-icon:hover { color: var(--fg); filter: none; }
+.session-icon.delete:hover { color: var(--bad, #e5484d); }
 
 /* ---- Modal / wizard ---- */
 .modal-overlay {
