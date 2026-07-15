@@ -1097,9 +1097,14 @@
     if (typeof saveAutoState === 'function') saveAutoState();
   }
 
-  // Theme toggle
+  // Theme toggle (lives in the shared header injected from base.html,
+  // so it may not exist yet on DOMContentLoaded — retry when ready)
   function initTheme() {
     const toggle = $("#themeToggle");
+    if (!toggle) {
+      document.addEventListener('toolmeup:headerready', initTheme, { once: true });
+      return;
+    }
     toggle.addEventListener('change', () => {
       document.documentElement.setAttribute('data-theme', toggle.checked ? 'dark' : 'light');
       if (typeof saveAutoState === 'function') saveAutoState();
@@ -1249,7 +1254,7 @@
       });
     });
     const unit = $('#unitToggle').value;
-    const themeDark = $('#themeToggle').checked;
+    const themeDark = $('#themeToggle')?.checked ?? (document.documentElement.getAttribute('data-theme') === 'dark');
     return { base, setups, unit, themeDark, selectedSetupId };
   }
 

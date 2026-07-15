@@ -52,7 +52,8 @@ body {
 .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
 .grid.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 900px) { .grid.two { grid-template-columns: 1fr; } }
+.grid.three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: end; }
+@media (max-width: 900px) { .grid.two, .grid.three { grid-template-columns: 1fr; } }
 
 h2 { margin: 0 0 12px; }
 h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
@@ -63,6 +64,14 @@ h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
 .tire-wrap { position: relative; display: inline-flex; align-items: center; }
 .tire-wrap input { padding-right: 52px; }
 .tire-suffix { position: absolute; right: 10px; font-weight: 600; font-size: 13px; pointer-events: none; user-select: none; }
+/* Full-width stacked field (label above input), e.g. URL inputs and textareas */
+.field--wide label { display: block; }
+.field--wide input, .field--wide textarea {
+  display: block; width: 100%; max-width: none; margin-top: 4px;
+  padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%); color: var(--fg);
+  font: inherit; resize: vertical;
+}
 .hint { color: var(--muted); font-size: 12px; padding-top: 6px; }
 .hint-bold { color: var(--fg); font-size: 12px; }
 

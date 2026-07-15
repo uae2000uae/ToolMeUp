@@ -1,37 +1,72 @@
 (function(){
-  // Minimal UI to use window.wget from the page
+  "use strict";
+
+  // ---------------------------------------------------------------------
+  // UI wiring (only on pages that have the wget markup)
+  // ---------------------------------------------------------------------
   function initWgetTool() {
+    // --- Single file section ---
     const urlEl = document.getElementById('wget_url');
     const methodEl = document.getElementById('wget_method');
     const headersEl = document.getElementById('wget_headers');
     const bodyEl = document.getElementById('wget_body');
     const filenameEl = document.getElementById('wget_filename');
     const btn = document.getElementById('wget_download');
+    const cancelBtn = document.getElementById('wget_cancel');
     const prog = document.getElementById('wget_progress');
     const statusEl = document.getElementById('wget_status');
-    if (!btn || !urlEl) return; // UI not present
 
-    function setStatus(msg, isError = false) {
-      if (!statusEl) return;
-      statusEl.textContent = msg || '';
-      statusEl.style.color = isError ? 'var(--danger, #b00020)' : '';
+    // --- Site mirror section ---
+    const zipUrlEl = document.getElementById('zip_url');
+    const siteBtn = document.getElementById('wget_site_zip');
+    const zipCancelBtn = document.getElementById('zip_cancel');
+    const zipProg = document.getElementById('zip_progress');
+    const zipStatusEl = document.getElementById('zip_status');
+
+    if (!btn && !siteBtn) return; // UI not present
+
+    function makeStatusSetter(el) {
+      return function (msg, isError = false) {
+        if (!el) return;
+        el.textContent = msg || '';
+        el.style.color = isError ? 'var(--bad, #b00020)' : '';
+      };
+    }
+    function makeProgressSetter(el) {
+      return function (pct) {
+        if (!el) return;
+        el.hidden = false;
+        if (pct == null) el.removeAttribute('value'); // indeterminate
+        else el.value = Math.max(0, Math.min(100, pct));
+      };
+    }
+    const setStatus = makeStatusSetter(statusEl);
+    const setProgress = makeProgressSetter(prog);
+    const setZipStatus = makeStatusSetter(zipStatusEl);
+    const setZipProgress = makeProgressSetter(zipProg);
+
+    function parseUrl(raw, setter) {
+      const url = (raw || '').trim();
+      if (!url) { setter('Please enter a URL.', true); return null; }
+      try { return new URL(url, location.href); } catch (_) { setter('Invalid URL.', true); return null; }
     }
 
-    function setProgressPercent(pct) {
-      if (!prog) return;
-      if (pct == null) {
-        // indeterminate
-        prog.removeAttribute('value');
-      } else {
-        prog.value = Math.max(0, Math.min(100, pct));
-      }
+    // Body is ignored for GET — reflect that in the UI.
+    function syncBodyState() {
+      if (!bodyEl || !methodEl) return;
+      const isGet = methodEl.value === 'GET';
+      bodyEl.disabled = isGet;
+      bodyEl.title = isGet ? 'GET requests cannot carry a body.' : '';
     }
+    if (methodEl) methodEl.addEventListener('change', syncBodyState);
+    syncBodyState();
 
-    btn.addEventListener('click', async () => {
-      const url = (urlEl.value || '').trim();
-      if (!url) { setStatus('Please enter a URL.', true); return; }
-      // Quick URL validation
-      try { new URL(url, location.href); } catch (_) { setStatus('Invalid URL.', true); return; }
+    // --- Single file download ---
+    let dlController = null;
+
+    async function startDownload() {
+      const u = parseUrl(urlEl && urlEl.value, setStatus);
+      if (!u) return;
 
       let headers = {};
       const rawHeaders = (headersEl && headersEl.value || '').trim();
@@ -39,9 +74,9 @@
         try {
           const parsed = JSON.parse(rawHeaders);
           if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) headers = parsed;
-          else setStatus('Headers must be a JSON object. Using none.', true);
+          else { setStatus('Headers must be a JSON object.', true); return; }
         } catch (e) {
-          setStatus('Invalid headers JSON. Using none.', true);
+          setStatus('Invalid headers JSON.', true); return;
         }
       }
 
@@ -49,85 +84,120 @@
       const body = (bodyEl && bodyEl.value) ? bodyEl.value : undefined;
       const filename = (filenameEl && filenameEl.value) ? filenameEl.value.trim() : '';
 
+      dlController = new AbortController();
       btn.disabled = true;
+      if (cancelBtn) cancelBtn.hidden = false;
       setStatus('Starting download...');
-      setProgressPercent(0);
+      setProgress(0);
 
       try {
-        const { filename: savedAs } = await window.wget(url, {
+        const { filename: savedAs } = await window.wget(u.toString(), {
           method,
           headers,
           body: method === 'GET' || method === 'HEAD' ? undefined : body,
           filename: filename || undefined,
+          signal: dlController.signal,
           onProgress: ({ loaded, total, percent }) => {
             if (total) {
-              setProgressPercent(percent);
+              setProgress(percent);
               setStatus(`Downloading: ${loaded}/${total} bytes (${percent.toFixed(1)}%)`);
             } else {
-              setProgressPercent(null);
+              setProgress(null);
               setStatus(`Downloading: ${loaded} bytes`);
             }
           }
         });
-        setProgressPercent(100);
+        setProgress(100);
         setStatus(`Completed: saved as ${savedAs}`);
       } catch (err) {
-        console.error(err);
-        setStatus(`Error: ${err.message || err}`, true);
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    // Site to ZIP button
-    const siteBtn = document.getElementById('wget_site_zip');
-    if (siteBtn && window.wgetSiteZip) {
-      siteBtn.addEventListener('click', async () => {
-        const startUrl = (urlEl.value || '').trim();
-        if (!startUrl) { setStatus('Please enter a URL.', true); return; }
-        let u;
-        try { u = new URL(startUrl, location.href); } catch (_) { setStatus('Invalid URL.', true); return; }
-        const maxDepth = Math.max(0, parseInt(document.getElementById('wget_max_depth')?.value || '2', 10) || 0);
-        const maxFiles = Math.max(1, parseInt(document.getElementById('wget_max_files')?.value || '200', 10) || 200);
-        const sameOrigin = !!document.getElementById('wget_same_origin')?.checked;
-
-        siteBtn.disabled = true;
-        btn.disabled = true;
-        setStatus('Starting site crawl...');
-        setProgressPercent(0);
-        try {
-          const { zipName } = await window.wgetSiteZip(u.toString(), {
-            maxDepth,
-            maxFiles,
-            sameOrigin,
-            onProgress: ({ queued, processed, addedBytes, status }) => {
-              const pct = Math.min(100, (processed / Math.max(1, Math.min(maxFiles, queued))) * 100);
-              if (!isFinite(pct)) setProgressPercent(null); else setProgressPercent(pct);
-              setStatus(status || `Processed ${processed}/${Math.min(maxFiles, queued)} files, ${addedBytes} bytes`);
-            }
-          });
-          setProgressPercent(100);
-          setStatus(`Completed: saved as ${zipName}`);
-        } catch (err) {
+        if (err && err.name === 'AbortError') {
+          setStatus('Cancelled.');
+        } else {
           console.error(err);
           setStatus(`Error: ${err.message || err}`, true);
-        } finally {
-          siteBtn.disabled = false;
-          btn.disabled = false;
         }
-      });
+        if (prog) prog.hidden = true;
+      } finally {
+        btn.disabled = false;
+        if (cancelBtn) cancelBtn.hidden = true;
+        dlController = null;
+      }
     }
+
+    if (btn) btn.addEventListener('click', startDownload);
+    if (cancelBtn) cancelBtn.addEventListener('click', () => { if (dlController) dlController.abort(); });
+    if (urlEl) urlEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') startDownload(); });
+
+    // --- Site mirror to ZIP ---
+    let zipController = null;
+
+    async function startSiteZip() {
+      if (!window.wgetSiteZip) return;
+      const u = parseUrl(zipUrlEl && zipUrlEl.value, setZipStatus);
+      if (!u) return;
+
+      const maxDepth = Math.max(0, parseInt(document.getElementById('wget_max_depth')?.value || '2', 10) || 0);
+      const maxFiles = Math.max(1, parseInt(document.getElementById('wget_max_files')?.value || '200', 10) || 200);
+      const sameOrigin = !!document.getElementById('wget_same_origin')?.checked;
+
+      zipController = new AbortController();
+      siteBtn.disabled = true;
+      if (zipCancelBtn) zipCancelBtn.hidden = false;
+      setZipStatus('Starting site crawl...');
+      setZipProgress(0);
+
+      try {
+        const { zipName, processed } = await window.wgetSiteZip(u.toString(), {
+          maxDepth,
+          maxFiles,
+          sameOrigin,
+          signal: zipController.signal,
+          onProgress: ({ queued, processed, addedBytes, status }) => {
+            const pct = Math.min(100, (processed / Math.max(1, Math.min(maxFiles, queued))) * 100);
+            if (!isFinite(pct)) setZipProgress(null); else setZipProgress(pct);
+            setZipStatus(status || `Processed ${processed}/${Math.min(maxFiles, queued)} files, ${addedBytes} bytes`);
+          }
+        });
+        setZipProgress(100);
+        setZipStatus(`Completed: ${processed} file(s) saved as ${zipName}`);
+      } catch (err) {
+        if (err && err.name === 'AbortError') {
+          setZipStatus('Cancelled.');
+        } else {
+          console.error(err);
+          setZipStatus(`Error: ${err.message || err}`, true);
+        }
+        if (zipProg) zipProg.hidden = true;
+      } finally {
+        siteBtn.disabled = false;
+        if (zipCancelBtn) zipCancelBtn.hidden = true;
+        zipController = null;
+      }
+    }
+
+    if (siteBtn) siteBtn.addEventListener('click', startSiteZip);
+    if (zipCancelBtn) zipCancelBtn.addEventListener('click', () => { if (zipController) zipController.abort(); });
+    if (zipUrlEl) zipUrlEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') startSiteZip(); });
   }
 
-  // Expose a wget-like helper globally for downloading files via Fetch
+  // ---------------------------------------------------------------------
+  // window.wget — download a single URL via fetch, with progress + abort
+  // ---------------------------------------------------------------------
   if (!window.wget) {
     window.wget = async function wget(url, opts = {}) {
       const method = opts.method || 'GET';
       const headers = opts.headers || {};
       const body = opts.body;
+      const signal = opts.signal;
       const onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null;
 
-      const resp = await fetch(url, { method, headers, body });
+      let resp;
+      try {
+        resp = await fetch(url, { method, headers, body, signal });
+      } catch (err) {
+        if (err && err.name === 'AbortError') throw err;
+        throw new Error('Request failed — network error or the server does not allow cross-origin (CORS) requests.');
+      }
       if (!resp.ok) {
         throw new Error(`wget: request failed (${resp.status} ${resp.statusText})`);
       }
@@ -188,9 +258,11 @@
     };
   }
 
-  // Ensure JSZip is loaded on demand (with multi-CDN fallback and timeout)
+  // ---------------------------------------------------------------------
+  // JSZip loader (multi-CDN fallback with timeout)
+  // ---------------------------------------------------------------------
   let __jszipPromise = null;
-  
+
   function loadScript(src, opts = {}) {
     const { integrity, crossOrigin, timeout = 10000 } = opts;
     return new Promise((resolve, reject) => {
@@ -213,24 +285,23 @@
       document.head.appendChild(script);
     });
   }
-  
+
   async function ensureJSZipLoaded() {
     if (typeof JSZip !== 'undefined') return JSZip;
     if (__jszipPromise) return __jszipPromise;
-    
+
     const sources = [
       { url: 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js', integrity: 'sha256-9iSxsysm3Al3cEQb9H9DqTsiYlFtoCReQfHn3fXZi5M=', crossOrigin: 'anonymous' },
       { url: 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js' },
       { url: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js' }
     ];
-    
+
     __jszipPromise = (async () => {
       const errors = [];
       for (const src of sources) {
         try {
           await loadScript(src.url, { integrity: src.integrity, crossOrigin: src.crossOrigin, timeout: 10000 });
           if (typeof JSZip !== 'undefined') return JSZip;
-          // Loaded but global not set – treat as failure and try next
           errors.push(new Error('JSZip global not found after loading ' + src.url));
         } catch (e) {
           errors.push(new Error(src.url + ': ' + (e && e.message ? e.message : e)));
@@ -240,10 +311,9 @@
       err.causes = errors;
       throw err;
     })();
-    
+
     try {
-      const lib = await __jszipPromise;
-      return lib;
+      return await __jszipPromise;
     } catch (e) {
       // Reset so next attempt can retry, instead of keeping a rejected promise cached
       __jszipPromise = null;
@@ -251,13 +321,24 @@
     }
   }
 
-  // Mirror a site (bounded) into a ZIP and download it.
+  // ---------------------------------------------------------------------
+  // window.wgetSiteZip — mirror a site (bounded) into a ZIP, with abort
+  // ---------------------------------------------------------------------
   if (!window.wgetSiteZip) {
     window.wgetSiteZip = async function wgetSiteZip(startUrl, options = {}) {
       const JSZipLib = await ensureJSZipLoaded();
       const start = new URL(startUrl, location.href);
       const opts = Object.assign({ maxDepth: 2, maxFiles: 200, sameOrigin: true }, options || {});
       const onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null;
+      const signal = opts.signal;
+
+      const throwIfAborted = () => {
+        if (signal && signal.aborted) {
+          const e = new Error('Aborted');
+          e.name = 'AbortError';
+          throw e;
+        }
+      };
 
       const allowedProtocols = new Set(['http:', 'https:']);
       const isHttp = (u) => allowedProtocols.has(u.protocol);
@@ -269,7 +350,7 @@
       let processed = 0;
       let addedBytes = 0;
 
-      const zip = new JSZip();
+      const zip = new JSZipLib();
       const makeZipPath = (u, contentType) => {
         const isHtml = typeof contentType === 'string' && contentType.toLowerCase().includes('text/html');
         let pathname = u.pathname;
@@ -339,6 +420,7 @@
       progress();
 
       while (queue.length && processed < opts.maxFiles) {
+        throwIfAborted();
         const { url: cur, depth } = queue.shift();
         const key = cur.toString();
         if (visited.has(key)) continue;
@@ -348,8 +430,9 @@
 
         let resp;
         try {
-          resp = await fetch(cur.toString(), { method: 'GET', credentials: 'same-origin' });
+          resp = await fetch(cur.toString(), { method: 'GET', credentials: 'same-origin', signal });
         } catch (e) {
+          if (e && e.name === 'AbortError') throw e;
           continue;
         }
         if (!resp || !resp.ok) continue;
@@ -384,6 +467,7 @@
         progress();
       }
 
+      throwIfAborted();
       if (onProgress) onProgress({ queued: queue.length + visited.size, processed, addedBytes, status: 'Creating ZIP...' });
       const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 
@@ -404,5 +488,9 @@
   }
 
   // Initialize only on pages that have the wget UI
-  document.addEventListener('DOMContentLoaded', initWgetTool);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWgetTool);
+  } else {
+    initWgetTool();
+  }
 })();

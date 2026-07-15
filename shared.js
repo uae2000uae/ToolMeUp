@@ -151,6 +151,25 @@
     }).join("");
   }
 
+  // ---- Shared header (base.html) ----------------------------------------
+  // Pages carry an empty <header class="app-header" data-shared-header
+  // data-brand="..."> and the nav markup lives once in base.html.
+  function loadSharedHeader() {
+    const mount = document.querySelector("header[data-shared-header]");
+    if (!mount) return Promise.resolve();
+    return fetch("base.html")
+      .then(function (r) { if (!r.ok) throw new Error("base.html " + r.status); return r.text(); })
+      .then(function (html) {
+        mount.innerHTML = html;
+        const brand = mount.getAttribute("data-brand");
+        if (brand) {
+          const b = mount.querySelector(".brand");
+          if (b) b.textContent = brand;
+        }
+      })
+      .catch(function () { /* keep whatever is in the page as fallback */ });
+  }
+
   // ---- Header kebab menu -------------------------------------------------
   function wireMenu() {
     const btn = document.getElementById("menuBtn");
@@ -171,11 +190,15 @@
   }
 
   function init() {
-    wireThemeToggle();
-    wireLangToggle();
-    wireMenu();
-    renderCards();
-    if (currentLang() === "ar") applyLang("ar");
+    loadSharedHeader().then(function () {
+      wireThemeToggle();
+      wireLangToggle();
+      wireMenu();
+      renderCards();
+      if (currentLang() === "ar") applyLang("ar");
+      // Let page scripts know the injected header is ready to wire up.
+      document.dispatchEvent(new CustomEvent("toolmeup:headerready"));
+    });
   }
 
   if (document.readyState === "loading") {

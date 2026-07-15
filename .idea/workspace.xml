@@ -7,16 +7,14 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 added images to canvases">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dualshock-tool/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Dualshock-tool/index.html" afterDir="false" />
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 changes in page look and drawing logic">
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wget.html" beforeDir="false" afterPath="$PROJECT_DIR$/wget.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wget.js" beforeDir="false" afterPath="$PROJECT_DIR$/wget.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,23 +62,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0000004987944884" />
-      <entry key="S2" value="1.0342917878873126" />
-      <entry key="S5" value="1.5286774281255682" />
-      <entry key="S10" value="2.6942188943568395" />
-      <entry key="S30" value="7.5537912667483935" />
-      <entry key="S60" value="12.55313111074365" />
-      <entry key="M2" value="17.292784886564824" />
-      <entry key="M5" value="22.95532248470451" />
-      <entry key="M10" value="26.70738447223101" />
-      <entry key="M15" value="28.43195255719474" />
-      <entry key="M30" value="30.500009232611884" />
-      <entry key="H1" value="31.796758201173482" />
-      <entry key="H2" value="33.828046945313794" />
-      <entry key="H4" value="38.26814923479964" />
-      <entry key="D1" value="49.793318656755915" />
-      <entry key="W1" value="53.34162731804548" />
+      <entry key="MS100" value="1.0028202059314577" />
+      <entry key="MS500" value="1.345387311964448" />
+      <entry key="S2" value="2.7429129103469596" />
+      <entry key="S5" value="4.88362088554663" />
+      <entry key="S10" value="7.14915134678786" />
+      <entry key="S30" value="10.33626247350762" />
+      <entry key="S60" value="11.545170569277024" />
+      <entry key="M2" value="12.238461126074538" />
+      <entry key="M5" value="12.686716083885365" />
+      <entry key="M10" value="12.846145483811227" />
+      <entry key="M15" value="12.978060712973848" />
+      <entry key="M30" value="14.602932414232809" />
+      <entry key="H1" value="20.38244189238834" />
+      <entry key="H2" value="29.31592874776315" />
+      <entry key="H4" value="39.581110128172085" />
+      <entry key="D1" value="59.859916608019525" />
+      <entry key="W1" value="65.88096206240489" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -102,23 +100,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9395227492140118" />
-      <entry key="MS500" value="0.9876013547387267" />
-      <entry key="S2" value="1.0310834592270373" />
-      <entry key="S5" value="1.5268558369147833" />
-      <entry key="S10" value="2.692657389577547" />
-      <entry key="S30" value="7.552159021546524" />
-      <entry key="S60" value="12.551668307212744" />
-      <entry key="M2" value="17.291725279481007" />
-      <entry key="M5" value="22.954715905721557" />
-      <entry key="M10" value="26.707013573787314" />
-      <entry key="M15" value="28.4316838910492" />
-      <entry key="M30" value="30.49986187295983" />
-      <entry key="H1" value="31.79667938025613" />
-      <entry key="H2" value="33.82799780321792" />
-      <entry key="H4" value="38.26811160589853" />
-      <entry key="D1" value="49.79330652441098" />
-      <entry key="W1" value="53.341625325121996" />
+      <entry key="MS100" value="0.9553246333765528" />
+      <entry key="MS500" value="1.332393536899543" />
+      <entry key="S2" value="2.736205588852029" />
+      <entry key="S5" value="4.878731008420079" />
+      <entry key="S10" value="7.1454310643578225" />
+      <entry key="S30" value="10.334377966345789" />
+      <entry key="S60" value="11.544101352027301" />
+      <entry key="M2" value="12.23788966281403" />
+      <entry key="M5" value="12.686477904522597" />
+      <entry key="M10" value="12.846024668959984" />
+      <entry key="M15" value="12.977979042026789" />
+      <entry key="M30" value="14.602883785024583" />
+      <entry key="H1" value="20.382403164529" />
+      <entry key="H2" value="29.315894833513248" />
+      <entry key="H4" value="39.581078885194906" />
+      <entry key="D1" value="59.85990433983381" />
+      <entry key="W1" value="65.88095996520417" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -226,7 +224,7 @@
       <workItem from="1783647541561" duration="3365000" />
       <workItem from="1783889853738" duration="3577000" />
       <workItem from="1783960810312" duration="6923000" />
-      <workItem from="1784067906043" duration="3665000" />
+      <workItem from="1784067906043" duration="4381000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -364,7 +362,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783990009651</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Version 1.1.3 changes in page look and drawing logic">
+      <option name="closed" value="true" />
+      <created>1784077273786</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1784077273786</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -390,14 +396,15 @@
     <MESSAGE value="Version 1.1.3 fixed tire size format" />
     <MESSAGE value="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality" />
     <MESSAGE value="Version 1.1.3 added images to canvases" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 added images to canvases" />
+    <MESSAGE value="Version 1.1.3 changes in page look and drawing logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 changes in page look and drawing logic" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1330</line>
+          <line>1335</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
