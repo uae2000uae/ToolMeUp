@@ -1,0 +1,37 @@
+<!--
+  ToolMeUp • shared top navigation bar
+  Injected by shared.js into <header class="app-header" data-shared-header>
+  on every page. Edit the nav in this one file only.
+  Per-page brand text comes from the header's data-brand attribute.
+-->
+<div class="brand">ToolMeUp</div>
+<div class="header-controls menu-wrap">
+  <button id="menuBtn" class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-haspopup="true">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+  </button>
+  <div id="menuDropdown" class="menu-dropdown" hidden>
+    <a href="index.html">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>
+      Home</a>
+    <a href="fitment.html">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 4a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>
+      Fitment</a>
+    <a href="wget.html">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2"/></svg>
+      Wget</a>
+    <a href="Dualshock-tool/index.html">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 10h4M8 8v4m6-1h.01M17 10h.01M7 6h10a4 4 0 014 4l1 6a2.5 2.5 0 01-4.6 1.4L15 14H9l-2.4 3.4A2.5 2.5 0 012 16l1-6a4 4 0 014-4z"/></svg>
+      DualShock-Tool</a>
+    <div class="menu-sep"></div>
+    <label class="toggle">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <span>Dark</span>
+      <input type="checkbox" id="themeToggle">
+    </label>
+    <label class="toggle">
+      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zM3 12h18M12 3c2.5 2.6 2.5 15.4 0 18-2.5-2.6-2.5-15.4 0-18z"/></svg>
+      <span>العربية</span>
+      <input type="checkbox" id="langToggle">
+    </label>
+  </div>
+</div>
