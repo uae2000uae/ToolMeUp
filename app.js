@@ -524,20 +524,28 @@
   // 1 = rim corner), b = outward bulge from the line as fraction of max
   // bulge (negative = inward).
   const SIDEWALL_PROFILE = [
-    { h: 0.05, b: 0.40 },
-    { h: 0.25, b: 1.05 },
-    { h: 0.45, b: 1.20 },   // max bulge
-    { h: 0.65, b: 1.05 },
-    { h: 0.90, b: 0.40 },
+    { h: 0.10, b: 0.60 },
+    { h: 0.30, b: 1.05 },   // max bulge
+    { h: 0.50, b: 1.00 },
+    { h: 0.80, b: 0.50 },
     { h: 1.00, b: -0.10 },
+    { h: 1.03, b: 0.00 },
     { h: 1.05, b: -0.20 },  // past the rim corner
     { h: 1.10, b: -0.20 }   // bead: tucks inside rim
   ];
-  const TREAD_GROOVES = { count: 8, depth: 10 }; // depth in px
   // Shoulder: length on each side of the tread that doesn't touch the
   // ground. The tread (contact) line is drawn shorter by this amount per
   // side; the C-curve will be extended to fill it.
   const SHOULDER_MM = 15;
+
+  // Tread profile (from Drawing/SVG/Asset 2.svg, symmetrized + vertically
+  // centered). Replaces the straight tread line; includes the grooves.
+  // Coordinates: x 0..TREAD_SVG_W, y centered on 0; the two endpoints sit
+  // at y = +TREAD_SVG_END_Y (toward the rim), where the C-curves connect.
+  const TREAD_SVG_D = "M0,10.51C1.09,9.48 3.89,6.91 7.68,4.46C12.07,1.62 16.88,-0.55 22.17,-2.1C33.79,-5.49 43.74,-7.08 55.87,-7.65C57.99,-7.75 59.55,-6.87 60.48,-5.2L63.35,-0.05L72.35,-0.41L73.92,-5.72C74.53,-7.77 76.09,-8.96 78.28,-9.05L106.19,-10.18C108.01,-10.26 109.97,-9.18 110.43,-7.54L112.09,-1.59L123.33,-1.72L124.85,-6.8C125.54,-9.1 127.35,-10.52 129.81,-10.51L143.63,-10.43L157.45,-10.51C159.91,-10.52 161.72,-9.1 162.41,-6.8L163.93,-1.72L175.17,-1.59L176.83,-7.54C177.29,-9.18 179.25,-10.26 181.07,-10.18L208.98,-9.05C211.17,-8.96 212.73,-7.77 213.34,-5.72L214.91,-0.41L223.91,-0.05L226.78,-5.2C227.71,-6.87 229.27,-7.75 231.39,-7.65C243.52,-7.08 253.47,-5.49 265.09,-2.1C270.38,-0.55 275.19,1.62 279.58,4.46C283.37,6.91 286.17,9.48 287.26,10.51";
+  const TREAD_SVG_W = 287.26;
+  const TREAD_SVG_END_Y = 10.51;
+  let treadPath2D = null; // lazy-built Path2D of TREAD_SVG_D
 
   function drawRimView(base, selected) {
     const c = $("#RimView");
@@ -707,31 +715,34 @@
       const contactRightX = tireRightX - shoulderPx;
       const contactWidthPx = contactRightX - contactLeftX;
 
-      // Draw tire top line (contact patch)
-      ctx.beginPath();
-      ctx.moveTo(contactLeftX, tireTopY);
-      ctx.lineTo(contactRightX, tireTopY);
-      ctx.stroke();
-
-      // Draw tire bottom line (contact patch)
-      ctx.beginPath();
-      ctx.moveTo(contactLeftX, tireBottomY);
-      ctx.lineTo(contactRightX, tireBottomY);
-      ctx.stroke();
-
-      // Tread grooves: short lines from the tread surface into the tire
-      // (top line -> down, bottom line -> up)
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (let g = 1; g <= TREAD_GROOVES.count; g++) {
-        const gx = contactLeftX + (contactWidthPx * g) / (TREAD_GROOVES.count + 1);
-        ctx.moveTo(gx, tireTopY);
-        ctx.lineTo(gx, tireTopY + TREAD_GROOVES.depth);
-        ctx.moveTo(gx, tireBottomY);
-        ctx.lineTo(gx, tireBottomY - TREAD_GROOVES.depth);
+      // Tread profile (Asset 2.svg shape, grooves included): the shape's
+      // vertical middle sits exactly on the tread line height; its
+      // endpoints land at lineY +/- TREAD_SVG_END_Y where the C-curves
+      // connect. Bottom line is the same shape flipped vertically.
+      const ts = contactWidthPx / TREAD_SVG_W; // uniform svg->px scale
+      const canPath2D = typeof Path2D !== 'undefined' && typeof DOMMatrix !== 'undefined';
+      if (canPath2D) {
+        if (!treadPath2D) treadPath2D = new Path2D(TREAD_SVG_D);
+        const strokeTread = (lineY, flip) => {
+          const p2 = new Path2D();
+          p2.addPath(treadPath2D, new DOMMatrix([ts, 0, 0, flip * ts, contactLeftX, lineY]));
+          ctx.stroke(p2);
+        };
+        strokeTread(tireTopY, 1);     // top: grooves face up
+        strokeTread(tireBottomY, -1); // bottom: mirrored
+      } else {
+        // Fallback: straight contact lines
+        ctx.beginPath();
+        ctx.moveTo(contactLeftX, tireTopY);
+        ctx.lineTo(contactRightX, tireTopY);
+        ctx.moveTo(contactLeftX, tireBottomY);
+        ctx.lineTo(contactRightX, tireBottomY);
+        ctx.stroke();
       }
-      ctx.stroke();
-      ctx.lineWidth = 2; // restore for sidewalls
+
+      // Y where the tread shape's endpoints sit (C-curve start points)
+      const treadEndTopY = canPath2D ? tireTopY + TREAD_SVG_END_Y * ts : tireTopY;
+      const treadEndBottomY = canPath2D ? tireBottomY - TREAD_SVG_END_Y * ts : tireBottomY;
 
       // Sidewall C-curves: one continuous curve from tread edge to rim
       // corner. Each profile point sits on the tread->rim chord at
@@ -747,12 +758,12 @@
         smoothPath(pts);
       }
 
-      // Start at the contact-line ends so the curve connects to it and
-      // spans the shoulder on its way to the rim corner.
-      drawSidewall(contactLeftX,  tireTopY,    rimLeftX,  rimTopY,    -1);
-      drawSidewall(contactRightX, tireTopY,    rimRightX, rimTopY,    +1);
-      drawSidewall(contactLeftX,  tireBottomY, rimLeftX,  rimBottomY, -1);
-      drawSidewall(contactRightX, tireBottomY, rimRightX, rimBottomY, +1);
+      // Start at the tread shape's end points so the curve connects to it
+      // and spans the shoulder on its way to the rim corner.
+      drawSidewall(contactLeftX,  treadEndTopY,    rimLeftX,  rimTopY,    -1);
+      drawSidewall(contactRightX, treadEndTopY,    rimRightX, rimTopY,    +1);
+      drawSidewall(contactLeftX,  treadEndBottomY, rimLeftX,  rimBottomY, -1);
+      drawSidewall(contactRightX, treadEndBottomY, rimRightX, rimBottomY, +1);
     }
 
     // Visibility toggles
@@ -1000,14 +1011,15 @@
     if (cmp) {
       const corrected = (-cmp.speedoErrPct) + (baseline?.baseSpeedoError || 0);
       const cls = Math.abs(corrected) > 2 ? 'warn' : 'good';
-      // Append example conversion at 100 km/h
-      const actual100 = 100;
-      const indicated100 = actual100 * (1 + corrected / 100);
+      // Append example conversion at an indicated 100 km/h:
+      // indicated = actual * (1 + err/100)  =>  actual = indicated / (1 + err/100)
+      const indicated100 = 100;
+      const actual100 = indicated100 / (1 + corrected / 100);
       const fmt1 = (n) => {
         const s = n.toFixed(1);
         return s.endsWith('.0') ? s.slice(0, -2) : s;
       };
-      const example = `When your GPS speed is ${fmt1(actual100)} km/h, Speedometer shows ${fmt1(indicated100)} km/h`;
+      const example = `when your Speedometer shows ${fmt1(indicated100)} km/h, your actual speed (GPS) is ${fmt1(actual100)} km/h`;
       alerts.push({ text: `Speedometer vs GPS Speed: ${corrected.toFixed(2)}% So, ` + example, cls });
     }
 
@@ -1157,18 +1169,19 @@
     if (!el) return;
     const val = parseFloat(document.getElementById('base_speedo_error')?.value);
     if (isNaN(val)) { el.textContent = ''; return; }
-    const actual = 100; // km/h
-    const indicated = actual * (1 + val / 100);
+    // indicated = actual * (1 + err/100)  =>  actual = indicated / (1 + err/100)
+    const indicated = 100; // km/h shown on the speedometer
+    const actual = indicated / (1 + val / 100);
     const fmt1 = n => {
       const s = n.toFixed(1);
       return s.endsWith('.0') ? s.slice(0, -2) : s;
     };
     const isAr = window.ToolMeUp?.lang?.() === 'ar';
     if (isAr) {
-      el.textContent = `عندما تكون سرعة GPS لديك ${fmt1(actual)} كم/س، يعرض عداد السرعة ${fmt1(indicated)} كم/س`;
+      el.textContent = `عندما يعرض عداد السرعة ${fmt1(indicated)} كم/س، تكون سرعتك الفعلية (GPS) ${fmt1(actual)} كم/س`;
       el.setAttribute('dir', 'rtl');
     } else {
-      el.textContent = `when your GPS speed is ${fmt1(actual)} km/h, Speedometer shows ${fmt1(indicated)} km/h`;
+      el.textContent = `when your Speedometer shows ${fmt1(indicated)} km/h, your actual speed (GPS) is ${fmt1(actual)} km/h`;
       el.removeAttribute('dir');
     }
   }

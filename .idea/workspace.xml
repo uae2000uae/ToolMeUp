@@ -7,14 +7,10 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 changes in page look and drawing logic">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 changes in drawing logic and enhace Wget tool">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wget.html" beforeDir="false" afterPath="$PROJECT_DIR$/wget.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wget.js" beforeDir="false" afterPath="$PROJECT_DIR$/wget.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,23 +58,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0028202059314577" />
-      <entry key="MS500" value="1.345387311964448" />
-      <entry key="S2" value="2.7429129103469596" />
-      <entry key="S5" value="4.88362088554663" />
-      <entry key="S10" value="7.14915134678786" />
-      <entry key="S30" value="10.33626247350762" />
-      <entry key="S60" value="11.545170569277024" />
-      <entry key="M2" value="12.238461126074538" />
-      <entry key="M5" value="12.686716083885365" />
-      <entry key="M10" value="12.846145483811227" />
-      <entry key="M15" value="12.978060712973848" />
-      <entry key="M30" value="14.602932414232809" />
-      <entry key="H1" value="20.38244189238834" />
-      <entry key="H2" value="29.31592874776315" />
-      <entry key="H4" value="39.581110128172085" />
-      <entry key="D1" value="59.859916608019525" />
-      <entry key="W1" value="65.88096206240489" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0" />
+      <entry key="S5" value="1.0" />
+      <entry key="S10" value="1.0" />
+      <entry key="S30" value="1.0" />
+      <entry key="S60" value="1.0" />
+      <entry key="M2" value="1.0000000003264131" />
+      <entry key="M5" value="1.0004395752038684" />
+      <entry key="M10" value="1.0612244062138252" />
+      <entry key="M15" value="1.3651590384387495" />
+      <entry key="M30" value="3.5954184091214865" />
+      <entry key="H1" value="9.925143890113164" />
+      <entry key="H2" value="21.111154933096323" />
+      <entry key="H4" value="35.01222201647001" />
+      <entry key="D1" value="62.96564533354051" />
+      <entry key="W1" value="71.41922737387446" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -100,23 +96,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9553246333765528" />
-      <entry key="MS500" value="1.332393536899543" />
-      <entry key="S2" value="2.736205588852029" />
-      <entry key="S5" value="4.878731008420079" />
-      <entry key="S10" value="7.1454310643578225" />
-      <entry key="S30" value="10.334377966345789" />
-      <entry key="S60" value="11.544101352027301" />
-      <entry key="M2" value="12.23788966281403" />
-      <entry key="M5" value="12.686477904522597" />
-      <entry key="M10" value="12.846024668959984" />
-      <entry key="M15" value="12.977979042026789" />
-      <entry key="M30" value="14.602883785024583" />
-      <entry key="H1" value="20.382403164529" />
-      <entry key="H2" value="29.315894833513248" />
-      <entry key="H4" value="39.581078885194906" />
-      <entry key="D1" value="59.85990433983381" />
-      <entry key="W1" value="65.88095996520417" />
+      <entry key="MS100" value="0.7022224378689985" />
+      <entry key="MS500" value="0.9317404293047731" />
+      <entry key="S2" value="0.9824800378998837" />
+      <entry key="S5" value="0.9929548331266311" />
+      <entry key="S10" value="0.996471190314417" />
+      <entry key="S30" value="0.9988223437750419" />
+      <entry key="S60" value="0.9994109984260939" />
+      <entry key="M2" value="0.9997054561613079" />
+      <entry key="M5" value="1.0003217366377444" />
+      <entry key="M10" value="1.0611647942822282" />
+      <entry key="M15" value="1.3651170853997814" />
+      <entry key="M30" value="3.59538941930424" />
+      <entry key="H1" value="9.925116877303509" />
+      <entry key="H2" value="21.111127283795422" />
+      <entry key="H4" value="35.01219390164606" />
+      <entry key="D1" value="62.96563281273507" />
+      <entry key="W1" value="71.41922517286402" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -224,7 +220,7 @@
       <workItem from="1783647541561" duration="3365000" />
       <workItem from="1783889853738" duration="3577000" />
       <workItem from="1783960810312" duration="6923000" />
-      <workItem from="1784067906043" duration="4381000" />
+      <workItem from="1784067906043" duration="7121000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -370,7 +366,23 @@
       <option name="project" value="LOCAL" />
       <updated>1784077273786</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Version 1.1.3 changes in drawing logic and enhace Wget tool">
+      <option name="closed" value="true" />
+      <created>1784079010266</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1784079010266</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Version 1.1.3 changes in drawing logic and enhace Wget tool">
+      <option name="closed" value="true" />
+      <created>1784079022994</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1784079022994</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -397,14 +409,15 @@
     <MESSAGE value="Version 1.1.3 fixed bulge percentage range and added get from baseline functionality" />
     <MESSAGE value="Version 1.1.3 added images to canvases" />
     <MESSAGE value="Version 1.1.3 changes in page look and drawing logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 changes in page look and drawing logic" />
+    <MESSAGE value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1335</line>
+          <line>1348</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
