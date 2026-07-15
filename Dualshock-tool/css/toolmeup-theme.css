@@ -1,0 +1,160 @@
+/*
+  ToolMeUp theme bridge for the DualShock tool.
+  Maps the ToolMeUp palette (see ../styles.css) onto Bootstrap 5.3 CSS
+  variables so this sub-app matches the rest of the site.
+  Dark/light follows the shared "toolmeup:theme" localStorage key via
+  data-bs-theme on <html> (set by the inline script in index.html).
+*/
+
+/* ---- Palette ---------------------------------------------------------- */
+[data-bs-theme="light"] {
+  --tmu-bg: #f7f9fc;
+  --tmu-fg: #0e1521;
+  --tmu-muted: #44769a;
+  --tmu-panel: #ffffff;
+  --tmu-accent: #b45309;
+  --tmu-border: #e3eaf2;
+}
+[data-bs-theme="dark"] {
+  --tmu-bg: #0b0d10;
+  --tmu-fg: #e9eef5;
+  --tmu-muted: #44769a;
+  --tmu-panel: #151922;
+  --tmu-accent: #f59e0b;
+  --tmu-border: #223044;
+}
+
+/* ---- Bootstrap variable remap ----------------------------------------- */
+[data-bs-theme="light"], [data-bs-theme="dark"] {
+  --bs-body-bg: var(--tmu-bg);
+  --bs-body-color: var(--tmu-fg);
+  --bs-emphasis-color: var(--tmu-fg);
+  --bs-secondary-color: var(--tmu-muted);
+  --bs-tertiary-bg: var(--tmu-panel);
+  --bs-secondary-bg: var(--tmu-panel);
+  --bs-border-color: var(--tmu-border);
+  --bs-border-color-translucent: var(--tmu-border);
+  --bs-link-color: var(--tmu-accent);
+  --bs-link-hover-color: color-mix(in oklab, var(--tmu-accent) 80%, var(--tmu-fg) 20%);
+  --bs-primary: var(--tmu-accent);
+  --bs-primary-rgb: 245, 158, 11;
+}
+[data-bs-theme="light"] { --bs-primary-rgb: 180, 83, 9; }
+
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* ---- Header / footer bars --------------------------------------------- */
+.navbar.bg-body-tertiary, footer.bg-body-tertiary {
+  background-color: var(--tmu-panel) !important;
+  border-color: var(--tmu-border) !important;
+}
+.navbar { border-bottom: 5px solid var(--tmu-border); }
+.navbar-brand { color: var(--tmu-fg); }
+.navbar .nav-link { color: var(--tmu-muted); }
+.navbar .nav-link:hover { color: var(--tmu-fg); }
+
+/* ---- Cards / panels ---------------------------------------------------- */
+.card {
+  --bs-card-bg: var(--tmu-panel);
+  --bs-card-border-color: var(--tmu-border);
+  --bs-card-cap-bg: color-mix(in oklab, var(--tmu-panel) 92%, var(--tmu-fg) 8%);
+  border-radius: 12px;
+}
+.text-bg-light {
+  background-color: var(--tmu-panel) !important;
+  color: var(--tmu-fg) !important;
+}
+.bg-white {
+  background-color: var(--tmu-panel) !important;
+}
+
+/* ---- Buttons ------------------------------------------------------------
+   Primary actions use the ToolMeUp accent (amber) like button.primary
+   on the other tool pages. */
+.btn { border-radius: 8px; }
+.btn-primary {
+  --bs-btn-bg: var(--tmu-accent);
+  --bs-btn-border-color: var(--tmu-accent);
+  --bs-btn-color: var(--tmu-bg);
+  --bs-btn-hover-bg: color-mix(in oklab, var(--tmu-accent) 85%, var(--tmu-fg) 15%);
+  --bs-btn-hover-border-color: color-mix(in oklab, var(--tmu-accent) 85%, var(--tmu-fg) 15%);
+  --bs-btn-hover-color: var(--tmu-bg);
+  --bs-btn-active-bg: color-mix(in oklab, var(--tmu-accent) 75%, var(--tmu-fg) 25%);
+  --bs-btn-active-border-color: color-mix(in oklab, var(--tmu-accent) 75%, var(--tmu-fg) 25%);
+  --bs-btn-active-color: var(--tmu-bg);
+  --bs-btn-disabled-bg: var(--tmu-accent);
+  --bs-btn-disabled-border-color: var(--tmu-accent);
+  --bs-btn-disabled-color: var(--tmu-bg);
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--tmu-accent);
+  --bs-btn-border-color: var(--tmu-accent);
+  --bs-btn-hover-bg: var(--tmu-accent);
+  --bs-btn-hover-border-color: var(--tmu-accent);
+  --bs-btn-hover-color: var(--tmu-bg);
+  --bs-btn-active-bg: var(--tmu-accent);
+  --bs-btn-active-border-color: var(--tmu-accent);
+  --bs-btn-active-color: var(--tmu-bg);
+}
+.btn-outline-secondary {
+  --bs-btn-color: var(--tmu-muted);
+  --bs-btn-border-color: var(--tmu-border);
+  --bs-btn-hover-bg: color-mix(in oklab, var(--tmu-fg) 8%, transparent);
+  --bs-btn-hover-border-color: var(--tmu-muted);
+  --bs-btn-hover-color: var(--tmu-fg);
+}
+
+/* ---- Tabs --------------------------------------------------------------- */
+.nav-tabs {
+  --bs-nav-tabs-border-color: var(--tmu-border);
+  --bs-nav-tabs-link-active-bg: var(--tmu-panel);
+  --bs-nav-tabs-link-active-color: var(--tmu-accent);
+  --bs-nav-tabs-link-active-border-color: var(--tmu-border) var(--tmu-border) var(--tmu-panel);
+  --bs-nav-tabs-link-hover-border-color: var(--tmu-border);
+}
+.nav-tabs .nav-link { color: var(--tmu-muted); }
+.nav-tabs .nav-link:hover { color: var(--tmu-fg); }
+
+/* ---- Modals / dropdowns -------------------------------------------------- */
+.modal-content {
+  background-color: var(--tmu-panel);
+  border: 1px solid var(--tmu-border);
+  border-radius: 14px;
+}
+.dropdown-menu {
+  --bs-dropdown-bg: var(--tmu-panel);
+  --bs-dropdown-border-color: var(--tmu-border);
+  --bs-dropdown-link-color: var(--tmu-fg);
+  --bs-dropdown-link-hover-bg: color-mix(in oklab, var(--tmu-fg) 8%, transparent);
+}
+
+/* ---- Theme toggle in the navbar (matches .toggle on other pages) -------- */
+.tmu-toggle { display: flex; gap: 8px; align-items: center; color: var(--tmu-muted); margin: 0; cursor: pointer; }
+
+/* ---- Fixes for hard-coded colors in the original app -------------------- */
+.stick-card-active {
+  border: 1px solid var(--tmu-accent) !important;
+  box-shadow: 0 0 10px color-mix(in oklab, var(--tmu-accent) 30%, transparent) !important;
+}
+.stick-card-active .card-header {
+  background-color: var(--tmu-accent) !important;
+  color: var(--tmu-bg) !important;
+}
+/* Info boxes that were white with Bootstrap-blue borders */
+.tmu-note {
+  border: 2px solid var(--tmu-accent) !important;
+  color: var(--tmu-fg) !important;
+  background-color: var(--tmu-panel) !important;
+}
+/* Footer icon links were .text-dark (invisible on dark bg) */
+[data-bs-theme="dark"] footer .text-dark { color: var(--tmu-fg) !important; }
+/* Finetune highlighted coordinate labels (were Bootstrap blue) */
+#finetuneStickCanvasLx-lbl.text-primary,
+#finetuneStickCanvasLy-lbl.text-primary,
+#finetuneStickCanvasRx-lbl.text-primary,
+#finetuneStickCanvasRy-lbl.text-primary {
+  color: var(--tmu-accent) !important;
+  background-color: color-mix(in oklab, var(--tmu-accent) 12%, transparent) !important;
+}

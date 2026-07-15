@@ -96,6 +96,10 @@ button:disabled:hover { filter: none; }
 .cv-base input { accent-color: #4aa3ff; }
 .cv-setup { color: #22c55e; }
 .cv-setup input { accent-color: #22c55e; }
+.cv-refs { color: #ef4444; }
+.cv-refs input { accent-color: #f87171; } /* lighter red so the checkmark renders black like the others */
+.cv-hub { color: #999; }
+.cv-hub input { accent-color: #999; }
 /* Structured fitment report (setups as columns) */
 .report-section { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; overflow-x: auto; }
 .report-title { margin: 0; color: var(--warn); font-weight: 600; font-size: 15px; }
@@ -139,6 +143,18 @@ html.compact { font-size: 87.5%; }
 /* Header nav links (rendered by shared.js) */
 .header-controls a { color: var(--muted); text-decoration: none; padding: 6px 8px; border-radius: 8px; font-weight: 500; }
 .header-controls a:hover { color: var(--fg); background: color-mix(in oklab, var(--fg) 8%, transparent); }
+
+/* Header kebab (three-dots) dropdown menu */
+.menu-wrap { position: relative; }
+.menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--fg); cursor: pointer; }
+.menu-btn:hover { background: color-mix(in oklab, var(--fg) 8%, transparent); }
+.menu-dropdown { position: absolute; right: 0; top: calc(100% + 6px); min-width: 220px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 1001; }
+.menu-dropdown[hidden] { display: none; }
+.menu-dropdown a, .menu-dropdown .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-weight: 500; cursor: pointer; }
+.menu-dropdown a:hover, .menu-dropdown .toggle:hover { background: color-mix(in oklab, var(--fg) 8%, transparent); }
+.menu-dropdown .menu-icon { flex: 0 0 auto; color: var(--muted); }
+.menu-dropdown .toggle input { margin-left: auto; }
+.menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
 
 /* Layout utilities (replacing former inline styles) */
 .preset { margin: 8px 0; }

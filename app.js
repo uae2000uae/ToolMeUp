@@ -124,16 +124,8 @@
     const corr = (brandWidthCorrectionPct || 0) / 100;
     sectionWidthMm = sectionWidthMm * (1 + corr);
 
-    // Very rough rim width influence: for each 0.5" wider than nominal, section width changes ~5 mm
-    // Only apply if metric and rim width known; fallback otherwise.
-    if (rimWidthIn && parsed.type === 'metric') {
-      // Nominal rim width guideline: sectionWidth(mm)/25.4 * 0.4? We'll use ETRTO approx:
-      // Recommended rim width ~ (section width in inches) * 0.7 to 0.9; we'll pick midpoint 0.8 to estimate nominal
-      const secIn = sectionWidthMm / MM_PER_IN;
-      const nominalRim = secIn * 0.8;
-      const halfInSteps = Math.round((rimWidthIn - nominalRim) / 0.5);
-      sectionWidthMm += halfInSteps * 5; // 5 mm per 0.5" change
-    }
+    // Note: rim width intentionally does NOT influence section width —
+    // tire width comes only from the tire size (plus brand correction).
 
     circumferenceMm = overallDiaMm * PI;
     // revs per mile = 1 mile / circumference
@@ -426,21 +418,47 @@
   }
 
   // Visualizations using canvas
+
+  // Design (logical) canvas size — all drawing code works in these units.
+  const CANVAS_W = 560;
+  const CANVAS_H = 320;
+
+  // Match the canvas backing store to its real on-screen resolution
+  // (CSS size x devicePixelRatio) so lines and the hub image stay sharp
+  // when the page is zoomed or on high-DPI screens. Drawing code keeps
+  // using logical 560x320 units via the applied transform.
+  function prepareCanvas(cv) {
+    const rect = cv.getBoundingClientRect();
+    const cssW = rect.width || cv.clientWidth || CANVAS_W;
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.max(1, Math.round(cssW * dpr));
+    const h = Math.max(1, Math.round(cssW * (CANVAS_H / CANVAS_W) * dpr));
+    if (cv.width !== w) cv.width = w;
+    if (cv.height !== h) cv.height = h;
+    const ctx = cv.getContext('2d');
+    const s = w / CANVAS_W;
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    return ctx;
+  }
+
   function drawSideView(base, selected, unitMode) {
     const c = $("#sideView");
-    const ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
+    const ctx = prepareCanvas(c);
+    const W = CANVAS_W, H = CANVAS_H;
+    ctx.clearRect(0, 0, W, H);
     if (!base?.tireGeom || !selected?.tireGeom) return;
 
     const margin = 20;
     const maxDia = Math.max(base.tireGeom.overallDiaMm, selected.tireGeom.overallDiaMm);
-    const scale = (c.height - margin * 2) / maxDia;
+    const scale = (H - margin * 2) / maxDia;
 
     // Vector wheel side profile (line-art style: treaded tire + spoked rim)
     function drawTire(set, x, color) {
       const r = (set.tireGeom.overallDiaMm / 2) * scale;
       const rimR = (set.tireGeom.rim_in * MM_PER_IN / 2) * scale;
-      const cx = x, cy = c.height - margin - r;
+      const cx = x, cy = H - margin - r;
 
       ctx.strokeStyle = color;
 
@@ -492,12 +510,12 @@
     ctx.strokeStyle = '#888';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(margin, c.height - margin);
-    ctx.lineTo(c.width - margin, c.height - margin);
+    ctx.moveTo(margin, H - margin);
+    ctx.lineTo(W - margin, H - margin);
     ctx.stroke();
 
-    drawTire(base, c.width * 0.33, '#4aa3ff');
-    drawTire(selected, c.width * 0.66, '#22c55e');
+    drawTire(base, W * 0.33, '#4aa3ff');
+    drawTire(selected, W * 0.66, '#22c55e');
   }
 
   // Sidewall C-curve profile (tuned in Drawing/Tyre drawing test.html).
@@ -506,21 +524,26 @@
   // 1 = rim corner), b = outward bulge from the line as fraction of max
   // bulge (negative = inward).
   const SIDEWALL_PROFILE = [
-    { h: 0.05, b: 0.05 },
-    { h: 0.25, b: 0.90 },
-    { h: 0.50, b: 1.25 },   // max bulge
-    { h: 0.75, b: 0.90 },
-    { h: 0.92, b: 0.00 },
-    { h: 0.96, b: 0.25 },
-    { h: 0.98, b: -0.25 },
-    { h: 1.00, b: -0.25 }   // bead: tucks inside rim corner
+    { h: 0.05, b: 0.40 },
+    { h: 0.25, b: 1.05 },
+    { h: 0.45, b: 1.20 },   // max bulge
+    { h: 0.65, b: 1.05 },
+    { h: 0.90, b: 0.40 },
+    { h: 1.00, b: -0.10 },
+    { h: 1.05, b: -0.20 },  // past the rim corner
+    { h: 1.10, b: -0.20 }   // bead: tucks inside rim
   ];
   const TREAD_GROOVES = { count: 8, depth: 10 }; // depth in px
+  // Shoulder: length on each side of the tread that doesn't touch the
+  // ground. The tread (contact) line is drawn shorter by this amount per
+  // side; the C-curve will be extended to fill it.
+  const SHOULDER_MM = 15;
 
   function drawRimView(base, selected) {
     const c = $("#RimView");
-    const ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
+    const ctx = prepareCanvas(c);
+    const W = CANVAS_W, H = CANVAS_H;
+    ctx.clearRect(0, 0, W, H);
     if (!base?.wheelGeom || !selected?.wheelGeom) return;
 
     // Catmull-Rom spline through points, rendered as beziers
@@ -581,17 +604,17 @@
     // Use a single uniform mm->px scale so width and height are in the same units visually
     const headroom = 1.05; // small headroom to avoid clipping
     // Full scale including tire so the whole drawing stays inside the canvas
-    const scaleX = (c.width - marginX * 2) / (maxTireWMm * headroom);
-    const scaleY = (c.height - marginY * 2) / (maxTireODMm * headroom);
+    const scaleX = (W - marginX * 2) / (maxTireWMm * headroom);
+    const scaleY = (H - marginY * 2) / (maxTireODMm * headroom);
     const scale = Math.min(scaleX, scaleY);
 
     const minPxH = 8; // ensure visibility for very small diameters
 
     // Hub face anchoring: center when ET=0, shift by baseline effective ET
-    const centerlineX = c.width / 2;
+    const centerlineX = W / 2;
     const hubFaceX = centerlineX - (base.wheelGeom.effectiveEt || 0) * scale; // positive ET moves inward (left)
 
-    const y = c.height / 2; // overlay both rectangles vertically centered
+    const y = H / 2; // overlay both rectangles vertically centered
 
     // Physical calibration: the wheel-assembly drawing is scaled with the same
     // mm->px scale as the wheels (it does NOT zoom for larger wheels). The hub
@@ -630,7 +653,7 @@
       const spacerMmVal = set.spacerMm || 0;
       if (spacerMmVal > 0) {
         const spacerPx = spacerMmVal * scale;
-        const rectH = Math.min(hubFlangeH, c.height - marginY * 2);
+        const rectH = Math.min(hubFlangeH, H - marginY * 2);
         ctx.fillStyle = color + '55';
         ctx.strokeStyle = color;
         ctx.lineWidth = 1;
@@ -643,7 +666,7 @@
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(hubFaceX + spacerPx, marginY);
-        ctx.lineTo(hubFaceX + spacerPx, c.height - marginY);
+        ctx.lineTo(hubFaceX + spacerPx, H - marginY);
         ctx.stroke();
       }
 
@@ -677,16 +700,23 @@
       const tireTopY = rimTopY - sidewallPx;
       const tireBottomY = rimBottomY + sidewallPx;
 
-      // Draw tire top line (tread)
+      // Contact (tread) line: shortened by the shoulder length on each
+      // side — that area doesn't touch the ground.
+      const shoulderPx = SHOULDER_MM * scale;
+      const contactLeftX = tireLeftX + shoulderPx;
+      const contactRightX = tireRightX - shoulderPx;
+      const contactWidthPx = contactRightX - contactLeftX;
+
+      // Draw tire top line (contact patch)
       ctx.beginPath();
-      ctx.moveTo(tireLeftX, tireTopY);
-      ctx.lineTo(tireRightX, tireTopY);
+      ctx.moveTo(contactLeftX, tireTopY);
+      ctx.lineTo(contactRightX, tireTopY);
       ctx.stroke();
 
-      // Draw tire bottom line (tread)
+      // Draw tire bottom line (contact patch)
       ctx.beginPath();
-      ctx.moveTo(tireLeftX, tireBottomY);
-      ctx.lineTo(tireRightX, tireBottomY);
+      ctx.moveTo(contactLeftX, tireBottomY);
+      ctx.lineTo(contactRightX, tireBottomY);
       ctx.stroke();
 
       // Tread grooves: short lines from the tread surface into the tire
@@ -694,7 +724,7 @@
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (let g = 1; g <= TREAD_GROOVES.count; g++) {
-        const gx = tireLeftX + (tireWidthPx * g) / (TREAD_GROOVES.count + 1);
+        const gx = contactLeftX + (contactWidthPx * g) / (TREAD_GROOVES.count + 1);
         ctx.moveTo(gx, tireTopY);
         ctx.lineTo(gx, tireTopY + TREAD_GROOVES.depth);
         ctx.moveTo(gx, tireBottomY);
@@ -717,23 +747,31 @@
         smoothPath(pts);
       }
 
-      drawSidewall(tireLeftX,  tireTopY,    rimLeftX,  rimTopY,    -1);
-      drawSidewall(tireRightX, tireTopY,    rimRightX, rimTopY,    +1);
-      drawSidewall(tireLeftX,  tireBottomY, rimLeftX,  rimBottomY, -1);
-      drawSidewall(tireRightX, tireBottomY, rimRightX, rimBottomY, +1);
+      // Start at the contact-line ends so the curve connects to it and
+      // spans the shoulder on its way to the rim corner.
+      drawSidewall(contactLeftX,  tireTopY,    rimLeftX,  rimTopY,    -1);
+      drawSidewall(contactRightX, tireTopY,    rimRightX, rimTopY,    +1);
+      drawSidewall(contactLeftX,  tireBottomY, rimLeftX,  rimBottomY, -1);
+      drawSidewall(contactRightX, tireBottomY, rimRightX, rimBottomY, +1);
     }
 
-    // Draw hub face reference line (parallel to wheel height)
-    ctx.strokeStyle = '#999';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(hubFaceX, marginY);
-    ctx.lineTo(hubFaceX, c.height - marginY);
-    ctx.stroke();
-
-    // Draw baseline then selected on top (overlay), honoring visibility toggles
+    // Visibility toggles
     const showBase = document.getElementById('rv_show_base')?.checked ?? true;
     const showSetup = document.getElementById('rv_show_setup')?.checked ?? true;
+    const showRefs = document.getElementById('rv_show_refs')?.checked ?? true; // Strut/Fender (red)
+    const showHub = document.getElementById('rv_show_hub')?.checked ?? true;   // Hub face (gray)
+
+    // Draw hub face reference line (parallel to wheel height)
+    if (showHub) {
+      ctx.strokeStyle = '#999';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(hubFaceX, marginY);
+      ctx.lineTo(hubFaceX, H - marginY);
+      ctx.stroke();
+    }
+
+    // Draw baseline then selected on top (overlay), honoring visibility toggles
     if (showBase) drawWheelRect(base, '#4aa3ff');
     if (showSetup) drawWheelRect(selected, '#22c55e');
 
@@ -743,7 +781,7 @@
 
     // Strut reference derived from baseline inner edge and baseline inner clearance input
     const baseInnerClearMm = parseFloat($("#base_inner_clear").value);
-    if (!isNaN(baseInnerClearMm)) {
+    if (showRefs && !isNaN(baseInnerClearMm)) {
       const xBaseInner = hubFaceX - base.wheelGeom.backspacingMm * scale; // baseline inner wheel edge
       const xStrut = xBaseInner - baseInnerClearMm * scale; // vehicle strut position (fixed)
       // Draw a vertical red line at the strut reference position
@@ -751,14 +789,14 @@
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(xStrut, marginY);
-      ctx.lineTo(xStrut, c.height - marginY);
+      ctx.lineTo(xStrut, H - marginY);
       ctx.stroke();
       xStrutLabel = xStrut;
     }
 
     // Fender reference derived from baseline outer edge and baseline outer clearance input
     const baseOuterClearMm = parseFloat($("#base_outer_clear").value);
-    if (!isNaN(baseOuterClearMm)) {
+    if (showRefs && !isNaN(baseOuterClearMm)) {
       const xBaseOuter = hubFaceX + base.wheelGeom.frontspacingMm * scale; // baseline outer wheel edge
       const xFender = xBaseOuter + baseOuterClearMm * scale; // vehicle fender position (fixed)
       // Draw a vertical red line at the fender reference position
@@ -766,7 +804,7 @@
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(xFender, marginY);
-      ctx.lineTo(xFender, c.height - marginY);
+      ctx.lineTo(xFender, H - marginY);
       ctx.stroke();
       xFenderLabel = xFender;
     }
@@ -776,7 +814,7 @@
     function drawDashedBand(x, w) {
       if (!isFinite(x) || !isFinite(w) || w <= 0) return;
       const top = marginY;
-      const h = c.height - marginY * 2;
+      const h = H - marginY * 2;
       ctx.save();
       ctx.beginPath();
       ctx.rect(x, top, w, h);
@@ -821,8 +859,8 @@
     ctx.font = '12px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    // Hub face label always shown
-    ctx.fillText('Hub', hubFaceX, marginY - 4);
+    // Hub face label only when the hub line is shown
+    if (showHub) ctx.fillText('Hub', hubFaceX, marginY - 4);
     // Strut/Fender labels only if their lines exist
     if (xStrutLabel != null) ctx.fillText('Strut', xStrutLabel, marginY - 4);
     if (xFenderLabel != null) ctx.fillText('Fender', xFenderLabel, marginY - 4);
@@ -1079,7 +1117,7 @@
 
   // RimView base/setup visibility toggles
   function initRimViewToggles() {
-    ['rv_show_base', 'rv_show_setup'].forEach(id => {
+    ['rv_show_base', 'rv_show_setup', 'rv_show_refs', 'rv_show_hub'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', renderAll);
     });
   }
@@ -1490,6 +1528,9 @@
     }
     // Try to auto-load last working state only on the fitment page
     if (hasFitment) tryAutoLoad();
+    // Re-render on resize/zoom so canvases match the new on-screen
+    // resolution (browser zoom changes devicePixelRatio and fires resize)
+    if (hasFitment) window.addEventListener('resize', debounce(renderAll, 100));
   }
 
 

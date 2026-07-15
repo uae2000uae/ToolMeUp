@@ -1,10 +1,10 @@
 /*
   ToolMeUp • shared site chrome
   - Single source of truth for the tool list (TOOLS manifest)
-  - Renders the header nav on every page and the tool cards on the hub
+  - Renders the tool cards on the hub
   - Persists the light/dark theme across pages via localStorage
-  Add a new tool by appending one entry to TOOLS below — the nav and hub
-  cards update automatically, no other file needs editing.
+  Header nav links are plain HTML in each page. Add a new tool by
+  appending one entry to TOOLS below and adding a nav link to each page.
 */
 (function () {
   "use strict";
@@ -129,24 +129,6 @@
     });
   }
 
-  // ---- Header nav ------------------------------------------------------
-  function renderNav() {
-    const mount = document.querySelector("[data-nav]");
-    if (!mount) return;
-    const activeId = mount.getAttribute("data-active") || "";
-    const links = TOOLS
-      .filter(function (t) { return t.id !== activeId; })
-      .map(function (t) {
-        return '<a href="' + t.href + '" title="Open ' + t.title + '">' + t.name + "</a>";
-      })
-      .join("");
-    // Home link when not already on the hub
-    const home = activeId === "home"
-      ? ""
-      : '<a href="index.html" title="All tools">Home</a>';
-    mount.insertAdjacentHTML("afterbegin", home + links);
-  }
-
   // ---- Hub cards -------------------------------------------------------
   function renderCards() {
     const mount = document.querySelector("[data-tool-cards]");
@@ -169,10 +151,29 @@
     }).join("");
   }
 
+  // ---- Header kebab menu -------------------------------------------------
+  function wireMenu() {
+    const btn = document.getElementById("menuBtn");
+    const dd = document.getElementById("menuDropdown");
+    if (!btn || !dd) return;
+    function close() { dd.hidden = true; btn.setAttribute("aria-expanded", "false"); }
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      dd.hidden = !dd.hidden;
+      btn.setAttribute("aria-expanded", String(!dd.hidden));
+    });
+    document.addEventListener("click", function (e) {
+      if (!dd.hidden && !dd.contains(e.target) && e.target !== btn) close();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") close();
+    });
+  }
+
   function init() {
     wireThemeToggle();
     wireLangToggle();
-    renderNav();
+    wireMenu();
     renderCards();
     if (currentLang() === "ar") applyLang("ar");
   }
