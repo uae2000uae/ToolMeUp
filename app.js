@@ -319,6 +319,13 @@
         c => displayDeltaSmart(c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
       ['Wheel Arch Clearance Change', 'Change in clearance of the tire to the wheel arch',
         c => displayDeltaSmart(-c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
+      ['Final Wheel Arch Clearance', 'Remaining gap between tire and wheel arch. 20 mm or less risks rubbing',
+        c => {
+          const baseArch = parseFloat($('#base_arch_clear').value);
+          if (isNaN(baseArch)) return null;
+          const f = baseArch - c.cmp.rideHeightDeltaMm;
+          return mark(displayLengthSmart(f, unitMode, 'mm'), f > 20);
+        }],
       ['Inner Clearance Change', 'Change in clearance toward suspension',
         c => {
           if (c.cmp.innerMoveMm == null) return null;
@@ -1247,6 +1254,7 @@
       spacer: $('#base_spacer').value,
       inner_clear: $('#base_inner_clear').value,
       outer_clear: $('#base_outer_clear').value,
+      arch_clear: $('#base_arch_clear').value,
       speedo_error: $('#base_speedo_error').value,
       th_inner: $('#th_inner').value,
       th_outer: $('#th_outer').value,
@@ -1288,6 +1296,7 @@
       $('#base_spacer').value = sess.base.spacer || '';
       $('#base_inner_clear').value = sess.base.inner_clear || '';
       $('#base_outer_clear').value = sess.base.outer_clear || '';
+      $('#base_arch_clear').value = (sess.base.arch_clear === '' || sess.base.arch_clear == null) ? 50 : sess.base.arch_clear;
       $('#base_speedo_error').value = sess.base.speedo_error || '';
       $('#th_inner').value = sess.base.th_inner || '';
       $('#th_outer').value = sess.base.th_outer || '';

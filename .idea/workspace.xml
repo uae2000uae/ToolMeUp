@@ -7,10 +7,11 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.3 changes in drawing logic and enhace Wget tool">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +24,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="147" />
+    <option name="cachedIndexableFilesCount" value="161" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -65,16 +66,16 @@
       <entry key="S10" value="1.0" />
       <entry key="S30" value="1.0" />
       <entry key="S60" value="1.0" />
-      <entry key="M2" value="1.0000000003264131" />
-      <entry key="M5" value="1.0004395752038684" />
-      <entry key="M10" value="1.0612244062138252" />
-      <entry key="M15" value="1.3651590384387495" />
-      <entry key="M30" value="3.5954184091214865" />
-      <entry key="H1" value="9.925143890113164" />
-      <entry key="H2" value="21.111154933096323" />
-      <entry key="H4" value="35.01222201647001" />
-      <entry key="D1" value="62.96564533354051" />
-      <entry key="W1" value="71.41922737387446" />
+      <entry key="M2" value="1.0000000001673535" />
+      <entry key="M5" value="1.0001229262546247" />
+      <entry key="M10" value="1.0117634340657409" />
+      <entry key="M15" value="1.067868436484737" />
+      <entry key="M30" value="1.801662807796676" />
+      <entry key="H1" value="5.686600780823209" />
+      <entry key="H2" value="15.506831526431794" />
+      <entry key="H4" value="30.023511846119106" />
+      <entry key="D1" value="62.027471044554645" />
+      <entry key="W1" value="72.10094820552168" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -96,23 +97,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.7022224378689985" />
-      <entry key="MS500" value="0.9317404293047731" />
-      <entry key="S2" value="0.9824800378998837" />
-      <entry key="S5" value="0.9929548331266311" />
-      <entry key="S10" value="0.996471190314417" />
-      <entry key="S30" value="0.9988223437750419" />
-      <entry key="S60" value="0.9994109984260939" />
-      <entry key="M2" value="0.9997054561613079" />
-      <entry key="M5" value="1.0003217366377444" />
-      <entry key="M10" value="1.0611647942822282" />
-      <entry key="M15" value="1.3651170853997814" />
-      <entry key="M30" value="3.59538941930424" />
-      <entry key="H1" value="9.925116877303509" />
-      <entry key="H2" value="21.111127283795422" />
-      <entry key="H4" value="35.01219390164606" />
-      <entry key="D1" value="62.96563281273507" />
-      <entry key="W1" value="71.41922517286402" />
+      <entry key="MS100" value="0.9395227492140118" />
+      <entry key="MS500" value="0.9876008614453725" />
+      <entry key="S2" value="0.9968856972203758" />
+      <entry key="S5" value="0.9987531130852756" />
+      <entry key="S10" value="0.9993763620805105" />
+      <entry key="S30" value="0.9997920774647191" />
+      <entry key="S60" value="0.9998960333278251" />
+      <entry key="M2" value="0.9999480154800129" />
+      <entry key="M5" value="1.0001021175763212" />
+      <entry key="M10" value="1.0117523761272176" />
+      <entry key="M15" value="1.0678594193553006" />
+      <entry key="M30" value="1.8016528782687873" />
+      <entry key="H1" value="5.686586292650012" />
+      <entry key="H2" value="15.506811660386317" />
+      <entry key="H4" value="30.02348810701418" />
+      <entry key="D1" value="62.027458836955006" />
+      <entry key="W1" value="72.10094600400532" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -138,40 +139,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JavaScript Debug.Tyre drawing test.html.executor": "Run",
-    "JavaScript Debug.index.html.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/shiha/OneDrive/Documents/PythonProjects/WebApps/ToolMeUp/Expantion-ideas",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "junie.project.settings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JavaScript Debug.Tyre drawing test.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/shiha/OneDrive/Documents/PythonProjects/WebApps/ToolMeUp/Expantion-ideas&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;junie.project.settings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\shiha\OneDrive\Documents\PythonProjects\WebApps\ToolMeUp\Expantion-ideas" />
@@ -180,7 +181,7 @@
       <recent name="C:\Users\shiha\OneDrive\Documents\PythonProjects\WebApps\ToolMeUp\Drawing" />
     </key>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.Tyre drawing test.html">
+  <component name="RunManager" selected="JavaScript Debug.index.html">
     <configuration name="Tyre drawing test.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/ToolMeUp/Drawing/Tyre drawing test.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -189,8 +190,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JavaScript Debug.Tyre drawing test.html" />
         <item itemvalue="JavaScript Debug.index.html" />
+        <item itemvalue="JavaScript Debug.Tyre drawing test.html" />
       </list>
     </recent_temporary>
   </component>
@@ -220,7 +221,8 @@
       <workItem from="1783647541561" duration="3365000" />
       <workItem from="1783889853738" duration="3577000" />
       <workItem from="1783960810312" duration="6923000" />
-      <workItem from="1784067906043" duration="7121000" />
+      <workItem from="1784067906043" duration="7177000" />
+      <workItem from="1784166138694" duration="515000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -382,7 +384,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784079022994</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Version 1.1.4">
+      <option name="closed" value="true" />
+      <created>1784086962961</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1784086962961</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -410,7 +420,8 @@
     <MESSAGE value="Version 1.1.3 added images to canvases" />
     <MESSAGE value="Version 1.1.3 changes in page look and drawing logic" />
     <MESSAGE value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
+    <MESSAGE value="Version 1.1.4" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
