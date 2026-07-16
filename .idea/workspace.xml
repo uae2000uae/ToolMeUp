@@ -7,11 +7,13 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 adding Wheel Arch Clearance">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/car-fender.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/car-fender.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,23 +61,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0" />
-      <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0" />
-      <entry key="S30" value="1.0" />
-      <entry key="S60" value="1.0" />
-      <entry key="M2" value="1.0000000001673535" />
-      <entry key="M5" value="1.0001229262546247" />
-      <entry key="M10" value="1.0117634340657409" />
-      <entry key="M15" value="1.067868436484737" />
-      <entry key="M30" value="1.801662807796676" />
-      <entry key="H1" value="5.686600780823209" />
-      <entry key="H2" value="15.506831526431794" />
-      <entry key="H4" value="30.023511846119106" />
-      <entry key="D1" value="62.027471044554645" />
-      <entry key="W1" value="72.10094820552168" />
+      <entry key="MS100" value="1.0000022999087566" />
+      <entry key="MS500" value="1.0811653689460303" />
+      <entry key="S2" value="1.8078876112337812" />
+      <entry key="S5" value="2.3770306170607483" />
+      <entry key="S10" value="2.6723746327151296" />
+      <entry key="S30" value="3.2768948483426135" />
+      <entry key="S60" value="3.831461376541252" />
+      <entry key="M2" value="4.305570510302278" />
+      <entry key="M5" value="4.689903229842573" />
+      <entry key="M10" value="4.849751223426223" />
+      <entry key="M15" value="4.9555316878850695" />
+      <entry key="M30" value="5.72528729532813" />
+      <entry key="H1" value="9.596249166208814" />
+      <entry key="H2" value="19.395671345345512" />
+      <entry key="H4" value="33.91909743854925" />
+      <entry key="D1" value="65.9921097519882" />
+      <entry key="W1" value="76.09508875337032" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -97,23 +99,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9395227492140118" />
-      <entry key="MS500" value="0.9876008614453725" />
-      <entry key="S2" value="0.9968856972203758" />
-      <entry key="S5" value="0.9987531130852756" />
-      <entry key="S10" value="0.9993763620805105" />
-      <entry key="S30" value="0.9997920774647191" />
-      <entry key="S60" value="0.9998960333278251" />
-      <entry key="M2" value="0.9999480154800129" />
-      <entry key="M5" value="1.0001021175763212" />
-      <entry key="M10" value="1.0117523761272176" />
-      <entry key="M15" value="1.0678594193553006" />
-      <entry key="M30" value="1.8016528782687873" />
-      <entry key="H1" value="5.686586292650012" />
-      <entry key="H2" value="15.506811660386317" />
-      <entry key="H4" value="30.02348810701418" />
-      <entry key="D1" value="62.027458836955006" />
-      <entry key="W1" value="72.10094600400532" />
+      <entry key="MS100" value="0.8293215480004844" />
+      <entry key="MS500" value="1.0421101474121448" />
+      <entry key="S2" value="1.791914864242162" />
+      <entry key="S5" value="2.36855934591047" />
+      <entry key="S10" value="2.667444529666377" />
+      <entry key="S30" value="3.273721400605311" />
+      <entry key="S60" value="3.8289589929023955" />
+      <entry key="M2" value="4.303912483967263" />
+      <entry key="M5" value="4.689106251510608" />
+      <entry key="M10" value="4.849326030916825" />
+      <entry key="M15" value="4.955240540008548" />
+      <entry key="M30" value="5.725133276678456" />
+      <entry key="H1" value="9.596161917102185" />
+      <entry key="H2" value="19.395614938713884" />
+      <entry key="H4" value="33.9190553928968" />
+      <entry key="D1" value="65.99209447997582" />
+      <entry key="W1" value="76.09508611311101" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -222,7 +224,7 @@
       <workItem from="1783889853738" duration="3577000" />
       <workItem from="1783960810312" duration="6923000" />
       <workItem from="1784067906043" duration="7177000" />
-      <workItem from="1784166138694" duration="515000" />
+      <workItem from="1784166138694" duration="3409000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -392,7 +394,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784086962961</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Version 1.1.4 adding Wheel Arch Clearance">
+      <option name="closed" value="true" />
+      <created>1784166689228</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1784166689228</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,14 +431,15 @@
     <MESSAGE value="Version 1.1.3 changes in page look and drawing logic" />
     <MESSAGE value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
     <MESSAGE value="Version 1.1.4" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4" />
+    <MESSAGE value="Version 1.1.4 adding Wheel Arch Clearance" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 adding Wheel Arch Clearance" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1348</line>
+          <line>1419</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

@@ -6,6 +6,7 @@
 */
 
 (function () {
+  try { console.log('ToolMeUp fitment app.js v2026-07-16-fender3'); } catch (_) { /* ignore */ }
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -55,6 +56,41 @@
   };
   rimImg.onerror = function () { rimImgLoaded = false; };
   rimImg.src = RIM_IMG_SRC;
+
+  // Preload car fender drawing for the side-view background. The wheel-arch
+  // opening inside the artwork was measured by circle-fitting the cutout:
+  // center (423.2, 368.2), radius 207.7 in viewBox units (728.1 x 425.9).
+  // Note: the arch center is NOT the geometric center of the file, so we
+  // anchor on the measured arch center to keep it concentric with the tire.
+  const FENDER_IMG_SRC = 'static/images/car-fender.svg';
+  const FENDER_IMG_W = 728.1;  // car-fender.svg viewBox width
+  const FENDER_IMG_H = 425.9;  // car-fender.svg viewBox height
+  const FENDER_ARCH_CX = 423.2;
+  const FENDER_ARCH_CY = 368.2;
+  const FENDER_ARCH_R = 207.7;
+  const fenderImg = new Image();
+  let fenderImgLoaded = false;
+  fenderImg.onload = function () {
+    fenderImgLoaded = true;
+    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+  };
+  fenderImg.onerror = function () {
+    fenderImgLoaded = false;
+    try { console.warn('ToolMeUp: could not load ' + FENDER_IMG_SRC + ' (fender view disabled until it loads)'); } catch (_) { /* ignore */ }
+  };
+  let fenderImgLoading = true; // guard so we don't spam reload attempts
+  fenderImg.addEventListener('load', function () { fenderImgLoading = false; });
+  fenderImg.addEventListener('error', function () { fenderImgLoading = false; });
+  fenderImg.src = FENDER_IMG_SRC;
+  // Retry a failed load (e.g. the file was temporarily unavailable / cloud
+  // placeholder not yet hydrated). Called from drawSideView when the fender
+  // toggle is on but the image never arrived; onload re-renders everything.
+  function retryFenderImg() {
+    if (fenderImgLoaded || fenderImgLoading) return;
+    fenderImgLoading = true;
+    const bust = (typeof location !== 'undefined' && /^http/.test(location.protocol)) ? ('?r=' + Date.now()) : '';
+    fenderImg.src = FENDER_IMG_SRC + bust;
+  }
 
   // Parse tire sizes: metric (e.g., 225/45R17, 225/45-17) and flotation (31x10.5R15, 33x12.50-20).
   // Partial sizes without the rim value (e.g., 235/45 or 31x10.5) take R from rimDiamIn (the wheel's rim diameter input).
@@ -459,7 +495,42 @@
 
     const margin = 20;
     const maxDia = Math.max(base.tireGeom.overallDiaMm, selected.tireGeom.overallDiaMm);
-    const scale = (H - margin * 2) / maxDia;
+    let scale = (H - margin * 2) / maxDia;
+
+    // Fender visibility: toggle + image ready + arch clearance provided.
+    // When fenders are shown, zoom out to 50% and spread the tires apart so
+    // the two fender drawings fit side by side without overlapping.
+    const archClearMm = parseFloat($("#base_arch_clear")?.value);
+    const fenderChecked = document.getElementById('sv_show_fender')?.checked ?? true;
+    if (fenderChecked && !fenderImgLoaded) retryFenderImg(); // self-heal a failed image load
+    const showFender = fenderChecked && fenderImgLoaded && fenderImg && !isNaN(archClearMm);
+    if (showFender) scale *= 0.5;
+    const baseX = showFender ? W * 0.25 + 30 : W * 0.33; // +20px inward +10px right in fender view
+    const setupX = showFender ? W * 0.75 + 10 : W * 0.66;
+
+    // Car fender background: the artwork is scaled once so its wheel-arch
+    // radius equals the baseline tire radius plus the wheel-arch clearance
+    // input, then the arch center is pinned to each wheel center. The same
+    // size is reused for the setup so any arch-clearance loss is visible.
+    if (showFender) {
+      const archRadiusMm = base.tireGeom.overallDiaMm / 2 + archClearMm;
+      const k = (archRadiusMm * scale) / FENDER_ARCH_R * 1.02; // canvas px per artwork unit (+2% visual tweak)
+      const drawFender = (set, cx) => {
+        const cy = H - margin - (set.tireGeom.overallDiaMm / 2) * scale; // wheel center
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        try {
+          ctx.drawImage(
+            fenderImg,
+            cx - FENDER_ARCH_CX * k - 0.5, cy - FENDER_ARCH_CY * k,
+            FENDER_IMG_W * k, FENDER_IMG_H * k
+          );
+        } catch (_) { /* ignore draw errors */ }
+        ctx.restore();
+      };
+      drawFender(base, baseX);
+      drawFender(selected, setupX);
+    }
 
     // Vector wheel side profile (line-art style: treaded tire + spoked rim)
     function drawTire(set, x, color) {
@@ -521,8 +592,8 @@
     ctx.lineTo(W - margin, H - margin);
     ctx.stroke();
 
-    drawTire(base, W * 0.33, '#4aa3ff');
-    drawTire(selected, W * 0.66, '#22c55e');
+    drawTire(base, baseX, '#4aa3ff');
+    drawTire(selected, setupX, '#22c55e');
   }
 
   // Sidewall C-curve profile (tuned in Drawing/Tyre drawing test.html).
@@ -1141,7 +1212,7 @@
 
   // RimView base/setup visibility toggles
   function initRimViewToggles() {
-    ['rv_show_base', 'rv_show_setup', 'rv_show_refs', 'rv_show_hub'].forEach(id => {
+    ['rv_show_base', 'rv_show_setup', 'rv_show_refs', 'rv_show_hub', 'sv_show_fender'].forEach(id => {
       document.getElementById(id)?.addEventListener('change', renderAll);
     });
   }

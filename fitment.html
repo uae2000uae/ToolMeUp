@@ -19,7 +19,7 @@
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20260716a">
 </head>
 <body>
   <!-- Shared top navigation: injected from base.html by shared.js -->
@@ -88,14 +88,15 @@
         <div>
           <h3>Vehicle Clearances (optional)</h3>
           <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
-          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
-          <div class="field"><label>Current tire clearance to wheel arch<input id="base_arch_clear" type="number" step="1" value="50" placeholder="mm"></label></div>
-				 <div class="hint" data-i18n="hint_arch_clearance">The gap (mm) between the top of your current tire and the wheel arch / fender liner. Taller tires eat into this gap; we use it to warn you before the tire rubs.</div>
-			 <div class="hint" data-i18n="hint_clearance">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div>
+          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label>
+				 <div class="hint" data-i18n="hint_clearance">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div></div>
+          <div class="field"><label>Current tire clearance to wheel arch<input id="base_arch_clear" type="number" step="1" value="50" placeholder="mm"></label>
+				 <div class="hint" data-i18n="hint_arch_clearance">The gap (mm) between the top of your current tire and the wheel arch / fender liner. Taller tires eat into this gap; we use it to warn you if the tire rubs.</div></div>
+
         </div>
         <div>
           <h3>Speedometer</h3>
-          <div class="field"><label>Baseline speedo error (%)<input id="base_speedo_error" type="number" placeholder="%" step="1"></label></div>
+          <div class="field"><label>Baseline speedo error (%)<input id="base_speedo_error" type="number" placeholder="%" step="1"></label>
 <div class="hint">
 
     <div data-i18n="hint_speedo_intro">
@@ -110,7 +111,7 @@
     <div class="hint-bold" id="base_speedo_hint">
         When your Speedometer shows 100 km/h, your actual speed (GPS) is 100 km/h
     </div>
-
+</div>
 </div>
 
         </div>
@@ -125,8 +126,8 @@
         <div>
           <h3>Optional Scrub Radius Inputs</h3>
           <div class="field"><label>Kingpin/steering axis inclination (deg)<input id="sr_kpi" type="number" step="0.1" placeholder="deg"></label></div>
-          <div class="field"><label>Hub face to ball-joint line at hub height (mm)<input id="sr_hub_offset" type="number" step="1" placeholder="mm"></label></div>
-          <div class="hint" data-i18n="hint_scrub">Extra geometric parameters you can enter when doing a tire/wheel fitment or suspension geometry calculation. They help you compute a more accurate scrub radius instead of relying on generic factory values</div>
+          <div class="field"><label>Hub face to ball-joint line at hub height (mm)<input id="sr_hub_offset" type="number" step="1" placeholder="mm"></label>
+          <div class="hint" data-i18n="hint_scrub">Extra geometric parameters you can enter when doing a tire/wheel fitment or suspension geometry calculation. They help you compute a more accurate scrub radius instead of relying on generic factory values</div></div>
         </div>
       </div>
       </details>
@@ -164,7 +165,12 @@
           <div class="caption">Wheel and tire cross-section comparison</div>
         </div>
         <div>
-          <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
+          <div class="canvas-wrap">
+            <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
+            <div class="canvas-controls canvas-controls--top">
+              <label class="cv-toggle cv-fender"><input type="checkbox" id="sv_show_fender" checked> Show Fender</label>
+            </div>
+          </div>
           <div class="caption">Tires side view comparison</div>
         </div>
       </div>
@@ -191,8 +197,8 @@
     <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
   </footer>
 
-  <script src="shared.js"></script>
-  <script src="app.js"></script>
-  <script src="oem-presets.js"></script>
+  <script src="shared.js?v=20260716a"></script>
+  <script src="app.js?v=20260716a"></script>
+  <script src="oem-presets.js?v=20260716a"></script>
 </body>
 </html>

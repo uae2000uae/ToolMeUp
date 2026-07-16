@@ -100,6 +100,7 @@ button:disabled:hover { filter: none; }
 /* Overlay toggles at the middle-right of a canvas */
 .canvas-wrap { position: relative; }
 .canvas-controls { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.canvas-controls--top { top: 10px; right: 12px; transform: none; }
 .cv-toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 600; user-select: none; }
 .cv-base { color: #4aa3ff; }
 .cv-base input { accent-color: #4aa3ff; }
@@ -109,6 +110,9 @@ button:disabled:hover { filter: none; }
 .cv-refs input { accent-color: #f87171; } /* lighter red so the checkmark renders black like the others */
 .cv-hub { color: #999; }
 .cv-hub input { accent-color: #999; }
+.cv-fender { color: #000; }
+.cv-fender input { accent-color: #000; }
+[data-theme="dark"] .cv-fender { color: #e5e7eb; } /* black is invisible on dark bg */
 /* Structured fitment report (setups as columns) */
 .report-section { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; overflow-x: auto; }
 .report-title { margin: 0; color: var(--warn); font-weight: 600; font-size: 15px; }
