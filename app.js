@@ -42,20 +42,78 @@
   hubImg.onerror = function () { hubImgLoaded = false; };
   hubImg.src = HUB_IMG_SRC;
 
-  // Preload rim face drawing for the side view. The SVG is 720x720 with the
-  // rim's outer edge at r=353.81 from the center, so we scale it so that edge
-  // lands exactly on the drawn rim circle.
-  const RIM_IMG_SRC = 'static/images/Rim.svg';
-  const RIM_IMG_SIZE = 720;    // Rim.svg viewBox width/height
-  const RIM_IMG_EDGE_R = 353.81; // outer rim radius inside the artwork
-  const rimImg = new Image();
-  let rimImgLoaded = false;
-  rimImg.onload = function () {
-    rimImgLoaded = true;
+  // Rim face drawings for the side view, loaded from static/images/rims/
+  // (Rim0.svg, Rim1.svg, ...). Clicking a wheel in the side view cycles that
+  // wheel's rim to the next file, wrapping back to Rim0 after the last one.
+  // New RimN.svg files dropped into the folder are picked up automatically.
+  const RIM_DIR = 'static/images/rims/';
+  const rimCache = {};    // index -> {img, loaded, failed, fx, fy, cxF, cyF}
+  const rimSel = [0, 0];  // current rim index per wheel: [base, setup]
+
+  // Measure where the wheel artwork actually sits inside the image: draw it
+  // stretched into a small square and find the opaque-pixel bounding box.
+  // The fractions are of that square, so they map directly onto any
+  // destination rectangle regardless of the SVG's viewBox size or shape.
+  function measureRimImage(entry) {
+    const S = 256;
+    try {
+      const cv = document.createElement('canvas');
+      cv.width = S; cv.height = S;
+      const mctx = cv.getContext('2d');
+      mctx.drawImage(entry.img, 0, 0, S, S);
+      const d = mctx.getImageData(0, 0, S, S).data;
+      let minX = S, minY = S, maxX = -1, maxY = -1;
+      for (let y = 0; y < S; y++) {
+        for (let x = 0; x < S; x++) {
+          if (d[(y * S + x) * 4 + 3] > 16) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (maxX >= minX && maxY >= minY) {
+        entry.fx = (maxX - minX + 1) / S;      // content width fraction
+        entry.fy = (maxY - minY + 1) / S;      // content height fraction
+        entry.cxF = (minX + maxX + 1) / 2 / S; // content center fraction
+        entry.cyF = (minY + maxY + 1) / 2 / S;
+        return;
+      }
+    } catch (_) { /* tainted canvas (file://) or draw error: use defaults */ }
+    entry.fx = entry.fy = 0.983; // Rim0.svg-like default (353.81/360)
+    entry.cxF = entry.cyF = 0.5;
+  }
+
+  function getRimEntry(i) {
+    let e = rimCache[i];
+    if (e) return e;
+    e = rimCache[i] = { img: new Image(), loaded: false, failed: false };
+    e.img.onload = function () {
+      e.loaded = true;
+      measureRimImage(e);
+      try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+    };
+    e.img.onerror = function () {
+      e.failed = true;
+      // Any wheel pointing at this missing file wraps back to Rim0
+      let changed = false;
+      for (let s = 0; s < rimSel.length; s++) {
+        if (rimSel[s] === i) { rimSel[s] = 0; changed = true; }
+      }
+      if (changed) { try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ } }
+    };
+    e.img.src = RIM_DIR + 'Rim' + i + '.svg';
+    return e;
+  }
+  getRimEntry(0); // preload the default rim
+
+  function cycleRim(slot) {
+    const next = rimSel[slot] + 1;
+    const e = getRimEntry(next);
+    rimSel[slot] = e.failed ? 0 : next; // wrap immediately if known missing
     try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
-  };
-  rimImg.onerror = function () { rimImgLoaded = false; };
-  rimImg.src = RIM_IMG_SRC;
+  }
 
   // Preload car fender drawing for the side-view background. The wheel-arch
   // opening inside the artwork was measured by circle-fitting the cutout:
@@ -316,6 +374,16 @@
   }
 
   // Structured fitment report (per "Report AI Guide") — one column per setup
+  // Remember report <details> open/closed state across re-renders and page reloads
+  const REPORT_OPEN_KEY = 'toolmeup_report_open_v1';
+  function loadReportOpen() {
+    try { return JSON.parse(localStorage.getItem(REPORT_OPEN_KEY) || '{}'); }
+    catch (_) { return {}; }
+  }
+  function saveReportOpen(state) {
+    try { localStorage.setItem(REPORT_OPEN_KEY, JSON.stringify(state)); } catch (_) { /* ignore */ }
+  }
+
   function renderComparison(base, setups, unitMode) {
     const wrap = $("#comparison");
     if (!base?.tireGeom) { wrap.innerHTML = '<div class="small">Enter and save a valid baseline to view results.</div>'; return; }
@@ -418,12 +486,24 @@
           : `${(1000000 / c.s.tireGeom.circumferenceMm).toFixed(0)} RpK`]
     ];
 
+    // Restore open/closed state: current DOM wins (mid-session), else saved state (reload)
+    const openState = loadReportOpen();
+    wrap.querySelectorAll('details.report-section[data-key]').forEach(d => { openState[d.dataset.key] = d.open; });
+
     wrap.innerHTML = `
       ${headHtml}
       <section class="report-section"><h3 class="report-title">Fitment Differences</h3>${sectionTable(diffDefs)}</section>
-      <details class="report-section"><summary class="report-title">Wheel Geometry</summary>${sectionTable(wheelDefs)}</details>
-      <details class="report-section"><summary class="report-title">Tire Geometry</summary>${sectionTable(tireDefs)}</details>
+      <details class="report-section" data-key="wheel"${openState.wheel ? ' open' : ''}><summary class="report-title">Wheel Geometry</summary>${sectionTable(wheelDefs)}</details>
+      <details class="report-section" data-key="tire"${openState.tire ? ' open' : ''}><summary class="report-title">Tire Geometry</summary>${sectionTable(tireDefs)}</details>
     `;
+    saveReportOpen(openState);
+    wrap.querySelectorAll('details.report-section[data-key]').forEach(d => {
+      d.addEventListener('toggle', () => {
+        const st = loadReportOpen();
+        st[d.dataset.key] = d.open;
+        saveReportOpen(st);
+      });
+    });
   }
 
   function displayLength(mm, unitMode) {
@@ -486,11 +566,14 @@
     return ctx;
   }
 
+  let sideViewHits = []; // clickable wheel circles from the last side-view draw
+
   function drawSideView(base, selected, unitMode) {
     const c = $("#sideView");
     const ctx = prepareCanvas(c);
     const W = CANVAS_W, H = CANVAS_H;
     ctx.clearRect(0, 0, W, H);
+    sideViewHits = [];
     if (!base?.tireGeom || !selected?.tireGeom) return;
 
     const margin = 20;
@@ -533,10 +616,11 @@
     }
 
     // Vector wheel side profile (line-art style: treaded tire + spoked rim)
-    function drawTire(set, x, color) {
+    function drawTire(set, x, color, slot) {
       const r = (set.tireGeom.overallDiaMm / 2) * scale;
       const rimR = (set.tireGeom.rim_in * MM_PER_IN / 2) * scale;
       const cx = x, cy = H - margin - r;
+      sideViewHits.push({ slot, cx, cy, r }); // click target for rim cycling
 
       ctx.strokeStyle = color;
 
@@ -565,23 +649,26 @@
       ctx.beginPath(); ctx.arc(cx, cy, r - tickLen, 0, 2 * PI); ctx.stroke();
 
       // --- Rim ---
-      // Rim face drawing (Rim.svg), scaled so its outer edge matches rimR
-      if (rimImgLoaded && rimImg) {
-        const k = rimR / RIM_IMG_EDGE_R;
-        const targetSize = RIM_IMG_SIZE * k;
+      // Rim face drawing (rims/RimN.svg per wheel), scaled so its outer
+      // edge matches rimR. Falls back to Rim0 while a rim is still loading.
+      const sel = getRimEntry(rimSel[slot]);
+      const rimE = sel.loaded ? sel : (getRimEntry(0).loaded ? getRimEntry(0) : null);
+      if (rimE) {
+        const dw = (2 * rimR) / rimE.fx;
+        const dh = (2 * rimR) / rimE.fy;
         ctx.save();
         ctx.imageSmoothingEnabled = true;
         try {
-          ctx.drawImage(rimImg, cx - targetSize / 2, cy - targetSize / 2, targetSize, targetSize);
+          ctx.drawImage(rimE.img, cx - dw * rimE.cxF, cy - dh * rimE.cyF, dw, dh);
         } catch (_) { /* ignore draw errors */ }
         ctx.restore();
-        ctx.strokeStyle = color;
       }
 
-      // Rim outer edge (tire bead) — colored line kept on top of the drawing
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
+      // Rim outer edge (tire bead) — thin black line kept on top of the drawing
+      ctx.strokeStyle = '#000';
       ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
+      ctx.strokeStyle = color;
     }
 
     // Ground line
@@ -592,9 +679,36 @@
     ctx.lineTo(W - margin, H - margin);
     ctx.stroke();
 
-    drawTire(base, baseX, '#4aa3ff');
-    drawTire(selected, setupX, '#22c55e');
+    drawTire(base, baseX, '#4aa3ff', 0);
+    drawTire(selected, setupX, '#22c55e', 1);
   }
+
+  // Click a wheel in the side view to cycle its rim drawing. Each wheel
+  // cycles independently and wraps to Rim0 after the last file in the folder.
+  (function () {
+    const c = $("#sideView");
+    if (!c) return;
+    function hitAt(evt) {
+      const rect = c.getBoundingClientRect();
+      if (!rect.width) return null;
+      const k = CANVAS_W / rect.width; // CSS px -> logical canvas units
+      const x = (evt.clientX - rect.left) * k;
+      const y = (evt.clientY - rect.top) * k;
+      let best = null, bestD = Infinity;
+      for (const h of sideViewHits) {
+        const d = Math.hypot(x - h.cx, y - h.cy);
+        if (d <= h.r && d < bestD) { best = h; bestD = d; }
+      }
+      return best;
+    }
+    c.addEventListener('click', function (e) {
+      const h = hitAt(e);
+      if (h) cycleRim(h.slot);
+    });
+    c.addEventListener('mousemove', function (e) {
+      c.style.cursor = hitAt(e) ? 'pointer' : '';
+    });
+  })();
 
   // Sidewall C-curve profile (tuned in Drawing/Tyre drawing test.html).
   // Baseline is the straight line (chord) from the tread edge to the rim

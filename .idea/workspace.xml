@@ -10,9 +10,35 @@
     <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 adding Wheel Arch Clearance">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/car-fender.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/car-fender.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/3-s2.0-B9780750650540500018-f01-56-9780750650540.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/CV98-20090-6550-31MB-1.ai" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/CV98-20090-6550-31MB-1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/CV98-D22095-6550-24BM-1.ai" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/CV98-D22095-6550-24BM-1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/CV98B-22090-6550-24B-1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/Tire.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/Wheel.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/Wheel_2.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/bead-seat-of-the-wheels-from-KIPARDO.webp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/center-bore-hub-diameter-spigot-rings-6-017561.webp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/hub_assembly copy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/hub_assembly.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1149637641-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1199402566-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1199402566-612x612.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1228085660-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1280148587-612x612.ai" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1280148587-612x612.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1281956436-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-1322712287-612x612.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-2203875374-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-539228526-1024x1024.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-673622172-612x612.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/istockphoto-674679934-612x612.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/offset-1_1024x1024.webp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/p73-202.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/pirelli_cinturato_p7c2_pattern.ai" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/pirelli_cinturato_p7c2_pattern_side.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,7 +52,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="161" />
+    <option name="cachedIndexableFilesCount" value="165" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -224,7 +250,8 @@
       <workItem from="1783889853738" duration="3577000" />
       <workItem from="1783960810312" duration="6923000" />
       <workItem from="1784067906043" duration="7177000" />
-      <workItem from="1784166138694" duration="3409000" />
+      <workItem from="1784166138694" duration="3514000" />
+      <workItem from="1784251282417" duration="1285000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -402,7 +429,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784166689228</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Version 1.1.4 adding Wheel Arch Clearance">
+      <option name="closed" value="true" />
+      <created>1784172460934</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1784172460934</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -439,7 +474,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1419</line>
+          <line>1533</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
