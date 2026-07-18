@@ -108,6 +108,22 @@
   }
   getRimEntry(0); // preload the default rim
 
+  // Brake disk drawn behind the rim (visible through the spoke openings).
+  // The graphic is centered in its SVG canvas, so it is anchored on the
+  // viewBox center — no pixel measuring needed.
+  const BRAKE_IMG_SRC = RIM_DIR + 'Break-disk.svg';
+  const BRAKE_IMG_W = 2534; // Break-disk.svg viewBox width
+  const BRAKE_IMG_H = 2534; // Break-disk.svg viewBox height
+  const BRAKE_DISK_SCALE = 1.0; // disk height as a fraction of rim diameter
+  const brakeImg = new Image();
+  let brakeImgLoaded = false;
+  brakeImg.onload = function () {
+    brakeImgLoaded = true;
+    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+  };
+  brakeImg.onerror = function () { brakeImgLoaded = false; };
+  brakeImg.src = BRAKE_IMG_SRC;
+
   function cycleRim(slot) {
     const next = rimSel[slot] + 1;
     const e = getRimEntry(next);
@@ -647,6 +663,22 @@
       }
       // Inner tread circle
       ctx.beginPath(); ctx.arc(cx, cy, r - tickLen, 0, 2 * PI); ctx.stroke();
+
+      // --- Brake disk ---
+      // Drawn behind the rim, centered on the wheel; shows through the
+      // spoke openings of the rim drawing painted on top of it.
+      if (brakeImgLoaded) {
+        const bh = 2 * rimR * BRAKE_DISK_SCALE;
+        const bw = bh * (BRAKE_IMG_W / BRAKE_IMG_H);
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        // Mask to the rim circle so nothing spills onto the tire
+        ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.clip();
+        try {
+          ctx.drawImage(brakeImg, cx - bw / 2, cy - bh / 2, bw, bh);
+        } catch (_) { /* ignore draw errors */ }
+        ctx.restore();
+      }
 
       // --- Rim ---
       // Rim face drawing (rims/RimN.svg per wheel), scaled so its outer
