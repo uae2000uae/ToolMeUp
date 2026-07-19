@@ -101,7 +101,7 @@ button:disabled:hover { filter: none; }
 .canvas { width: 100%; height: auto; background: linear-gradient(180deg, color-mix(in oklab, var(--panel) 95%, var(--fg) 5%), var(--panel)); border: 2px solid var(--border); border-radius: 8px; display: block; }
 /* Overlay toggles at the middle-right of a canvas */
 .canvas-wrap { position: relative; }
-.canvas-controls { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.canvas-controls { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font-size: 14px; }
 .canvas-controls--top { top: 10px; right: 12px; transform: none; }
 .cv-toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 600; user-select: none; }
 .cv-base { color: #4aa3ff; }

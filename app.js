@@ -748,14 +748,14 @@
   // 1 = rim corner), b = outward bulge from the line as fraction of max
   // bulge (negative = inward).
   const SIDEWALL_PROFILE = [
-    { h: 0.10, b: 0.60 },
-    { h: 0.30, b: 1.05 },   // max bulge
-    { h: 0.50, b: 1.00 },
-    { h: 0.80, b: 0.50 },
-    { h: 1.00, b: -0.10 },
-    { h: 1.03, b: 0.00 },
-    { h: 1.05, b: -0.20 },  // past the rim corner
-    { h: 1.10, b: -0.20 }   // bead: tucks inside rim
+    { h: 0.20, b: 0.70 },
+    { h: 0.45, b: 1.00 },   // max bulge
+    { h: 0.64, b: 0.95 },
+    { h: 0.90, b: 0.40 },
+    { h: 0.91, b: 0.10 },
+    { h: 0.95, b: -0.35 },
+    { h: 1.00, b: 0.00 },   // touches the rim corner
+    { h: 1.00, b: -0.55 }   // bead: tucks inside rim corner
   ];
   // Shoulder: length on each side of the tread that doesn't touch the
   // ground. The tread (contact) line is drawn shorter by this amount per

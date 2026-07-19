@@ -7,14 +7,10 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 adding more rims">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 adding breakdisk and fixing rim images">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim0.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim0.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim1.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim1.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim2.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim2.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim4.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim4.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,23 +58,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0010986899523084" />
-      <entry key="MS500" value="1.2717751815366911" />
-      <entry key="S2" value="2.7057342855970106" />
-      <entry key="S5" value="4.42044678070241" />
-      <entry key="S10" value="5.496007294482994" />
-      <entry key="S30" value="6.796007395975626" />
-      <entry key="S60" value="7.560279659196749" />
-      <entry key="M2" value="8.157470935663973" />
-      <entry key="M5" value="8.626673205460854" />
-      <entry key="M10" value="8.817316384788498" />
-      <entry key="M15" value="8.933561546005219" />
-      <entry key="M30" value="9.713089443200781" />
-      <entry key="H1" value="13.58711793195307" />
-      <entry key="H2" value="23.387268825000294" />
-      <entry key="H4" value="37.912052859672045" />
-      <entry key="D1" value="69.98988911045312" />
-      <entry key="W1" value="80.09472442362733" />
+      <entry key="MS100" value="1.0012446881126165" />
+      <entry key="MS500" value="1.2627809485838766" />
+      <entry key="S2" value="2.092802589601982" />
+      <entry key="S5" value="4.213546817414202" />
+      <entry key="S10" value="7.365990711126297" />
+      <entry key="S30" value="13.034171059311523" />
+      <entry key="S60" value="15.774384330085459" />
+      <entry key="M2" value="17.624717503031004" />
+      <entry key="M5" value="18.972197780988214" />
+      <entry key="M10" value="19.482095656994918" />
+      <entry key="M15" value="19.707445007161745" />
+      <entry key="M30" value="20.59340722131038" />
+      <entry key="H1" value="24.5116716833814" />
+      <entry key="H2" value="34.32988801842799" />
+      <entry key="H4" value="48.86879983935662" />
+      <entry key="D1" value="80.97731989253508" />
+      <entry key="W1" value="91.09268758361469" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -100,23 +96,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.96031077311933" />
-      <entry key="MS500" value="1.2597957432103462" />
-      <entry key="S2" value="2.6819407404403455" />
-      <entry key="S5" value="4.399343629113083" />
-      <entry key="S10" value="5.481821741748605" />
-      <entry key="S30" value="6.788983076288859" />
-      <entry key="S60" value="7.55573398472856" />
-      <entry key="M2" value="8.15474895545391" />
-      <entry key="M5" value="8.625436987664099" />
-      <entry key="M10" value="8.816668877723192" />
-      <entry key="M15" value="8.933121556084428" />
-      <entry key="M30" value="9.712860682042184" />
-      <entry key="H1" value="13.586993232532063" />
-      <entry key="H2" value="23.387193674430215" />
-      <entry key="H4" value="37.91200143756125" />
-      <entry key="D1" value="69.98987227459101" />
-      <entry key="W1" value="80.09472155989633" />
+      <entry key="MS100" value="0.9342105382435367" />
+      <entry key="MS500" value="1.2461068533472084" />
+      <entry key="S2" value="2.085285952003194" />
+      <entry key="S5" value="4.205437575090711" />
+      <entry key="S10" value="7.356227673364473" />
+      <entry key="S30" value="13.026069948916163" />
+      <entry key="S60" value="15.768603302026172" />
+      <entry key="M2" value="17.62110476148021" />
+      <entry key="M5" value="18.970514990418447" />
+      <entry key="M10" value="19.48120688363459" />
+      <entry key="M15" value="19.70683993543708" />
+      <entry key="M30" value="20.59309375422134" />
+      <entry key="H1" value="24.511504092774604" />
+      <entry key="H2" value="34.32979129228567" />
+      <entry key="H4" value="48.86873759796508" />
+      <entry key="D1" value="80.97730124660741" />
+      <entry key="W1" value="91.09268446094306" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -184,7 +180,7 @@
       <recent name="C:\Users\shiha\OneDrive\Documents\PythonProjects\WebApps\ToolMeUp\Drawing" />
     </key>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.index.html">
+  <component name="RunManager" selected="JavaScript Debug.Tyre drawing test.html">
     <configuration name="Tyre drawing test.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/ToolMeUp/Drawing/Tyre drawing test.html" useBuiltInWebServerPort="true">
       <method v="2" />
     </configuration>
@@ -193,8 +189,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JavaScript Debug.index.html" />
         <item itemvalue="JavaScript Debug.Tyre drawing test.html" />
+        <item itemvalue="JavaScript Debug.index.html" />
       </list>
     </recent_temporary>
   </component>
@@ -227,7 +223,7 @@
       <workItem from="1784067906043" duration="7177000" />
       <workItem from="1784166138694" duration="3514000" />
       <workItem from="1784251282417" duration="1337000" />
-      <workItem from="1784403952423" duration="2390000" />
+      <workItem from="1784403952423" duration="5667000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -421,7 +417,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784271132466</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Version 1.1.4 adding breakdisk and fixing rim images">
+      <option name="closed" value="true" />
+      <created>1784415403651</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1784415403651</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -452,7 +456,8 @@
     <MESSAGE value="Version 1.1.4" />
     <MESSAGE value="Version 1.1.4 adding Wheel Arch Clearance" />
     <MESSAGE value="Version 1.1.4 adding more rims" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 adding more rims" />
+    <MESSAGE value="Version 1.1.4 adding breakdisk and fixing rim images" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 adding breakdisk and fixing rim images" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
