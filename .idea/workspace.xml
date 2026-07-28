@@ -7,17 +7,11 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 enhanced C shape">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 changed the logo">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apple-touch-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/apple-touch-icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/favicon-32.png" beforeDir="false" afterPath="$PROJECT_DIR$/favicon-32.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/favicon.ico" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/favicon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/site.webmanifest" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/tires/tire1.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/tires/tire1.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-app-icon-192.png" beforeDir="false" afterPath="$PROJECT_DIR$/web-app-icon-192.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-app-icon-512.png" beforeDir="false" afterPath="$PROJECT_DIR$/web-app-icon-512.png" afterDir="false" />
     </list>
@@ -67,23 +61,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000228202733332" />
-      <entry key="MS500" value="1.1467885469807415" />
-      <entry key="S2" value="2.3728078764120575" />
-      <entry key="S5" value="3.533116047448224" />
-      <entry key="S10" value="4.167165169407527" />
-      <entry key="S30" value="4.69636055861451" />
-      <entry key="S60" value="4.844642102144615" />
-      <entry key="M2" value="4.921413520461826" />
-      <entry key="M5" value="4.968344634720439" />
-      <entry key="M10" value="4.985126749470999" />
-      <entry key="M15" value="5.016480110196888" />
-      <entry key="M30" value="5.757864286518194" />
-      <entry key="H1" value="9.715990814741302" />
-      <entry key="H2" value="20.061081061889155" />
-      <entry key="H4" value="37.36933412302862" />
-      <entry key="D1" value="80.60454915852563" />
-      <entry key="W1" value="95.20366373263627" />
+      <entry key="MS100" value="1.0000345764713343" />
+      <entry key="MS500" value="1.1548670057420811" />
+      <entry key="S2" value="2.752582733850616" />
+      <entry key="S5" value="5.00682455687273" />
+      <entry key="S10" value="6.5732164664828225" />
+      <entry key="S30" value="8.066346715910985" />
+      <entry key="S60" value="8.515267775246922" />
+      <entry key="M2" value="8.752960947391744" />
+      <entry key="M5" value="8.90003669208497" />
+      <entry key="M10" value="8.950811423576155" />
+      <entry key="M15" value="8.993482481753546" />
+      <entry key="M30" value="9.745135459314982" />
+      <entry key="H1" value="13.706362731327337" />
+      <entry key="H2" value="24.052003386702935" />
+      <entry key="H4" value="41.36122853778568" />
+      <entry key="D1" value="84.60171324759807" />
+      <entry key="W1" value="99.20318696832267" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -105,23 +99,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9526600408329048" />
-      <entry key="MS500" value="1.1360304779555246" />
-      <entry key="S2" value="2.3673048841660824" />
-      <entry key="S5" value="3.529759066192894" />
-      <entry key="S10" value="4.165165014127301" />
-      <entry key="S30" value="4.695603756607504" />
-      <entry key="S60" value="4.844251043225277" />
-      <entry key="M2" value="4.921214711466356" />
-      <entry key="M5" value="4.968264308838152" />
-      <entry key="M10" value="4.985086406300069" />
-      <entry key="M15" value="5.01645238384447" />
-      <entry key="M30" value="5.757839207131974" />
-      <entry key="H1" value="9.715951817414275" />
-      <entry key="H2" value="20.061035254300602" />
-      <entry key="H4" value="37.36929121072111" />
-      <entry key="D1" value="80.60453146893045" />
-      <entry key="W1" value="95.20366060032741" />
+      <entry key="MS100" value="0.9526709366968649" />
+      <entry key="MS500" value="1.1429412072652148" />
+      <entry key="S2" value="2.7343416056109358" />
+      <entry key="S5" value="4.991116913472501" />
+      <entry key="S10" value="6.562802976683728" />
+      <entry key="S30" value="8.062124965828" />
+      <entry key="S60" value="8.513048792561474" />
+      <entry key="M2" value="8.751823223108405" />
+      <entry key="M5" value="8.899574665805272" />
+      <entry key="M10" value="8.95057919567548" />
+      <entry key="M15" value="8.993326603963341" />
+      <entry key="M30" value="9.74504620630902" />
+      <entry key="H1" value="13.70629163524422" />
+      <entry key="H2" value="24.051941526686836" />
+      <entry key="H4" value="41.36117759720362" />
+      <entry key="D1" value="84.60169421888747" />
+      <entry key="W1" value="99.20318364463522" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -233,7 +227,8 @@
       <workItem from="1784166138694" duration="3514000" />
       <workItem from="1784251282417" duration="1337000" />
       <workItem from="1784403952423" duration="5807000" />
-      <workItem from="1785181371294" duration="4865000" />
+      <workItem from="1785181371294" duration="5089000" />
+      <workItem from="1785209563586" duration="659000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -451,7 +446,15 @@
       <option name="project" value="LOCAL" />
       <updated>1785202732305</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Version 1.1.4 changed the logo">
+      <option name="closed" value="true" />
+      <created>1785206329929</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1785206329929</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -484,7 +487,8 @@
     <MESSAGE value="Version 1.1.4 adding more rims" />
     <MESSAGE value="Version 1.1.4 adding breakdisk and fixing rim images" />
     <MESSAGE value="Version 1.1.4 enhanced C shape" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 enhanced C shape" />
+    <MESSAGE value="Version 1.1.4 changed the logo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 changed the logo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
