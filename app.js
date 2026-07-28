@@ -6,7 +6,7 @@
 */
 
 (function () {
-  try { console.log('ToolMeUp fitment app.js v2026-07-16-fender3'); } catch (_) { /* ignore */ }
+  try { console.log('ToolMeUp fitment app.js v2026-07-28-fender4'); } catch (_) { /* ignore */ }
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -131,39 +131,130 @@
     try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
   }
 
-  // Preload car fender drawing for the side-view background. The wheel-arch
-  // opening inside the artwork was measured by circle-fitting the cutout:
-  // center (423.2, 368.2), radius 207.7 in viewBox units (728.1 x 425.9).
-  // Note: the arch center is NOT the geometric center of the file, so we
-  // anchor on the measured arch center to keep it concentric with the tire.
-  const FENDER_IMG_SRC = 'static/images/car-fender.svg';
-  const FENDER_IMG_W = 728.1;  // car-fender.svg viewBox width
-  const FENDER_IMG_H = 425.9;  // car-fender.svg viewBox height
-  const FENDER_ARCH_CX = 423.2;
-  const FENDER_ARCH_CY = 368.2;
-  const FENDER_ARCH_R = 207.7;
-  const fenderImg = new Image();
-  let fenderImgLoaded = false;
-  fenderImg.onload = function () {
-    fenderImgLoaded = true;
+  // Car fender drawings for the side-view background, loaded from
+  // static/images/fenders/. Clicking either fender in the side view cycles
+  // BOTH sides to the next file, wrapping back to the first one.
+  //
+  // RULE for every SVG in this folder: the artwork contains an invisible
+  // perfect circle (<circle>, fill:none, no stroke) marking the wheel
+  // opening — all the clearance available for the wheel. That circle is
+  // read from the SVG source at load time and used for everything:
+  //   - its center is the anchor pinned to the wheel center, and
+  //   - the image is sized (uniformly, aspect ratio preserved) so the
+  //     circle radius = tire radius + the wheel-arch clearance input,
+  //     i.e. the circle is the fender-to-wheel gap boundary.
+  // The w/h/cx/cy/r values below are the same numbers hardcoded as a
+  // fallback for when the SVG source can't be fetched (e.g. file://).
+  const FENDER_DIR = 'static/images/fenders/';
+  const FENDERS = [
+    { file: 'sedan.svg', w: 845.8, h: 736.3, cx: 423.1, cy: 368.4, r: 199.2 },
+    { file: 'sport.svg', w: 510.4, h: 429.3, cx: 255.7, cy: 215.6, r: 111.6 },
+    { file: 'SUV.svg', w: 1001.9, h: 1237.8, cx: 500.9, cy: 619.3, r: 253.9 },
+  ];
+  let fenderSel = 0; // current fender index (shared by both wheels)
+
+  // Auto-discover fender SVGs dropped into the folder: ask the server for a
+  // directory listing (nginx autoindex JSON in production — see
+  // default.conf.template — or the HTML index that simple dev servers
+  // return) and append any new .svg files to FENDERS. Their wheel-opening
+  // circles are read by loadFenderGeom like any other fender. When no
+  // listing is available (e.g. file://), the hardcoded list above is used.
+  (function discoverFenders() {
+    if (typeof fetch !== 'function') return;
+    fetch(FENDER_DIR)
+      .then(res => {
+        if (!res.ok) throw new Error('http ' + res.status);
+        const isJson = (res.headers.get('content-type') || '').includes('json');
+        return res.text().then(txt => ({ isJson, txt }));
+      })
+      .then(({ isJson, txt }) => {
+        let names = [];
+        if (isJson) {
+          names = JSON.parse(txt).filter(e => e.type === 'file').map(e => e.name);
+        } else {
+          const re = /href="([^"?#]+\.svg)"/gi;
+          let m;
+          while ((m = re.exec(txt))) names.push(decodeURIComponent(m[1].split('/').pop()));
+        }
+        const known = new Set(FENDERS.map(f => f.file));
+        names.filter(n => /\.svg$/i.test(n) && !known.has(n)).sort()
+          .forEach(n => { known.add(n); FENDERS.push({ file: n }); });
+      })
+      .catch(() => { /* no directory listing available: hardcoded list only */ });
+  })();
+
+  // Read the wheel-opening circle straight from the SVG source: viewBox
+  // size plus the <circle> whose center sits closest to the viewBox middle
+  // (largest radius breaks ties). Stored as f.geom; the hardcoded config
+  // values remain the fallback when fetch/parse isn't possible.
+  function loadFenderGeom(f) {
+    if (typeof fetch !== 'function' || typeof DOMParser === 'undefined') return;
+    fetch(FENDER_DIR + f.file)
+      .then(res => res.ok ? res.text() : Promise.reject(new Error('http ' + res.status)))
+      .then(txt => {
+        const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
+        const svg = doc.querySelector('svg');
+        const vb = (svg?.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+        if (vb.length !== 4 || !vb.every(isFinite) || vb[2] <= 0 || vb[3] <= 0) return;
+        const midX = vb[0] + vb[2] / 2, midY = vb[1] + vb[3] / 2;
+        let best = null, bestScore = Infinity;
+        doc.querySelectorAll('circle').forEach(el => {
+          const cx = parseFloat(el.getAttribute('cx'));
+          const cy = parseFloat(el.getAttribute('cy'));
+          const r = parseFloat(el.getAttribute('r'));
+          if (!isFinite(cx) || !isFinite(cy) || !(r > 0)) return;
+          const score = Math.hypot(cx - midX, cy - midY) - r * 1e-3; // nearest to middle, bigger r wins ties
+          if (score < bestScore) { bestScore = score; best = { cx, cy, r }; }
+        });
+        if (!best) return;
+        // cx/cy relative to the image top-left (viewBox min-x/min-y)
+        f.geom = { w: vb[2], h: vb[3], cx: best.cx - vb[0], cy: best.cy - vb[1], r: best.r };
+        try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+      })
+      .catch(() => { /* file:// or fetch error: hardcoded fallback stays */ });
+  }
+
+  function getFenderEntry(i) {
+    const f = FENDERS[i];
+    if (!f) return null;
+    if (f.img) return f;
+    f.img = new Image();
+    f.loaded = false; f.failed = false; f.loading = true;
+    loadFenderGeom(f);
+    f.img.onload = function () {
+      f.loaded = true; f.loading = false;
+      try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+    };
+    f.img.onerror = function () {
+      f.failed = true; f.loading = false;
+      try { console.warn('ToolMeUp: could not load ' + FENDER_DIR + f.file); } catch (_) { /* ignore */ }
+      // If the current selection points at this missing file, fall back
+      if (fenderSel === i && i !== 0) {
+        fenderSel = 0;
+        try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+      }
+    };
+    f.img.src = FENDER_DIR + f.file;
+    return f;
+  }
+  getFenderEntry(0); // preload the default fender
+
+  function cycleFender() {
+    const next = (fenderSel + 1) % FENDERS.length;
+    const e = getFenderEntry(next);
+    fenderSel = (e && e.failed) ? 0 : next; // wrap immediately if known missing
     try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
-  };
-  fenderImg.onerror = function () {
-    fenderImgLoaded = false;
-    try { console.warn('ToolMeUp: could not load ' + FENDER_IMG_SRC + ' (fender view disabled until it loads)'); } catch (_) { /* ignore */ }
-  };
-  let fenderImgLoading = true; // guard so we don't spam reload attempts
-  fenderImg.addEventListener('load', function () { fenderImgLoading = false; });
-  fenderImg.addEventListener('error', function () { fenderImgLoading = false; });
-  fenderImg.src = FENDER_IMG_SRC;
+  }
+
   // Retry a failed load (e.g. the file was temporarily unavailable / cloud
   // placeholder not yet hydrated). Called from drawSideView when the fender
   // toggle is on but the image never arrived; onload re-renders everything.
-  function retryFenderImg() {
-    if (fenderImgLoaded || fenderImgLoading) return;
-    fenderImgLoading = true;
+  function retryFenderImgs() {
+    const f = getFenderEntry(fenderSel);
+    if (!f || f.loaded || f.loading) return;
+    f.loading = true; f.failed = false;
     const bust = (typeof location !== 'undefined' && /^http/.test(location.protocol)) ? ('?r=' + Date.now()) : '';
-    fenderImg.src = FENDER_IMG_SRC + bust;
+    f.img.src = FENDER_DIR + f.file + bust;
   }
 
   // Parse tire sizes: metric (e.g., 225/45R17, 225/45-17) and flotation (31x10.5R15, 33x12.50-20).
@@ -583,6 +674,7 @@
   }
 
   let sideViewHits = []; // clickable wheel circles from the last side-view draw
+  let sideViewFenderHits = []; // clickable fender rects from the last side-view draw
 
   function drawSideView(base, selected, unitMode) {
     const c = $("#sideView");
@@ -590,6 +682,7 @@
     const W = CANVAS_W, H = CANVAS_H;
     ctx.clearRect(0, 0, W, H);
     sideViewHits = [];
+    sideViewFenderHits = [];
     if (!base?.tireGeom || !selected?.tireGeom) return;
 
     const margin = 20;
@@ -601,29 +694,42 @@
     // the two fender drawings fit side by side without overlapping.
     const archClearMm = parseFloat($("#base_arch_clear")?.value);
     const fenderChecked = document.getElementById('sv_show_fender')?.checked ?? true;
-    if (fenderChecked && !fenderImgLoaded) retryFenderImg(); // self-heal a failed image load
-    const showFender = fenderChecked && fenderImgLoaded && fenderImg && !isNaN(archClearMm);
+    // Usable fender entry: the selected file, falling back to the default
+    // one while the selection (image or its circle geometry) is still
+    // loading. Shared by both sides.
+    const usable = (f) => f && f.loaded && (f.geom || f.r > 0);
+    const fenderEntry = (() => {
+      const sel = getFenderEntry(fenderSel);
+      if (usable(sel)) return sel;
+      const def = getFenderEntry(0);
+      return usable(def) ? def : null;
+    })();
+    if (fenderChecked && !fenderEntry) retryFenderImgs(); // self-heal a failed image load
+    const showFender = fenderChecked && fenderEntry && !isNaN(archClearMm);
     if (showFender) scale *= 0.5;
     const baseX = showFender ? W * 0.25 + 30 : W * 0.33; // +20px inward +10px right in fender view
     const setupX = showFender ? W * 0.75 + 10 : W * 0.66;
 
-    // Car fender background: the artwork is scaled once so its wheel-arch
-    // radius equals the baseline tire radius plus the wheel-arch clearance
-    // input, then the arch center is pinned to each wheel center. The same
-    // size is reused for the setup so any arch-clearance loss is visible.
+    // Car fender background: the wheel-opening circle read from the SVG is
+    // the anchor and the scale reference. The artwork is scaled uniformly
+    // (aspect ratio preserved) so the circle radius equals the baseline
+    // tire radius plus the wheel-arch clearance input, then the circle
+    // center is pinned to each wheel center. The same size is reused for
+    // the setup so any arch-clearance loss is visible.
     if (showFender) {
       const archRadiusMm = base.tireGeom.overallDiaMm / 2 + archClearMm;
-      const k = (archRadiusMm * scale) / FENDER_ARCH_R * 1.02; // canvas px per artwork unit (+2% visual tweak)
+      const f = fenderEntry;
+      const g = f.geom || f; // circle geometry parsed from the SVG, else hardcoded fallback
+      const k = (archRadiusMm * scale) / g.r; // canvas px per artwork unit (uniform: no stretching)
+      const dw = g.w * k, dh = g.h * k;
       const drawFender = (set, cx) => {
         const cy = H - margin - (set.tireGeom.overallDiaMm / 2) * scale; // wheel center
+        const dx = cx - g.cx * k, dy = cy - g.cy * k; // circle center pinned to wheel center
+        sideViewFenderHits.push({ x: dx, y: dy, w: dw, h: dh }); // click target for fender cycling
         ctx.save();
         ctx.imageSmoothingEnabled = true;
         try {
-          ctx.drawImage(
-            fenderImg,
-            cx - FENDER_ARCH_CX * k - 0.5, cy - FENDER_ARCH_CY * k,
-            FENDER_IMG_W * k, FENDER_IMG_H * k
-          );
+          ctx.drawImage(f.img, dx, dy, dw, dh);
         } catch (_) { /* ignore draw errors */ }
         ctx.restore();
       };
@@ -715,30 +821,43 @@
     drawTire(selected, setupX, '#22c55e', 1);
   }
 
-  // Click a wheel in the side view to cycle its rim drawing. Each wheel
-  // cycles independently and wraps to Rim0 after the last file in the folder.
+  // Click a wheel in the side view to cycle its rim drawing; click the fender
+  // artwork around it to cycle BOTH fender drawings together, wrapping to
+  // the first file after the last one.
   (function () {
     const c = $("#sideView");
     if (!c) return;
-    function hitAt(evt) {
+    function toCanvas(evt) {
       const rect = c.getBoundingClientRect();
       if (!rect.width) return null;
       const k = CANVAS_W / rect.width; // CSS px -> logical canvas units
-      const x = (evt.clientX - rect.left) * k;
-      const y = (evt.clientY - rect.top) * k;
+      return { x: (evt.clientX - rect.left) * k, y: (evt.clientY - rect.top) * k };
+    }
+    function rimHitAt(p) {
       let best = null, bestD = Infinity;
       for (const h of sideViewHits) {
-        const d = Math.hypot(x - h.cx, y - h.cy);
+        const d = Math.hypot(p.x - h.cx, p.y - h.cy);
         if (d <= h.r && d < bestD) { best = h; bestD = d; }
       }
       return best;
     }
+    function fenderHitAt(p) {
+      for (let i = sideViewFenderHits.length - 1; i >= 0; i--) { // last drawn = on top
+        const h = sideViewFenderHits[i];
+        if (p.x >= h.x && p.x <= h.x + h.w && p.y >= h.y && p.y <= h.y + h.h) return h;
+      }
+      return null;
+    }
     c.addEventListener('click', function (e) {
-      const h = hitAt(e);
-      if (h) cycleRim(h.slot);
+      const p = toCanvas(e);
+      if (!p) return;
+      const h = rimHitAt(p); // wheel wins over the fender behind it
+      if (h) { cycleRim(h.slot); return; }
+      if (fenderHitAt(p)) cycleFender(); // either fender switches both
     });
     c.addEventListener('mousemove', function (e) {
-      c.style.cursor = hitAt(e) ? 'pointer' : '';
+      const p = toCanvas(e);
+      c.style.cursor = (p && (rimHitAt(p) || fenderHitAt(p))) ? 'pointer' : '';
     });
   })();
 

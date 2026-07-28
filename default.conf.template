@@ -33,6 +33,14 @@ server {
         proxy_hide_header Set-Cookie;
     }
 
+    # Fender artwork folder: expose a JSON directory listing so the fitment
+    # app can auto-discover new fender SVGs dropped into the folder
+    # (see discoverFenders in app.js).
+    location = /static/images/fenders/ {
+        autoindex on;
+        autoindex_format json;
+    }
+
     # SPA-ish fallback is not needed; this is a multi-page static site.
     location / {
         try_files $uri $uri/ =404;
