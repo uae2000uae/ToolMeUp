@@ -9,12 +9,17 @@
   <component name="ChangeListManager">
     <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 enhanced C shape">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/default.conf.template" beforeDir="false" afterPath="$PROJECT_DIR$/default.conf.template" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/car-fender.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/fenders/sedan.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/rims/Rim2.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rims/Rim2.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/tires/tire1.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/tires/tire1.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apple-touch-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/apple-touch-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/favicon-32.png" beforeDir="false" afterPath="$PROJECT_DIR$/favicon-32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/favicon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/site.webmanifest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app-icon-192.png" beforeDir="false" afterPath="$PROJECT_DIR$/web-app-icon-192.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-app-icon-512.png" beforeDir="false" afterPath="$PROJECT_DIR$/web-app-icon-512.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -228,7 +233,7 @@
       <workItem from="1784166138694" duration="3514000" />
       <workItem from="1784251282417" duration="1337000" />
       <workItem from="1784403952423" duration="5807000" />
-      <workItem from="1785181371294" duration="2731000" />
+      <workItem from="1785181371294" duration="4865000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -438,7 +443,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784423952438</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Version 1.1.4 enhanced C shape">
+      <option name="closed" value="true" />
+      <created>1785202732305</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1785202732305</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

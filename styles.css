@@ -46,7 +46,9 @@ body {
 /* Keep header visible while scrolling */
 .app-header { position: sticky; top: 0; z-index: 1000; }
 .app-footer { border-top: 1px solid var(--border); border-bottom: none; margin-top: 24px; }
-.brand { font-weight: 700; }
+.brand { font-weight: 700; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
+.brand-logo { height: 26px; width: auto; display: block; }
+.brand-text { font-weight: 700; }
 .header-controls { display: flex; gap: 12px; align-items: center; }
 .toggle { display: flex; gap: 8px; align-items: center; color: var(--muted); }
 .preset select, .toggle select { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%); color: var(--fg); }
@@ -186,6 +188,7 @@ html.compact { font-size: 87.5%; }
 
 /* Landing hub */
 .hero { padding: 24px 4px 8px; }
+.hero__logo { display: block; width: min(240px, 55%); height: auto; margin: 0 0 14px; }
 .hero__title { margin: 0 0 6px; font-size: 28px; }
 .hero__lead { margin: 0; color: var(--muted); max-width: 640px; }
 

@@ -164,7 +164,8 @@
         mount.innerHTML = html;
         const brand = mount.getAttribute("data-brand");
         if (brand) {
-          const b = mount.querySelector(".brand");
+          // Prefer the text span so we don't overwrite the logo image.
+          const b = mount.querySelector(".brand-text") || mount.querySelector(".brand");
           if (b) b.textContent = brand;
         }
       })
