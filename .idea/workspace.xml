@@ -7,8 +7,12 @@
     <option name="selectedModelId" value="auto" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4 changed the logo">
+    <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/temp/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/temp/logo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/temp/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/temp/logo.svg" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +25,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="198" />
+    <option name="cachedIndexableFilesCount" value="209" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -224,6 +228,7 @@
       <workItem from="1784403952423" duration="5807000" />
       <workItem from="1785181371294" duration="5089000" />
       <workItem from="1785209563586" duration="1143000" />
+      <workItem from="1785429395305" duration="1052000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -465,7 +470,15 @@
       <option name="project" value="LOCAL" />
       <updated>1785210516390</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="Version 1.1.4">
+      <option name="closed" value="true" />
+      <created>1785429598437</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1785429598437</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,13 +506,13 @@
     <MESSAGE value="Version 1.1.3 added images to canvases" />
     <MESSAGE value="Version 1.1.3 changes in page look and drawing logic" />
     <MESSAGE value="Version 1.1.3 changes in drawing logic and enhace Wget tool" />
-    <MESSAGE value="Version 1.1.4" />
     <MESSAGE value="Version 1.1.4 adding Wheel Arch Clearance" />
     <MESSAGE value="Version 1.1.4 adding more rims" />
     <MESSAGE value="Version 1.1.4 adding breakdisk and fixing rim images" />
     <MESSAGE value="Version 1.1.4 enhanced C shape" />
     <MESSAGE value="Version 1.1.4 changed the logo" />
-    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4 changed the logo" />
+    <MESSAGE value="Version 1.1.4" />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 1.1.4" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
