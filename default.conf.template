@@ -41,6 +41,13 @@ server {
         autoindex_format json;
     }
 
+    # Rim artwork folder: same JSON listing, so the fitment app knows the full
+    # RimN.svg set and can preload all of them up front (see preloadRims).
+    location = /static/images/rims/ {
+        autoindex on;
+        autoindex_format json;
+    }
+
     # SPA-ish fallback is not needed; this is a multi-page static site.
     location / {
         try_files $uri $uri/ =404;

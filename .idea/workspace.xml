@@ -9,10 +9,12 @@
   <component name="ChangeListManager">
     <list default="true" id="dba1cede-64c7-4b4d-b314-0ed51bbbb6ed" name="Changes" comment="Version 1.1.4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/logo.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/temp/logo.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/temp/logo.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/images/temp/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/temp/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/default.conf.template" beforeDir="false" afterPath="$PROJECT_DIR$/default.conf.template" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fitment.html" beforeDir="false" afterPath="$PROJECT_DIR$/fitment.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared.js" beforeDir="false" afterPath="$PROJECT_DIR$/shared.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/fenders/sport.svg" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/fenders/sport.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +27,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="209" />
+    <option name="cachedIndexableFilesCount" value="210" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -60,23 +62,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000345764713343" />
-      <entry key="MS500" value="1.1548670057420811" />
-      <entry key="S2" value="2.752582733850616" />
-      <entry key="S5" value="5.00682455687273" />
-      <entry key="S10" value="6.5732164664828225" />
-      <entry key="S30" value="8.066346715910985" />
-      <entry key="S60" value="8.515267775246922" />
-      <entry key="M2" value="8.752960947391744" />
-      <entry key="M5" value="8.90003669208497" />
-      <entry key="M10" value="8.950811423576155" />
-      <entry key="M15" value="8.993482481753546" />
-      <entry key="M30" value="9.745135459314982" />
-      <entry key="H1" value="13.706362731327337" />
-      <entry key="H2" value="24.052003386702935" />
-      <entry key="H4" value="41.36122853778568" />
-      <entry key="D1" value="84.60171324759807" />
-      <entry key="W1" value="99.20318696832267" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0000000441152497" />
+      <entry key="S2" value="1.0172310336859798" />
+      <entry key="S5" value="1.278294372442962" />
+      <entry key="S10" value="1.7361071680284577" />
+      <entry key="S30" value="2.428913695380145" />
+      <entry key="S60" value="2.689861384547992" />
+      <entry key="M2" value="2.8384339801258163" />
+      <entry key="M5" value="3.1606936672574877" />
+      <entry key="M10" value="5.416823475730574" />
+      <entry key="M15" value="8.62581438398943" />
+      <entry key="M30" value="16.925754974245685" />
+      <entry key="H1" value="27.409297922896222" />
+      <entry key="H2" value="41.78334021591605" />
+      <entry key="H4" value="62.132463664110944" />
+      <entry key="D1" value="112.3945649040173" />
+      <entry key="W1" value="129.6716771000017" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -98,23 +100,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9526709366968649" />
-      <entry key="MS500" value="1.1429412072652148" />
-      <entry key="S2" value="2.7343416056109358" />
-      <entry key="S5" value="4.991116913472501" />
-      <entry key="S10" value="6.562802976683728" />
-      <entry key="S30" value="8.062124965828" />
-      <entry key="S60" value="8.513048792561474" />
-      <entry key="M2" value="8.751823223108405" />
-      <entry key="M5" value="8.899574665805272" />
-      <entry key="M10" value="8.95057919567548" />
-      <entry key="M15" value="8.993326603963341" />
-      <entry key="M30" value="9.74504620630902" />
-      <entry key="H1" value="13.70629163524422" />
-      <entry key="H2" value="24.051941526686836" />
-      <entry key="H4" value="41.36117759720362" />
-      <entry key="D1" value="84.60169421888747" />
-      <entry key="W1" value="99.20318364463522" />
+      <entry key="MS100" value="0.8585654364377537" />
+      <entry key="MS500" value="0.9699619531309408" />
+      <entry key="S2" value="1.0094932300061594" />
+      <entry key="S5" value="1.2742451614124775" />
+      <entry key="S10" value="1.7332065954967952" />
+      <entry key="S30" value="2.427492382258377" />
+      <entry key="S60" value="2.689063985157428" />
+      <entry key="M2" value="2.838010414096284" />
+      <entry key="M5" value="3.1604738563658055" />
+      <entry key="M10" value="5.416501702823647" />
+      <entry key="M15" value="8.625405702858126" />
+      <entry key="M30" value="16.925315953883" />
+      <entry key="H1" value="27.408950801056857" />
+      <entry key="H2" value="41.78310423372182" />
+      <entry key="H4" value="62.13231368635853" />
+      <entry key="D1" value="112.39452676498556" />
+      <entry key="W1" value="129.67167093051276" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -228,7 +230,8 @@
       <workItem from="1784403952423" duration="5807000" />
       <workItem from="1785181371294" duration="5089000" />
       <workItem from="1785209563586" duration="1143000" />
-      <workItem from="1785429395305" duration="1052000" />
+      <workItem from="1785429395305" duration="1702000" />
+      <workItem from="1785702682214" duration="5127000" />
     </task>
     <task id="LOCAL-00001" summary="Version 1.0.1">
       <option name="closed" value="true" />
@@ -478,7 +481,15 @@
       <option name="project" value="LOCAL" />
       <updated>1785429598437</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Version 1.1.4">
+      <option name="closed" value="true" />
+      <created>1785433462879</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1785433462879</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -519,7 +530,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app.js</url>
-          <line>1684</line>
+          <line>1747</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

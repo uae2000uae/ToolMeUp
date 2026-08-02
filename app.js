@@ -2,13 +2,22 @@
   ToolMeUp • Fitment Calculator (static)
   - Calculations in JS (backend logic on the client), inputs are simple boxes.
   - Supports: tire parsing, geometry, offsets, spacer, clearances, ride height, speedo error,
-    thresholds, optional scrub radius, visuals, multiple setups vs baseline, unit toggle.
+    thresholds, visuals, multiple setups vs baseline, unit toggle.
 */
 
 (function () {
-  try { console.log('ToolMeUp fitment app.js v2026-07-28-fender4'); } catch (_) { /* ignore */ }
+  try { console.log('ToolMeUp fitment app.js v2026-08-03-preload'); } catch (_) { /* ignore */ }
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  // Translation helpers for text built in JS (the report rows, the result
+  // lines under the canvases). Static markup uses data-i18n instead and is
+  // handled by shared.js. `en` is the English fallback and doubles as the
+  // English copy; `vars` fills {placeholders} in either language.
+  const t = (key, en, vars) => window.ToolMeUp?.t?.(key, en, vars)
+    ?? String(en).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m));
+  const isRtl = () => window.ToolMeUp?.isRtl?.() === true;
+  const rtlAttr = () => (isRtl() ? ' dir="rtl"' : '');
 
   // Units and conversions
   const MM_PER_IN = 25.4;
@@ -41,6 +50,32 @@
   };
   hubImg.onerror = function () { hubImgLoaded = false; };
   hubImg.src = HUB_IMG_SRC;
+
+  // Ask the server for a directory listing and return the .svg file names in
+  // it. Works with the nginx autoindex JSON used in production (see
+  // default.conf.template) and with the HTML index simple dev servers return.
+  // Resolves to [] when no listing is available (e.g. file://).
+  function listSvgDir(dir) {
+    if (typeof fetch !== 'function') return Promise.resolve([]);
+    return fetch(dir)
+      .then(res => {
+        if (!res.ok) throw new Error('http ' + res.status);
+        const isJson = (res.headers.get('content-type') || '').includes('json');
+        return res.text().then(txt => ({ isJson, txt }));
+      })
+      .then(({ isJson, txt }) => {
+        let names = [];
+        if (isJson) {
+          names = JSON.parse(txt).filter(e => e.type === 'file').map(e => e.name);
+        } else {
+          const re = /href="([^"?#]+\.svg)"/gi;
+          let m;
+          while ((m = re.exec(txt))) names.push(decodeURIComponent(m[1].split('/').pop()));
+        }
+        return names.filter(n => /\.svg$/i.test(n));
+      })
+      .catch(() => []);
+  }
 
   // Rim face drawings for the side view, loaded from static/images/rims/
   // (Rim0.svg, Rim1.svg, ...). Clicking a wheel in the side view cycles that
@@ -106,7 +141,41 @@
     e.img.src = RIM_DIR + 'Rim' + i + '.svg';
     return e;
   }
-  getRimEntry(0); // preload the default rim
+  getRimEntry(0); // the default rim is always needed first
+
+  // Preload every rim in the folder up front so cycling through them is
+  // instant. The directory listing gives the exact RimN.svg set; without a
+  // listing (file://, no autoindex) we walk indices upward instead, starting
+  // the next one only after the previous has loaded, and stop at the first
+  // miss. PRELOAD_PROBE_MAX caps that walk so a gap in the numbering can't
+  // spin forever.
+  const PRELOAD_PROBE_MAX = 40;
+  function preloadRims() {
+    listSvgDir(RIM_DIR).then(names => {
+      const idx = [];
+      names.forEach(n => {
+        const m = /^Rim(\d+)\.svg$/i.exec(n);
+        if (m) idx.push(parseInt(m[1], 10));
+      });
+      if (idx.length) {
+        idx.sort((a, b) => a - b).forEach(i => getRimEntry(i));
+        return;
+      }
+      // No listing: probe sequentially from Rim1 upward.
+      (function probe(i) {
+        if (i > PRELOAD_PROBE_MAX) return;
+        const e = getRimEntry(i);
+        if (e.loaded) return probe(i + 1);
+        if (e.failed) return;
+        const prevLoad = e.img.onload;
+        e.img.onload = function (ev) {
+          if (typeof prevLoad === 'function') prevLoad.call(this, ev);
+          probe(i + 1);
+        };
+      })(1);
+    });
+  }
+  preloadRims();
 
   // Brake disk drawn behind the rim (visible through the spoke openings).
   // The graphic is centered in its SVG canvas, so it is anchored on the
@@ -153,35 +222,23 @@
   ];
   let fenderSel = 0; // current fender index (shared by both wheels)
 
-  // Auto-discover fender SVGs dropped into the folder: ask the server for a
-  // directory listing (nginx autoindex JSON in production — see
-  // default.conf.template — or the HTML index that simple dev servers
-  // return) and append any new .svg files to FENDERS. Their wheel-opening
-  // circles are read by loadFenderGeom like any other fender. When no
-  // listing is available (e.g. file://), the hardcoded list above is used.
+  // Auto-discover fender SVGs dropped into the folder (nginx autoindex JSON
+  // in production — see default.conf.template — or the HTML index that
+  // simple dev servers return) and append any new .svg files to FENDERS.
+  // Their wheel-opening circles are read by loadFenderGeom like any other
+  // fender. When no listing is available (e.g. file://), the hardcoded list
+  // above is used. Every fender is then preloaded so cycling is instant.
   (function discoverFenders() {
-    if (typeof fetch !== 'function') return;
-    fetch(FENDER_DIR)
-      .then(res => {
-        if (!res.ok) throw new Error('http ' + res.status);
-        const isJson = (res.headers.get('content-type') || '').includes('json');
-        return res.text().then(txt => ({ isJson, txt }));
-      })
-      .then(({ isJson, txt }) => {
-        let names = [];
-        if (isJson) {
-          names = JSON.parse(txt).filter(e => e.type === 'file').map(e => e.name);
-        } else {
-          const re = /href="([^"?#]+\.svg)"/gi;
-          let m;
-          while ((m = re.exec(txt))) names.push(decodeURIComponent(m[1].split('/').pop()));
-        }
-        const known = new Set(FENDERS.map(f => f.file));
-        names.filter(n => /\.svg$/i.test(n) && !known.has(n)).sort()
-          .forEach(n => { known.add(n); FENDERS.push({ file: n }); });
-      })
-      .catch(() => { /* no directory listing available: hardcoded list only */ });
+    listSvgDir(FENDER_DIR).then(names => {
+      const known = new Set(FENDERS.map(f => f.file));
+      names.filter(n => !known.has(n)).sort()
+        .forEach(n => { known.add(n); FENDERS.push({ file: n }); });
+    }).then(preloadFenders, preloadFenders);
   })();
+
+  function preloadFenders() {
+    for (let i = 0; i < FENDERS.length; i++) getFenderEntry(i);
+  }
 
   // Read the wheel-opening circle straight from the SVG source: viewBox
   // size plus the <circle> whose center sits closest to the viewBox middle
@@ -455,20 +512,30 @@
     return res;
   }
 
-  // Optional scrub radius estimate: requires KPI and hub geometry
-  function scrubRadiusEstimate(setup) {
-    const kpi = parseFloat($("#sr_kpi").value);
-    const hubOffset = parseFloat($("#sr_hub_offset").value);
-    if (!setup?.wheelGeom || isNaN(kpi) || isNaN(hubOffset)) return null;
-    // Simplified: project steering axis to ground and compare to tire contact patch center
-    // Approximate contact patch center at wheel centerline minus effective ET on ground
-    const axisX = hubOffset; // mm from hub face to steering axis at hub height (positive inward)
-    const camberHeightMm = setup.tireGeom?.overallDiaMm / 2 || 300;
-    const axisRun = camberHeightMm * Math.tan((kpi * PI) / 180);
-    const axisAtGround = axisX - axisRun; // mm at ground from hub face line
-    const contactCenter = -setup.wheelGeom.effectiveEt; // negative ET pushes out, so negative is outward
-    const scrub = contactCenter - axisAtGround; // positive = positive scrub (contact outward of axis)
-    return scrub;
+  // Remaining gap between the tire and the wheel arch for a setup, and how
+  // safe that gap is. Shared by the report row and the alert under the
+  // canvases so both grade it identically:
+  //   > 20 mm  ok      20 mm down to 10 mm  tight      < 10 mm  rubbing risk
+  const ARCH_WARN_MM = 20;
+  const ARCH_BAD_MM = 10;
+  function archClearance(base, setup) {
+    const baseArch = parseFloat($('#base_arch_clear').value);
+    const cmp = compareSetups(base, setup);
+    if (isNaN(baseArch) || !cmp || cmp.rideHeightDeltaMm == null) return null;
+    const value = baseArch - cmp.rideHeightDeltaMm;
+    const level = value < ARCH_BAD_MM ? 'bad' : (value < ARCH_WARN_MM ? 'warn' : 'good');
+    return { value, level };
+  }
+
+  // Final speedometer error, graded on the signed value: reading faster than
+  // actual (positive) is the safe side, reading slower is not.
+  //   >= -0.5%  ok      -0.5% down to -3%  noticeable      < -3%  too slow
+  const SPEEDO_WARN_PCT = -0.5;
+  const SPEEDO_BAD_PCT = -3;
+  function speedoErrorLevel(pct) {
+    if (pct < SPEEDO_BAD_PCT) return 'bad';
+    if (pct <= SPEEDO_WARN_PCT) return 'warn';
+    return 'good';
   }
 
   // Rendering helpers
@@ -493,9 +560,16 @@
 
   function renderComparison(base, setups, unitMode) {
     const wrap = $("#comparison");
-    if (!base?.tireGeom) { wrap.innerHTML = '<div class="small">Enter and save a valid baseline to view results.</div>'; return; }
+    const rtl = isRtl() ? ' dir="rtl"' : '';
+    if (!base?.tireGeom) {
+      wrap.innerHTML = `<div class="small"${rtl}>${t('report_need_baseline', 'Enter and save a valid baseline to view results.')}</div>`;
+      return;
+    }
     const valid = (setups || []).filter(s => s.tireGeom && s.wheelGeom);
-    if (!valid.length) { wrap.innerHTML = '<div class="small">Add setups to compare.</div>'; return; }
+    if (!valid.length) {
+      wrap.innerHTML = `<div class="small"${rtl}>${t('report_need_setups', 'Add setups to compare.')}</div>`;
+      return;
+    }
     // Baseline as first column, then each setup
     const allSets = [base, ...valid];
     const cols = allSets.map(s => ({ s, cmp: compareSetups(base, s), checks: clearanceChecks(base, s, { inner: 3, outer: 3 }) }));
@@ -509,15 +583,18 @@
 
     // Color the value instead of showing PASS/WARN text
     const mark = (valueHtml, pass) => `<span class="${pass ? 'val-good' : 'val-bad'}">${valueHtml}</span>`;
+    // Three-level variant for values with a warning band (see archClearance)
+    const markLevel = (valueHtml, level) => `<span class="val-${level}">${valueHtml}</span>`;
     const sign = (n, unit, digits = 1) => `${n >= 0 ? '+' : ''}${n.toFixed(digits)}${unit}`;
 
     // defs: [label, desc, (col) => cellHtml | null]
+    const descDir = rtlAttr();
     function sectionTable(defs) {
       let html = '<table class="report-table"><tbody>';
       for (const [label, desc, fn] of defs) {
         const cells = cols.map(fn);
         if (cells.every(v => v == null)) continue; // hide rows with no data at all
-        html += `<tr><td class="report-label">${label}<div class="report-desc">${desc}</div></td>`
+        html += `<tr><td class="report-label">${label}<div class="report-desc"${descDir}>${desc}</div></td>`
           + cells.map(v => `<td class="report-value">${v ?? ''}</td>`).join('')
           + '</tr>';
       }
@@ -526,66 +603,69 @@
 
     // --- Fitment Differences (not collapsible) ---
     const diffDefs = [
-      ['Ride Height Change', 'How much the vehicle height changes due to tire diameter difference',
+      ['Ride Height Change', t('rep_ride_height_desc', 'How much the vehicle height changes due to tire diameter difference'),
         c => displayDeltaSmart(c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
-      ['Wheel Arch Clearance Change', 'Change in clearance of the tire to the wheel arch',
+      ['Wheel Arch Clearance Change', t('rep_arch_change_desc', 'Change in clearance of the tire to the wheel arch'),
         c => displayDeltaSmart(-c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
-      ['Final Wheel Arch Clearance', 'Remaining gap between tire and wheel arch. 20 mm or less risks rubbing',
+      ['Final Wheel Arch Clearance', t('rep_arch_final_desc', 'Remaining gap between tire and wheel arch. Under 20 mm is tight, under 10 mm risks rubbing'),
         c => {
-          const baseArch = parseFloat($('#base_arch_clear').value);
-          if (isNaN(baseArch)) return null;
-          const f = baseArch - c.cmp.rideHeightDeltaMm;
-          return mark(displayLengthSmart(f, unitMode, 'mm'), f > 20);
+          const arch = archClearance(base, c.s);
+          if (!arch) return null;
+          return markLevel(displayLengthSmart(arch.value, unitMode, 'mm'), arch.level);
         }],
-      ['Inner Clearance Change', 'Change in clearance toward suspension',
+      ['Inner Clearance Change', t('rep_inner_change_desc', 'Change in clearance toward suspension'),
         c => {
           if (c.cmp.innerMoveMm == null) return null;
           const v = displayDeltaSmart(-c.cmp.innerMoveMm, unitMode, 'mm');
           return c.checks.inner ? mark(v, c.checks.inner.pass) : v;
         }],
-      ['Outer Clearance Change', 'Change in clearance toward fender',
+      ['Outer Clearance Change', t('rep_outer_change_desc', 'Change in clearance toward fender'),
         c => {
           if (c.cmp.outerMoveMm == null) return null;
           const v = displayDeltaSmart(-c.cmp.outerMoveMm, unitMode, 'mm');
           return c.checks.outer ? mark(v, c.checks.outer.pass) : v;
         }],
-      ['Final Outer Clearance', 'Clearance from the fender. Positive = out of fender line',
+      ['Final Outer Clearance', t('rep_outer_final_desc', 'Clearance from the fender. Positive = out of fender line'),
         c => {
           if (!c.checks.outer) return null;
           const f = -c.checks.outer.value; // positive = out of fender line (warning)
           return mark(displayDeltaSmart(f, unitMode, 'mm'), f <= 0);
         }],
-      ['Speedometer Error Change', 'Difference in speedometer reading due to tire circumference change',
+      ['Speedometer Error Change', t('rep_speedo_change_desc', 'Difference in speedometer reading due to tire circumference change'),
         c => sign(-c.cmp.speedoErrPct, ' %')],
-      ['Final Speedometer Error', 'Speedometer reading error. Negative = reads slower than actual',
+      ['Final Speedometer Error', t('rep_speedo_final_desc', 'Speedometer reading error. Negative = reads slower than actual'),
         c => {
           const f = -c.cmp.speedoErrPct + (base.baseSpeedoError || 0);
-          return mark(sign(f, ' %'), f >= 0);
+          return markLevel(sign(f, ' %'), speedoErrorLevel(f));
         }]
     ];
 
     // --- Wheel Geometry (collapsible) ---
     const wheelDefs = [
-      ['Wheel Width', 'Rim width', c => displayLengthSmart(inToMm(c.s.rimWidthIn), unitMode, 'in')],
-      ['Wheel Diameter', 'Rim diameter', c => displayLengthSmart(inToMm(c.s.rimDiamIn), unitMode, 'in')],
-      ['Offset', 'Distance from wheel centerline to mounting face. Positive = wheel sits further inward',
+      ['Wheel Width', t('rep_wheel_width_desc', 'Rim width'),
+        c => displayLengthSmart(inToMm(c.s.rimWidthIn), unitMode, 'in')],
+      ['Wheel Diameter', t('rep_wheel_diam_desc', 'Rim diameter'),
+        c => displayLengthSmart(inToMm(c.s.rimDiamIn), unitMode, 'in')],
+      ['Offset', t('rep_offset_desc', 'Distance from wheel centerline to mounting face. Positive = wheel sits further inward'),
         c => displayLengthSmart(c.s.etMm, unitMode, 'mm')],
-      ['Backspacing', 'Distance from hub mounting face to inner wheel lip',
+      ['Backspacing', t('rep_backspacing_desc', 'Distance from hub mounting face to inner wheel lip'),
         c => displayLengthSmart(c.s.wheelGeom.backspacingMm, unitMode, 'mm')],
-      ['Poke', 'How far the wheel sticks outward past the mounting face',
+      ['Poke', t('rep_poke_desc', 'How far the wheel sticks outward past the mounting face'),
         c => displayLengthSmart(c.s.wheelGeom.frontspacingMm, unitMode, 'mm')]
     ];
 
     // --- Tire Geometry (collapsible) ---
-    const revsDesc = (unitMode === 'imperial') ? 'How many times the tire rotates per mile' : 'How many times the tire rotates per km';
+    const revsDesc = (unitMode === 'imperial')
+      ? t('rep_revs_mile_desc', 'How many times the tire rotates per mile')
+      : t('rep_revs_km_desc', 'How many times the tire rotates per km');
     const tireDefs = [
-      ['Overall Diameter', 'Total tire height from ground to top',
+      ['Overall Diameter', t('rep_od_desc', 'Total tire height from ground to top'),
         c => displayLengthSmart(c.s.tireGeom.overallDiaMm, unitMode, 'mm')],
-      ['Section Width', 'Maximum width of the tire (incl. bulge)',
+      ['Section Width', t('rep_section_width_desc', 'Maximum width of the tire (incl. bulge)'),
         c => displayLengthSmart(c.s.tireGeom.sectionWidthMm * (1 + (c.s.bulgePct || 0) / 100), unitMode, 'mm')],
-      ['Sidewall Height', 'Height of the tire’s sidewall',
+      ['Sidewall Height', t('rep_sidewall_desc', 'Height of the tire’s sidewall'),
         c => displayLengthSmart(c.s.tireGeom.sidewallMm, unitMode, 'mm')],
-      ['Circumference', 'Perimeter length of the tire',
+      ['Circumference', t('rep_circumference_desc', 'Perimeter length of the tire'),
         c => displayLengthSmart(c.s.tireGeom.circumferenceMm, unitMode, 'mm')],
       ['Revolutions', revsDesc,
         c => (unitMode === 'imperial')
@@ -751,24 +831,30 @@
       // drawing is painted over its center, leaving a dark tire ring visible
       ctx.fillStyle = '#1a1a1c';
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.fill();
-      // Outer circle
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.stroke();
 
-      // Tread hatch ticks around the outer edge
-      const tickLen = Math.max(3, (r - rimR) * 0.3);
+      // Tread hatch ticks around the outer edge (no inner circle closing
+      // them off — the ticks read as tread blocks on their own). Always gray,
+      // on both wheels: only the outer circle carries the base/setup color.
+      const tickLen = Math.max(2.25, (r - rimR) * 0.225); // 25% shorter than the original 0.3 / 3px
       const ticks = 72;
+      const TICK_TILT = 30 * PI / 180; // slant off the radial direction
       ctx.lineWidth = 1;
+      ctx.strokeStyle = '#444';
       for (let i = 0; i < ticks; i++) {
         const a = (i / ticks) * 2 * PI;
         const ca = Math.cos(a), sa = Math.sin(a);
+        // Start on the outer circle and run inward, tilted by TICK_TILT
+        const d = a + PI + TICK_TILT;
         ctx.beginPath();
         ctx.moveTo(cx + ca * r, cy + sa * r);
-        ctx.lineTo(cx + ca * (r - tickLen), cy + sa * (r - tickLen));
+        ctx.lineTo(cx + ca * r + Math.cos(d) * tickLen, cy + sa * r + Math.sin(d) * tickLen);
         ctx.stroke();
       }
-      // Inner tread circle
-      ctx.beginPath(); ctx.arc(cx, cy, r - tickLen, 0, 2 * PI); ctx.stroke();
+
+      // Outer circle — thin, same weight as the ticks, drawn last so the
+      // colored outline sits on top of the gray tread lines
+      ctx.strokeStyle = color;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * PI); ctx.stroke();
 
       // --- Brake disk ---
       // Drawn behind the rim, centered on the wheel; shows through the
@@ -810,7 +896,7 @@
     }
 
     // Ground line
-    ctx.strokeStyle = '#888';
+    ctx.strokeStyle = '#444';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(margin, H - margin);
@@ -1353,7 +1439,7 @@
     const cmp = compareSetups(base, selected);
     if (cmp) {
       const corrected = (-cmp.speedoErrPct) + (baseline?.baseSpeedoError || 0);
-      const cls = Math.abs(corrected) > 2 ? 'warn' : 'good';
+      const cls = speedoErrorLevel(corrected); // same grading as the report row
       // Append example conversion at an indicated 100 km/h:
       // indicated = actual * (1 + err/100)  =>  actual = indicated / (1 + err/100)
       const indicated100 = 100;
@@ -1362,20 +1448,39 @@
         const s = n.toFixed(1);
         return s.endsWith('.0') ? s.slice(0, -2) : s;
       };
-      const example = `when your Speedometer shows ${fmt1(indicated100)} km/h, your actual speed (GPS) is ${fmt1(actual100)} km/h`;
-      alerts.push({ text: `Speedometer vs GPS Speed: ${corrected.toFixed(2)}% So, ` + example, cls });
+      alerts.push({
+        text: t('alert_speedo',
+          'Speedometer vs GPS Speed: {pct}% So, when your Speedometer shows {indicated} km/h, your actual speed (GPS) is {actual} km/h',
+          { pct: corrected.toFixed(2), indicated: fmt1(indicated100), actual: fmt1(actual100) }),
+        cls
+      });
+    }
+
+    // Wheel arch clearance — same grading as the report row (see archClearance)
+    const arch = archClearance(base, selected);
+    if (arch) {
+      alerts.push({
+        text: t('alert_arch_clear', 'Wheel arch clearance → {value} mm (tight under {warn} mm, rubbing risk under {bad} mm)',
+          { value: arch.value.toFixed(0), warn: ARCH_WARN_MM, bad: ARCH_BAD_MM }),
+        cls: arch.level
+      });
     }
 
     // Clearance checks
     const checks = clearanceChecks(base, selected, { inner: 3, outer: 3 });
-    if (checks.inner) alerts.push({ text: `Inner clearance → ${checks.inner.value.toFixed(0)} mm (min ${checks.inner.min} mm)`, cls: checks.inner.pass ? 'good' : 'bad' });
-    if (checks.outer) alerts.push({ text: `Outer clearance → ${checks.outer.value.toFixed(0)} mm (min ${checks.outer.min} mm)`, cls: checks.outer.pass ? 'good' : 'bad' });
-
-    // Scrub radius (optional)
-    const sr = scrubRadiusEstimate(selected);
-    if (sr != null && !isNaN(sr)) {
-      const cls = Math.abs(sr) > 10 ? 'warn' : 'good';
-      alerts.push({ text: `Estimated scrub radius: ${sr.toFixed(1)} mm`, cls });
+    if (checks.inner) {
+      alerts.push({
+        text: t('alert_inner_clear', 'Inner clearance → {value} mm (min {min} mm)',
+          { value: checks.inner.value.toFixed(0), min: checks.inner.min }),
+        cls: checks.inner.pass ? 'good' : 'bad'
+      });
+    }
+    if (checks.outer) {
+      alerts.push({
+        text: t('alert_outer_clear', 'Outer clearance → {value} mm (min {min} mm)',
+          { value: checks.outer.value.toFixed(0), min: checks.outer.min }),
+        cls: checks.outer.pass ? 'good' : 'bad'
+      });
     }
 
     return alerts;
@@ -1383,7 +1488,8 @@
 
   function renderAlerts(alerts) {
     const wrap = $("#alerts");
-    wrap.innerHTML = alerts.map(a => `<div class="alert ${a.cls}">${a.text}</div>`).join('');
+    const dir = rtlAttr();
+    wrap.innerHTML = alerts.map(a => `<div class="alert ${a.cls}"${dir}>${a.text}</div>`).join('');
   }
 
   // Full tire size label: appends R{rim} from the wheel's rim diameter when the typed size is partial
@@ -1442,7 +1548,9 @@
     const alerts = [];
     if (invalids.length > 0) {
       for (const s of invalids) {
-        const msg = `Setup "${s.tireStr || s.id}": tire rim ${s.diamMismatch.tireRimIn}\" does not match wheel rim ${s.diamMismatch.wheelRimIn}\".`;
+        const msg = t('alert_rim_mismatch',
+          'Setup "{setup}": tire rim {tireRim}" does not match wheel rim {wheelRim}".',
+          { setup: s.tireStr || s.id, tireRim: s.diamMismatch.tireRimIn, wheelRim: s.diamMismatch.wheelRimIn });
         alerts.push({ text: msg, cls: 'bad' });
       }
     }
@@ -1540,8 +1648,13 @@
     // Keep speedo hint in sync while typing
     const sp = document.getElementById('base_speedo_error');
     if (sp) sp.addEventListener('input', updateSpeedoHint);
-    // Re-render dynamic hint when the hint language changes
-    document.addEventListener('toolmeup:langchange', updateSpeedoHint);
+    // Re-render dynamic hint when the hint language changes. The report rows
+    // and the result lines under the canvases are built in JS too, so redraw
+    // everything to pick up the new language.
+    document.addEventListener('toolmeup:langchange', () => {
+      updateSpeedoHint();
+      try { renderAll(); } catch (_) { /* ignore */ }
+    });
     // Keep baseline tire R-suffix in sync while typing rim diameter
     const rd = document.getElementById('base_rim_diam');
     if (rd) rd.addEventListener('input', updateTireSuffixes);
@@ -1593,9 +1706,7 @@
       arch_clear: $('#base_arch_clear').value,
       speedo_error: $('#base_speedo_error').value,
       th_inner: $('#th_inner').value,
-      th_outer: $('#th_outer').value,
-      sr_kpi: $('#sr_kpi').value,
-      sr_hub: $('#sr_hub_offset').value
+      th_outer: $('#th_outer').value
     };
     const setups = [];
     $$('#setups .setup-card').forEach(card => {
@@ -1636,8 +1747,6 @@
       $('#base_speedo_error').value = sess.base.speedo_error || '';
       $('#th_inner').value = sess.base.th_inner || '';
       $('#th_outer').value = sess.base.th_outer || '';
-      $('#sr_kpi').value = sess.base.sr_kpi || '';
-      $('#sr_hub_offset').value = sess.base.sr_hub || '';
       // Refresh speedo hint to reflect loaded value
       updateSpeedoHint();
     }

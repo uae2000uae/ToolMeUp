@@ -62,8 +62,48 @@
     hint_speedo_intro: "معظم تركيبات المصنع تجعل عداد السرعة يعطي قراءة أعلى من سرعة GPS أو الرادار. تساعدك هذه الحاسبة على معرفة القراءة المتوقعة باستخدام التركيب الجديد.",
     hint_speedo_asper: "بحسب إعداداتك، ",
     hint_thresholds: "هذه حدود التحذير. سنحسب الخلوص بناءً على إعداداتك الحالية المُدخلة وسنحذّرك عند تجاوز الحدود. لن يتم إيقاف الحساب.",
-    hint_scrub: "معاملات هندسية إضافية يمكنك إدخالها عند حساب تركيب الإطارات/الجنوط أو هندسة نظام التعليق، وتساعدك على حساب نصف قطر الاحتكاك (scrub radius) بدقة أعلى بدلاً من الاعتماد على قيم المصنع العامة.",
-    hint_sessions: "انقر على اسم الجلسة لتحميلها."
+    hint_sessions: "اختر اسم الجلسة لتحميلها.",
+
+    // Canvas captions (static markup, data-i18n)
+    caption_rim_view: "مقارنة المقطع العرضي للجنط والإطار",
+    caption_side_view: "مقارنة الإطارات من المنظر الجانبي",
+
+    // Result lines under the canvases (built in app.js — {..} placeholders
+    // are filled by ToolMeUp.t)
+    alert_speedo: "سرعة العداد مقابل الأقمار الاصطناعية: {pct}% أي، عندما يعرض عداد السرعة {indicated} كم/س، تكون سرعتك الفعلية (GPS) {actual} كم/س",
+    alert_arch_clear: "خلوص قوس العجلة ← {value} مم (ضيّق دون {warn} مم، واحتمال احتكاك دون {bad} مم)",
+    alert_inner_clear: "الخلوص الداخلي ← {value} مم (الحد الأدنى {min} مم)",
+    alert_outer_clear: "الخلوص الخارجي ← {value} مم (الحد الأدنى {min} مم)",
+    alert_rim_mismatch: "التركيب \"{setup}\": مقاس جنط الإطار {tireRim}\" لا يطابق قطر الجنط {wheelRim}\".",
+
+    // Report placeholders
+    report_need_baseline: "أدخل إعداداً أساسياً صحيحاً واحفظه لعرض النتائج.",
+    report_need_setups: "أضف تركيبات للمقارنة.",
+
+    // Report row descriptions — Fitment Differences
+    rep_ride_height_desc: "مقدار تغيّر ارتفاع السيارة نتيجة اختلاف قطر الإطار",
+    rep_arch_change_desc: "التغيّر في خلوص الإطار عن قوس العجلة",
+    rep_arch_final_desc: "الفجوة المتبقية بين الإطار وقوس العجلة. أقل من 20 مم تُعد ضيّقة، وأقل من 10 مم قد تسبب احتكاكاً",
+    rep_inner_change_desc: "التغيّر في الخلوص باتجاه نظام التعليق",
+    rep_outer_change_desc: "التغيّر في الخلوص باتجاه الرفرف",
+    rep_outer_final_desc: "الخلوص عن الرفرف. القيمة الموجبة تعني خروج الإطار عن خط الرفرف",
+    rep_speedo_change_desc: "الفرق في قراءة عداد السرعة نتيجة تغيّر محيط الإطار",
+    rep_speedo_final_desc: "خطأ قراءة عداد السرعة. القيمة السالبة تعني أن العداد يقرأ أبطأ من السرعة الفعلية",
+
+    // Report row descriptions — Wheel Geometry
+    rep_wheel_width_desc: "عرض الجنط",
+    rep_wheel_diam_desc: "قطر الجنط",
+    rep_offset_desc: "المسافة من خط منتصف الجنط إلى سطح التثبيت. القيمة الموجبة تعني أن الجنط يقع أكثر إلى الداخل",
+    rep_backspacing_desc: "المسافة من سطح تثبيت الصرة إلى الحافة الداخلية للجنط",
+    rep_poke_desc: "مقدار بروز الجنط إلى الخارج بعد سطح التثبيت",
+
+    // Report row descriptions — Tire Geometry
+    rep_od_desc: "ارتفاع الإطار الكلي من الأرض إلى أعلى نقطة",
+    rep_section_width_desc: "أقصى عرض للإطار (شاملاً الانتفاخ)",
+    rep_sidewall_desc: "ارتفاع الجدار الجانبي للإطار",
+    rep_circumference_desc: "طول محيط الإطار",
+    rep_revs_mile_desc: "عدد دورات الإطار في الميل الواحد",
+    rep_revs_km_desc: "عدد دورات الإطار في الكيلومتر الواحد"
   };
 
   // ---- Theme -----------------------------------------------------------
@@ -209,8 +249,28 @@
     init();
   }
 
+  // Fill {name} placeholders in a template from a values object.
+  function fill(str, vars) {
+    if (!vars) return str;
+    return str.replace(/\{(\w+)\}/g, function (m, k) {
+      return vars[k] !== undefined ? vars[k] : m;
+    });
+  }
+
   // Expose for any page that wants the list or current hint language
-  window.ToolMeUp = { tools: TOOLS, lang: currentLang, hintText: function (key) {
-    return currentLang() === "ar" && AR[key] ? AR[key] : null;
-  } };
+  window.ToolMeUp = {
+    tools: TOOLS,
+    lang: currentLang,
+    isRtl: function () { return currentLang() === "ar"; },
+    hintText: function (key) {
+      return currentLang() === "ar" && AR[key] ? AR[key] : null;
+    },
+    // Translate for text built in JS: returns the Arabic string when Arabic is
+    // active and the key exists, otherwise the English fallback passed in.
+    // Both sides go through fill(), so callers write one set of {placeholders}.
+    t: function (key, fallback, vars) {
+      const s = (currentLang() === "ar" && AR[key]) ? AR[key] : fallback;
+      return fill(s, vars);
+    }
+  };
 })();

@@ -120,7 +120,6 @@ button:disabled:hover { filter: none; }
 /* Structured fitment report (setups as columns) */
 .report-section { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 10px 0; overflow-x: auto; }
 .report-title { margin: 0; color: var(--warn); font-weight: 600; font-size: 15px; }
-details.report-section > summary { cursor: pointer; list-style-position: outside; }
 .report-table { width: 100%; border-collapse: collapse; margin-top: 6px; table-layout: fixed; }
 .report-table th { text-align: right; padding: 6px 8px; font-weight: 700; }
 .report-table th:first-child { text-align: left; }
@@ -134,6 +133,7 @@ details.report-section > summary { cursor: pointer; list-style-position: outside
 .report-desc { color: var(--muted); font-size: 12px; font-weight: 400; max-width: 320px; }
 .report-value { font-weight: 600; text-align: right; }
 .val-good { color: #22c55e; }
+.val-warn { color: var(--warn); }
 .val-bad { color: #ef4444; }
 .caption { color: var(--muted); text-align: center; font-size: 12px; margin: 4px 0 0; }
 
@@ -208,18 +208,36 @@ html.compact { font-size: 87.5%; }
 /* Collapsible "Advanced settings" disclosure */
 .advanced { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
 .advanced__summary {
-  list-style: none; cursor: pointer; user-select: none;
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 14px; font-weight: 600; color: var(--accent);
+  font-size: 16px; font-weight: 600; color: var(--accent);
   padding: 6px 0;
 }
-.advanced__summary::-webkit-details-marker { display: none; }
-.advanced__summary::before {
-  content: "▸"; display: inline-block; transition: transform .15s ease; color: var(--muted);
-}
-.advanced[open] > .advanced__summary::before { transform: rotate(90deg); }
 .advanced__summary:hover { filter: brightness(1.1); }
 .advanced > .grid.two:first-of-type { margin-top: 10px; }
+
+/* ---- Disclosure triangles ----------------------------------------------
+   One marker for every collapsible section (Advanced settings, report
+   sections): the native ::marker is hidden and replaced by a ▸ drawn at a
+   fixed size and color so it looks identical regardless of the summary's own
+   font size, and nudged right so it clears the panel edge and shows whole. */
+.advanced__summary,
+details.report-section > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.advanced__summary::-webkit-details-marker,
+details.report-section > summary::-webkit-details-marker { display: none; }
+.advanced__summary::before,
+details.report-section > summary::before {
+  content: "▸";
+  flex: none;
+  margin-left: 4px;              /* offset right so the glyph isn't clipped */
+  font-size: 14px;
+  line-height: 1;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+.advanced[open] > .advanced__summary::before,
+details.report-section[open] > summary::before { transform: rotate(90deg); }
 
 /* ---- Sessions ---- */
 .session-name { margin-top: 6px; font-size: 16px; color: var(--warn); background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;}
