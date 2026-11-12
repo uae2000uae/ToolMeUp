@@ -120,35 +120,81 @@
     entry.cxF = entry.cyF = 0.5;
   }
 
+  // A wheel only ever shows a rim that is fully downloaded AND decoded
+  // ("ready"). Clicking a wheel whose next rim isn't ready yet records it in
+  // rimPending and keeps the current rim on screen; the switch happens in one
+  // step the moment the new rim becomes ready (no flash of Rim0 in between).
+  const rimPending = [null, null]; // per wheel: rim index waiting to be shown
+
+  function renderSoon() {
+    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+  }
+
+  // Move every wheel waiting on rim i to it (or to Rim0 if i failed).
+  function settlePending(i) {
+    let changed = false;
+    for (let s = 0; s < rimPending.length; s++) {
+      if (rimPending[s] !== i) continue;
+      const e = rimCache[i];
+      if (e.ready) {
+        rimSel[s] = i; rimPending[s] = null; changed = true;
+      } else if (e.failed) {
+        // Past the last rim: wrap to Rim0 (wait for it if it isn't ready)
+        rimPending[s] = null;
+        if (getRimEntry(0).ready) rimSel[s] = 0; else rimPending[s] = 0;
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
   function getRimEntry(i) {
     let e = rimCache[i];
     if (e) return e;
-    e = rimCache[i] = { img: new Image(), loaded: false, failed: false };
+    e = rimCache[i] = { img: new Image(), loaded: false, ready: false, failed: false, waiters: [] };
+    e.img.decoding = 'async';
     e.img.onload = function () {
       e.loaded = true;
-      measureRimImage(e);
-      try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+      // Decode off the main thread before first use so the first draw after
+      // a switch doesn't stall (large SVGs take 100-250 ms to decode).
+      const decoded = typeof e.img.decode === 'function' ? e.img.decode().catch(() => {}) : Promise.resolve();
+      decoded.then(() => {
+        measureRimImage(e);
+        e.ready = true;
+        e.waiters.splice(0).forEach(fn => fn());
+        settlePending(i);
+        renderSoon(); // initial Rim0 draw, or a pending switch
+      });
     };
     e.img.onerror = function () {
       e.failed = true;
-      // Any wheel pointing at this missing file wraps back to Rim0
-      let changed = false;
+      e.waiters.splice(0).forEach(fn => fn());
+      // Any wheel showing this missing file wraps back to Rim0
+      let changed = settlePending(i);
       for (let s = 0; s < rimSel.length; s++) {
         if (rimSel[s] === i) { rimSel[s] = 0; changed = true; }
       }
-      if (changed) { try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ } }
+      if (changed) renderSoon();
     };
     e.img.src = RIM_DIR + 'Rim' + i + '.svg';
     return e;
   }
   getRimEntry(0); // the default rim is always needed first
 
-  // Preload every rim in the folder up front so cycling through them is
-  // instant. The directory listing gives the exact RimN.svg set; without a
-  // listing (file://, no autoindex) we walk indices upward instead, starting
-  // the next one only after the previous has loaded, and stop at the first
-  // miss. PRELOAD_PROBE_MAX caps that walk so a gap in the numbering can't
-  // spin forever.
+  // Resolve once rim i is ready or has failed (starts loading it if needed).
+  function whenRimSettled(i) {
+    const e = getRimEntry(i);
+    if (e.ready || e.failed) return Promise.resolve(e);
+    return new Promise(res => e.waiters.push(() => res(e)));
+  }
+
+  // Preload every rim up front so cycling is instant — but in click order,
+  // one at a time: Rim1 (the next click) finishes first instead of all rims
+  // sharing the bandwidth and arriving together at the end. A rim the user
+  // clicks to before its turn is requested immediately by getRimEntry.
+  // The directory listing gives the exact RimN.svg set; without one
+  // (file://, no autoindex) we walk upward and stop at the first miss.
+  // PRELOAD_PROBE_MAX caps that walk so a gap can't spin forever.
   const PRELOAD_PROBE_MAX = 40;
   function preloadRims() {
     listSvgDir(RIM_DIR).then(names => {
@@ -158,24 +204,23 @@
         if (m) idx.push(parseInt(m[1], 10));
       });
       if (idx.length) {
-        idx.sort((a, b) => a - b).forEach(i => getRimEntry(i));
+        const queue = idx.sort((a, b) => a - b);
+        (function next() {
+          if (queue.length) whenRimSettled(queue.shift()).then(next);
+        })();
         return;
       }
       // No listing: probe sequentially from Rim1 upward.
       (function probe(i) {
         if (i > PRELOAD_PROBE_MAX) return;
-        const e = getRimEntry(i);
-        if (e.loaded) return probe(i + 1);
-        if (e.failed) return;
-        const prevLoad = e.img.onload;
-        e.img.onload = function (ev) {
-          if (typeof prevLoad === 'function') prevLoad.call(this, ev);
-          probe(i + 1);
-        };
+        whenRimSettled(i).then(e => { if (!e.failed) probe(i + 1); });
       })(1);
     });
   }
-  preloadRims();
+  // Start once the page itself (HTML, CSS, JS, Rim0, fenders) has loaded so
+  // the rim queue doesn't compete with what the user sees first.
+  if (document.readyState === 'complete') preloadRims();
+  else window.addEventListener('load', preloadRims, { once: true });
 
   // Brake disk drawn behind the rim (visible through the spoke openings).
   // The graphic is centered in its SVG canvas, so it is anchored on the
@@ -186,18 +231,30 @@
   const BRAKE_DISK_SCALE = 1.0; // disk height as a fraction of rim diameter
   const brakeImg = new Image();
   let brakeImgLoaded = false;
+  brakeImg.decoding = 'async';
   brakeImg.onload = function () {
-    brakeImgLoaded = true;
-    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+    // Decode first: this is the largest image, and drawing it undecoded
+    // would stall the first frame it appears in.
+    const decoded = typeof brakeImg.decode === 'function' ? brakeImg.decode().catch(() => {}) : Promise.resolve();
+    decoded.then(() => { brakeImgLoaded = true; renderSoon(); });
   };
   brakeImg.onerror = function () { brakeImgLoaded = false; };
   brakeImg.src = BRAKE_IMG_SRC;
 
+  // Advance a wheel to its next rim. Repeated clicks while waiting step on
+  // from the pending rim, so clicks are never lost. The current drawing
+  // stays up until the target is ready (see settlePending).
   function cycleRim(slot) {
-    const next = rimSel[slot] + 1;
+    const from = rimPending[slot] != null ? rimPending[slot] : rimSel[slot];
+    let next = from + 1;
+    if (getRimEntry(next).failed) next = 0; // wrap immediately if known missing
     const e = getRimEntry(next);
-    rimSel[slot] = e.failed ? 0 : next; // wrap immediately if known missing
-    try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+    if (e.ready) {
+      rimSel[slot] = next; rimPending[slot] = null;
+    } else {
+      rimPending[slot] = next === rimSel[slot] ? null : next;
+    }
+    renderSoon(); // switch now, or show the "loading" ring
   }
 
   // Car fender drawings for the side-view background, loaded from
@@ -874,9 +931,10 @@
 
       // --- Rim ---
       // Rim face drawing (rims/RimN.svg per wheel), scaled so its outer
-      // edge matches rimR. Falls back to Rim0 while a rim is still loading.
+      // edge matches rimR. rimSel only ever points at a ready rim (a click
+      // waits in rimPending), except before Rim0 itself is ready.
       const sel = getRimEntry(rimSel[slot]);
-      const rimE = sel.loaded ? sel : (getRimEntry(0).loaded ? getRimEntry(0) : null);
+      const rimE = sel.ready ? sel : null;
       if (rimE) {
         const dw = (2 * rimR) / rimE.fx;
         const dh = (2 * rimR) / rimE.fy;
@@ -892,6 +950,17 @@
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.arc(cx, cy, rimR, 0, 2 * PI); ctx.stroke();
+
+      // Next rim still loading: dashed ring just inside the rim edge as
+      // feedback that the click registered; it clears when the rim swaps.
+      if (rimPending[slot] != null) {
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
+        ctx.beginPath(); ctx.arc(cx, cy, Math.max(1, rimR - 3), 0, 2 * PI); ctx.stroke();
+        ctx.restore();
+      }
       ctx.strokeStyle = color;
     }
 
