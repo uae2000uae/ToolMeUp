@@ -35,6 +35,14 @@
       icon: "M12 3v10m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2"
     },
     {
+      id: "calculators",
+      name: "Calculators",
+      title: "Calculator Suite",
+      href: "calculators.html",
+      desc: "Basic, percentage, loan/interest, video ratio & pixel comparison, and BMI calculators — all in one tabbed page.",
+      icon: "M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm1 3h8v3H8V6zm0 6h.01M12 12h.01M16 12h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01"
+    },
+    {
       id: "dualshock",
       name: "DualShock-Tool",
       title: "DualShock / DualSense Calibration",

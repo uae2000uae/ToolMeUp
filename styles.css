@@ -297,3 +297,56 @@ details.report-section[open] > summary::before { transform: rotate(90deg); }
 
 .oem-capture { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); display: grid; gap: 8px; }
 .oem-capture .toggle { color: var(--fg); font-size: 14px; }
+
+/* ---- Calculator Suite ---- */
+.calc-tabs { margin-bottom: 14px; }
+
+/* Basic calculator */
+.calc-basic { max-width: 340px; }
+.calc-display {
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px;
+  background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%);
+  text-align: right; margin-bottom: 10px; overflow: hidden;
+}
+.calc-expr { color: var(--muted); font-size: 14px; min-height: 18px; word-break: break-all; }
+.calc-value { font-size: 30px; font-weight: 700; word-break: break-all; }
+.calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.calc-keys button {
+  padding: 14px 0; font-size: 17px; font-weight: 600; border-radius: 10px;
+  background: color-mix(in oklab, var(--panel) 80%, var(--fg) 20%); color: var(--fg);
+  border: 1px solid var(--border);
+}
+.calc-keys .k-op { background: color-mix(in oklab, var(--accent) 18%, var(--panel)); color: var(--accent); }
+.calc-keys .k-fn { background: color-mix(in oklab, var(--muted) 18%, var(--panel)); }
+.calc-keys .k-eq { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+/* Percentage rows */
+.calc-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 0; border-bottom: 1px dashed var(--border);
+}
+.calc-row:last-of-type { border-bottom: none; }
+.calc-row input { width: 110px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: color-mix(in oklab, var(--panel) 88%, var(--fg) 12%); color: var(--fg); }
+.calc-out { font-weight: 700; color: var(--accent); margin-left: auto; min-width: 90px; text-align: right; }
+
+/* Video: paired W×H inputs */
+.calc-pair { display: inline-flex; align-items: center; gap: 6px; }
+.calc-pair input { width: 90px; }
+
+/* BMI scale */
+.bmi-scale { max-width: 480px; margin-top: 10px; }
+.bmi-scale__bar { position: relative; display: flex; height: 14px; border-radius: 999px; overflow: visible; }
+.bmi-seg { height: 100%; }
+.bmi-seg:first-child { border-radius: 999px 0 0 999px; }
+.bmi-obese { border-radius: 0 999px 999px 0; }
+/* segment widths on a 15–40 scale: 18.5 | 25 | 30 | 40 */
+.bmi-under  { width: 14%; background: #60a5fa; }
+.bmi-normal { width: 26%; background: #22c55e; }
+.bmi-over   { width: 20%; background: #f59e0b; }
+.bmi-obese  { width: 40%; background: #ef4444; }
+.bmi-marker {
+  position: absolute; top: -4px; bottom: -4px; width: 3px; left: 0;
+  background: var(--fg); border-radius: 2px; transform: translateX(-50%);
+  transition: left .2s ease;
+}
+.bmi-scale__labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }

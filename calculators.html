@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en" data-theme="light" class="compact">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator Suite — ToolMeUp</title>
+  <meta name="description" content="A suite of everyday calculators: basic, percentage, loan/interest, video ratio & pixel size comparison, and BMI — all in your browser.">
+  <meta name="theme-color" content="#2563eb">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Calculator Suite — ToolMeUp">
+  <meta property="og:description" content="Basic, percentage, loan, video ratio and BMI calculators in one place.">
+  <meta property="og:image" content="web-app-icon-512.png">
+
+  <link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Shared top navigation: injected from base.html by shared.js -->
+  <header class="app-header" data-shared-header data-brand="ToolMeUp • Calculator Suite"></header>
+
+  <main class="container">
+    <!-- Calculator tabs -->
+    <nav class="tabs calc-tabs" role="tablist" aria-label="Calculators">
+      <button class="tab active" role="tab" data-calc-tab="basic" aria-selected="true">Basic</button>
+      <button class="tab" role="tab" data-calc-tab="percent" aria-selected="false">Percentage</button>
+      <button class="tab" role="tab" data-calc-tab="loan" aria-selected="false">Loan / Interest</button>
+      <button class="tab" role="tab" data-calc-tab="video" aria-selected="false">Video Ratio &amp; Pixels</button>
+      <button class="tab" role="tab" data-calc-tab="bmi" aria-selected="false">BMI</button>
+    </nav>
+
+    <!-- ============ Basic calculator ============ -->
+    <section class="panel calc-pane" data-calc-pane="basic" role="tabpanel">
+      <h2>Basic Calculator</h2>
+      <p class="hint">Use the keypad or your keyboard. Enter <kbd>=</kbd>, <kbd>Backspace</kbd> deletes, <kbd>Esc</kbd> clears.</p>
+      <div class="calc-basic">
+        <div class="calc-display" aria-live="polite">
+          <div id="calc_expr" class="calc-expr">&nbsp;</div>
+          <div id="calc_result" class="calc-value">0</div>
+        </div>
+        <div class="calc-keys" id="calc_keys">
+          <button data-k="ac" class="k-fn">AC</button>
+          <button data-k="del" class="k-fn">⌫</button>
+          <button data-k="%" class="k-fn">%</button>
+          <button data-k="/" class="k-op">÷</button>
+          <button data-k="7">7</button>
+          <button data-k="8">8</button>
+          <button data-k="9">9</button>
+          <button data-k="*" class="k-op">×</button>
+          <button data-k="4">4</button>
+          <button data-k="5">5</button>
+          <button data-k="6">6</button>
+          <button data-k="-" class="k-op">−</button>
+          <button data-k="1">1</button>
+          <button data-k="2">2</button>
+          <button data-k="3">3</button>
+          <button data-k="+" class="k-op">+</button>
+          <button data-k="neg">±</button>
+          <button data-k="0">0</button>
+          <button data-k=".">.</button>
+          <button data-k="=" class="k-eq">=</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Percentage calculator ============ -->
+    <section class="panel calc-pane" data-calc-pane="percent" role="tabpanel" hidden>
+      <h2>Percentage Calculator</h2>
+
+      <div class="calc-row">
+        <span>What is</span>
+        <input id="pct_a1" type="number" step="any" inputmode="decimal" placeholder="15">
+        <span>% of</span>
+        <input id="pct_a2" type="number" step="any" inputmode="decimal" placeholder="200">
+        <span>?</span>
+        <output id="pct_a_out" class="calc-out">—</output>
+      </div>
+
+      <div class="calc-row">
+        <input id="pct_b1" type="number" step="any" inputmode="decimal" placeholder="30">
+        <span>is what % of</span>
+        <input id="pct_b2" type="number" step="any" inputmode="decimal" placeholder="200">
+        <span>?</span>
+        <output id="pct_b_out" class="calc-out">—</output>
+      </div>
+
+      <div class="calc-row">
+        <span>% change from</span>
+        <input id="pct_c1" type="number" step="any" inputmode="decimal" placeholder="120">
+        <span>to</span>
+        <input id="pct_c2" type="number" step="any" inputmode="decimal" placeholder="150">
+        <span>?</span>
+        <output id="pct_c_out" class="calc-out">—</output>
+      </div>
+
+      <div class="calc-row">
+        <input id="pct_d1" type="number" step="any" inputmode="decimal" placeholder="80">
+        <span>increased / decreased by</span>
+        <input id="pct_d2" type="number" step="any" inputmode="decimal" placeholder="25">
+        <span>%</span>
+        <output id="pct_d_out" class="calc-out">—</output>
+      </div>
+
+      <p class="hint">Each row calculates on its own as you type.</p>
+    </section>
+
+    <!-- ============ Loan / interest calculator ============ -->
+    <section class="panel calc-pane" data-calc-pane="loan" role="tabpanel" hidden>
+      <h2>Loan / Interest Calculator</h2>
+      <p class="hint">Amortized loan (equal monthly payments, e.g. car loan or mortgage).</p>
+
+      <div class="grid three">
+        <div class="field"><label>Loan amount<input id="loan_amount" type="number" min="0" step="any" inputmode="decimal" placeholder="100000"></label></div>
+        <div class="field"><label>Annual rate (%)<input id="loan_rate" type="number" min="0" step="any" inputmode="decimal" placeholder="4.5"></label></div>
+        <div class="field"><label>Term (years)<input id="loan_years" type="number" min="0" step="any" inputmode="decimal" placeholder="5"></label></div>
+      </div>
+
+      <div id="loan_summary" class="alerts" hidden>
+        <div class="alert good">Monthly payment: <strong id="loan_monthly">—</strong></div>
+        <div class="alert">Total paid: <strong id="loan_total">—</strong> &nbsp;•&nbsp; Total interest: <strong id="loan_interest">—</strong></div>
+      </div>
+
+      <details class="advanced">
+        <summary class="advanced__summary">Amortization schedule (yearly)</summary>
+        <div class="table-wrap">
+          <table class="table" id="loan_schedule">
+            <thead><tr><th>Year</th><th>Principal paid</th><th>Interest paid</th><th>Balance</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+
+      <h3>Simple / Compound Interest</h3>
+      <div class="grid three">
+        <div class="field"><label>Principal<input id="int_principal" type="number" min="0" step="any" inputmode="decimal" placeholder="10000"></label></div>
+        <div class="field"><label>Annual rate (%)<input id="int_rate" type="number" min="0" step="any" inputmode="decimal" placeholder="5"></label></div>
+        <div class="field"><label>Years<input id="int_years" type="number" min="0" step="any" inputmode="decimal" placeholder="10"></label></div>
+      </div>
+      <div class="field">
+        <label>Compounding
+          <select id="int_compound">
+            <option value="0">Simple (none)</option>
+            <option value="1">Yearly</option>
+            <option value="12" selected>Monthly</option>
+            <option value="365">Daily</option>
+          </select>
+        </label>
+      </div>
+      <div id="int_summary" class="alerts" hidden>
+        <div class="alert good">Final amount: <strong id="int_final">—</strong> &nbsp;•&nbsp; Interest earned: <strong id="int_earned">—</strong></div>
+      </div>
+    </section>
+
+    <!-- ============ Video ratio & pixel size calculator ============ -->
+    <section class="panel calc-pane" data-calc-pane="video" role="tabpanel" hidden>
+      <h2>Video Ratio &amp; Pixel Size Comparison</h2>
+      <p class="hint">Enter a resolution to get its aspect ratio, megapixels and common-name match — or fill one dimension and pick a ratio to get the other.</p>
+
+      <div class="grid three">
+        <div class="field"><label>Width (px)<input id="vid_w" type="number" min="1" step="1" inputmode="numeric" placeholder="1920"></label></div>
+        <div class="field"><label>Height (px)<input id="vid_h" type="number" min="1" step="1" inputmode="numeric" placeholder="1080"></label></div>
+        <div class="field">
+          <label>Aspect ratio
+            <select id="vid_ratio">
+              <option value="">Auto (from W×H)</option>
+              <option value="16:9">16:9 (widescreen)</option>
+              <option value="9:16">9:16 (vertical)</option>
+              <option value="4:3">4:3 (classic)</option>
+              <option value="21:9">21:9 (ultrawide)</option>
+              <option value="1:1">1:1 (square)</option>
+              <option value="3:2">3:2</option>
+              <option value="2.39:1">2.39:1 (cinema)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="vid_summary" class="alerts" hidden>
+        <div class="alert good" id="vid_info">—</div>
+      </div>
+
+      <h3>Compare Two Resolutions</h3>
+      <div class="grid two">
+        <div class="field"><label>A: width × height
+          <span class="calc-pair"><input id="cmp_aw" type="number" min="1" step="1" inputmode="numeric" placeholder="1920"> × <input id="cmp_ah" type="number" min="1" step="1" inputmode="numeric" placeholder="1080"></span>
+        </label></div>
+        <div class="field"><label>B: width × height
+          <span class="calc-pair"><input id="cmp_bw" type="number" min="1" step="1" inputmode="numeric" placeholder="3840"> × <input id="cmp_bh" type="number" min="1" step="1" inputmode="numeric" placeholder="2160"></span>
+        </label></div>
+      </div>
+      <div id="cmp_summary" class="alerts" hidden>
+        <div class="alert" id="cmp_info">—</div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="cmp_canvas" class="canvas" width="720" height="300" hidden></canvas>
+      </div>
+
+      <details class="advanced">
+        <summary class="advanced__summary">Common resolutions reference</summary>
+        <div class="table-wrap">
+          <table class="table" id="vid_reference">
+            <thead><tr><th>Name</th><th>Resolution</th><th>Ratio</th><th>Megapixels</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ BMI calculator ============ -->
+    <section class="panel calc-pane" data-calc-pane="bmi" role="tabpanel" hidden>
+      <h2>BMI Calculator</h2>
+
+      <div class="field">
+        <label class="toggle"><input type="checkbox" id="bmi_imperial"> <span>Use imperial units (lb / ft+in)</span></label>
+      </div>
+
+      <div class="grid three" id="bmi_metric_fields">
+        <div class="field"><label>Weight (kg)<input id="bmi_kg" type="number" min="0" step="any" inputmode="decimal" placeholder="75"></label></div>
+        <div class="field"><label>Height (cm)<input id="bmi_cm" type="number" min="0" step="any" inputmode="decimal" placeholder="175"></label></div>
+      </div>
+
+      <div class="grid three" id="bmi_imperial_fields" hidden>
+        <div class="field"><label>Weight (lb)<input id="bmi_lb" type="number" min="0" step="any" inputmode="decimal" placeholder="165"></label></div>
+        <div class="field"><label>Height (ft)<input id="bmi_ft" type="number" min="0" step="1" inputmode="numeric" placeholder="5"></label></div>
+        <div class="field"><label>Height (in)<input id="bmi_in" type="number" min="0" step="any" inputmode="decimal" placeholder="9"></label></div>
+      </div>
+
+      <div id="bmi_summary" class="alerts" hidden>
+        <div class="alert" id="bmi_result">—</div>
+        <div class="alert" id="bmi_range">—</div>
+      </div>
+
+      <div class="bmi-scale" id="bmi_scale" hidden>
+        <div class="bmi-scale__bar">
+          <span class="bmi-seg bmi-under" title="Underweight &lt;18.5"></span>
+          <span class="bmi-seg bmi-normal" title="Normal 18.5–24.9"></span>
+          <span class="bmi-seg bmi-over" title="Overweight 25–29.9"></span>
+          <span class="bmi-seg bmi-obese" title="Obese ≥30"></span>
+          <span class="bmi-marker" id="bmi_marker"></span>
+        </div>
+        <div class="bmi-scale__labels"><span>15</span><span>18.5</span><span>25</span><span>30</span><span>40</span></div>
+      </div>
+
+      <p class="hint mt-6">BMI is a screening measure only — it does not account for muscle mass, age or body composition. Consult a healthcare professional for medical advice.</p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
+  </footer>
+
+  <script src="shared.js"></script>
+  <script src="calculators.js"></script>
+</body>
+</html>
