@@ -140,3 +140,34 @@ What this means:
 - Production: `curl -w` with `Accept-Encoding: gzip, br`, one sample each (results will vary).
 - Static checks: `node --check`, `JSON.parse`, `scripts/check_translations.py`, `npm audit --package-lock-only`, `gcloud run services describe`.
 - **Not covered:** Lighthouse/Core Web Vitals under throttling, real-device testing, WebHID with a real controller, the Wheel-Size API itself (I didn't call it, to avoid using your quota), and the Docker build (Docker isn't installed here).
+
+---
+
+## 6. Status update (2026-11-12): what has been done
+
+| # | Item | Status |
+|---|---|---|
+| P0-1 | Shrink rim/brake artwork | **Open.** Still 41 MB; needs re-exported art |
+| P0-2 | Compression | ✅ gzip on in `default.conf.template` |
+| P0-3 | Stop shipping build/source files | ✅ `.dockerignore` rewritten; nginx also returns 404 for dotfiles, `*.md/yaml/sh/py/ai/tif`, `package*.json`, `Dockerfile` etc. |
+| P0-4 | Uncommitted calculators WIP | ✅ Saved on branch **`wip/calculators`** (`062065b`). The main checkout was left untouched |
+| P1-5 | Wheel-Size proxy | ✅ Only `makes`, `models`, `years` and `search/by_model` are allowed (all other `/api/` paths return 404). Referer must be this service's `*.run.app` URL or `$ALLOWED_REFERER_HOST`. Limit is 10 req/min per client IP (burst 10), keyed on the last `X-Forwarded-For` hop |
+| P1-6 | Security headers | ✅ CSP, HSTS, nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy (`nginx/security-headers*.conf`). The DualShock tool gets a looser CSP because it uses inline handlers and CDNs |
+| P1-7 | Caching | ✅ HTML is `no-cache`. Assets requested with `?v=` are cached 1 year and marked `immutable`; other assets 1 h. `index.html` and `wget.html` now use `?v=` too |
+| P1-8 | Automated deploys | ⚠️ **Partly done.** Base images are pinned by digest (nginx 1.28-alpine, node 22-alpine) and `cloudbuild.yaml` now uses `^master$`. **You still need to:** connect GitHub in Console → Cloud Build → Repositories (one-time OAuth), then run the `gcloud builds triggers create` command in `cloudbuild.yaml` |
+| P1-9 | Upstream trackers | ✅ Removed GA `G-FSXPMDXLLS` and the Google verification file (both confirmed to be the upstream project's). Also **disabled the upstream `the.al` usage beacon**, which sent controller serials and Bluetooth addresses to the original author. Home page wording updated |
+| P2-10 | Repo cleanup | ✅ `.idea/`, `static/images/temp`, `static/images/wheels`, `*.ai` and `*.tif` are untracked and gitignored (65 files). Backup copies are in `Drawing/repo-archive-2026-11-12/` in the main checkout |
+| P2-11 | Favicon / fender double fetch | ✅ The 290 KB SVG favicon is no longer linked (PNG/ICO are used); `favicon.svg` is kept because the `wip/calculators` page still links it. Each fender SVG is now fetched once, and the `<img>` is built from a blob of the same bytes |
+| P2-12 | DualShock | ✅ All 19 missing keys are added (Arabic translated; other languages fall back to English). The tool is now **bundled at Docker build time** (49 → 12 requests). `npm audit fix` brought vulns from 23 → 16 (no critical); the rest need breaking upgrades and are build-only |
+| P2-13 | CI | ✅ `.github/workflows/ci.yml` runs static checks (`scripts/ci-checks.sh`), a Docker build + nginx smoke test (gzip, headers, 404s, proxy rules, caching), and Lighthouse with warn-only budgets (`lighthouserc.json`) |
+| extra | Wget JSZip | ✅ Fixed a wrong SRI hash (the jsDelivr copy was always blocked) and pinned the same hash on all three CDN fallbacks |
+| extra | DualShock icons | ✅ Favicon and manifest links were root-relative (`/favicon-32x32.png`), so they 404'd under `/Dualshock-tool/`. They are now relative |
+
+### New conventions
+- **When you change a JS or CSS file, bump its `?v=` in every HTML page that loads it.** These assets are now cached for a year, so a forgotten bump means users keep the old file. `styles.css` and `shared.js` are loaded by index, fitment and wget (and calculators).
+- **Custom domain:** set the Cloud Run env var `ALLOWED_REFERER_HOST` (e.g. `toolmeup.com`), or OEM presets will return 403 on that domain.
+- **Merging this branch into `master` will delete `.idea/` from your working copy** (it is now untracked). Afterwards, restore it from `Drawing/repo-archive-2026-11-12/.idea/`. Git now ignores it.
+- **DualShock edits** go in `Dualshock-tool/` sources. Production serves the gulp bundle (`npm run build:prod` in that folder to preview it; output in `dist/`).
+
+### Not verified
+The nginx config and Dockerfile have **not** been run, because Docker isn't installed on this machine. The CI `container` job builds the image and runs `nginx -t` plus the smoke tests on the first push. Pages were tested locally under the exact CSP headers: all four pages load with no CSP errors, and DualShock modals, icons and the theme work.

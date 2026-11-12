@@ -301,31 +301,47 @@
   // size plus the <circle> whose center sits closest to the viewBox middle
   // (largest radius breaks ties). Stored as f.geom; the hardcoded config
   // values remain the fallback when fetch/parse isn't possible.
-  function loadFenderGeom(f) {
-    if (typeof fetch !== 'function' || typeof DOMParser === 'undefined') return;
-    fetch(FENDER_DIR + f.file)
+  function readFenderGeom(f, txt) {
+    if (typeof DOMParser === 'undefined') return;
+    const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    const vb = (svg?.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
+    if (vb.length !== 4 || !vb.every(isFinite) || vb[2] <= 0 || vb[3] <= 0) return;
+    const midX = vb[0] + vb[2] / 2, midY = vb[1] + vb[3] / 2;
+    let best = null, bestScore = Infinity;
+    doc.querySelectorAll('circle').forEach(el => {
+      const cx = parseFloat(el.getAttribute('cx'));
+      const cy = parseFloat(el.getAttribute('cy'));
+      const r = parseFloat(el.getAttribute('r'));
+      if (!isFinite(cx) || !isFinite(cy) || !(r > 0)) return;
+      const score = Math.hypot(cx - midX, cy - midY) - r * 1e-3; // nearest to middle, bigger r wins ties
+      if (score < bestScore) { bestScore = score; best = { cx, cy, r }; }
+    });
+    if (!best) return;
+    // cx/cy relative to the image top-left (viewBox min-x/min-y)
+    f.geom = { w: vb[2], h: vb[3], cx: best.cx - vb[0], cy: best.cy - vb[1], r: best.r };
+  }
+
+  // Download each fender SVG once: the text gives the geometry, and the
+  // same bytes become the <img> via a blob: URL (previously the file was
+  // fetched for geometry AND loaded again by the <img>, doubling ~1.4 MB).
+  // Falls back to loading the URL directly when fetch isn't possible
+  // (file://), keeping the hardcoded geometry.
+  function loadFenderSource(f) {
+    const url = FENDER_DIR + f.file;
+    const direct = () => { f.img.src = url; };
+    if (typeof fetch !== 'function' || typeof URL === 'undefined' || !URL.createObjectURL) return direct();
+    fetch(url)
       .then(res => res.ok ? res.text() : Promise.reject(new Error('http ' + res.status)))
       .then(txt => {
-        const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
-        const svg = doc.querySelector('svg');
-        const vb = (svg?.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(Number);
-        if (vb.length !== 4 || !vb.every(isFinite) || vb[2] <= 0 || vb[3] <= 0) return;
-        const midX = vb[0] + vb[2] / 2, midY = vb[1] + vb[3] / 2;
-        let best = null, bestScore = Infinity;
-        doc.querySelectorAll('circle').forEach(el => {
-          const cx = parseFloat(el.getAttribute('cx'));
-          const cy = parseFloat(el.getAttribute('cy'));
-          const r = parseFloat(el.getAttribute('r'));
-          if (!isFinite(cx) || !isFinite(cy) || !(r > 0)) return;
-          const score = Math.hypot(cx - midX, cy - midY) - r * 1e-3; // nearest to middle, bigger r wins ties
-          if (score < bestScore) { bestScore = score; best = { cx, cy, r }; }
-        });
-        if (!best) return;
-        // cx/cy relative to the image top-left (viewBox min-x/min-y)
-        f.geom = { w: vb[2], h: vb[3], cx: best.cx - vb[0], cy: best.cy - vb[1], r: best.r };
-        try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
+        try { readFenderGeom(f, txt); } catch (_) { /* keep hardcoded geometry */ }
+        const blobUrl = URL.createObjectURL(new Blob([txt], { type: 'image/svg+xml' }));
+        const done = () => { try { URL.revokeObjectURL(blobUrl); } catch (_) { /* ignore */ } };
+        f.img.addEventListener('load', done, { once: true });
+        f.img.addEventListener('error', done, { once: true });
+        f.img.src = blobUrl;
       })
-      .catch(() => { /* file:// or fetch error: hardcoded fallback stays */ });
+      .catch(direct);
   }
 
   function getFenderEntry(i) {
@@ -334,7 +350,6 @@
     if (f.img) return f;
     f.img = new Image();
     f.loaded = false; f.failed = false; f.loading = true;
-    loadFenderGeom(f);
     f.img.onload = function () {
       f.loaded = true; f.loading = false;
       try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
@@ -348,7 +363,7 @@
         try { if (typeof renderAll === 'function') renderAll(); } catch (_) { /* ignore */ }
       }
     };
-    f.img.src = FENDER_DIR + f.file;
+    loadFenderSource(f);
     return f;
   }
   getFenderEntry(0); // preload the default fender

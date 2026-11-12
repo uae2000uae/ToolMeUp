@@ -291,9 +291,11 @@
     if (__jszipPromise) return __jszipPromise;
 
     const sources = [
-      { url: 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js', integrity: 'sha256-9iSxsysm3Al3cEQb9H9DqTsiYlFtoCReQfHn3fXZi5M=', crossOrigin: 'anonymous' },
-      { url: 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js' },
-      { url: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js' }
+      // Same file on every CDN; the SRI hash pins it (the old hash was wrong,
+      // so the first source was always rejected).
+      { url: 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js', integrity: 'sha256-rMfkFFWoB2W1/Zx+4bgHim0WC7vKRVrq6FTeZclH1Z4=', crossOrigin: 'anonymous' },
+      { url: 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js', integrity: 'sha256-rMfkFFWoB2W1/Zx+4bgHim0WC7vKRVrq6FTeZclH1Z4=', crossOrigin: 'anonymous' },
+      { url: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', integrity: 'sha256-rMfkFFWoB2W1/Zx+4bgHim0WC7vKRVrq6FTeZclH1Z4=', crossOrigin: 'anonymous' }
     ];
 
     __jszipPromise = (async () => {

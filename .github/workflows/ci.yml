@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: sh scripts/ci-checks.sh
+
+  container:
+    name: Build image and smoke-test nginx
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t toolmeup:ci .
+      - name: Run
+        run: |
+          docker run -d --name tmu -p 8080:8080 -e WHEEL_SIZE_KEY=dummy toolmeup:ci
+          for i in $(seq 1 20); do curl -fs http://localhost:8080/ >/dev/null && break; sleep 1; done
+          docker exec tmu nginx -t
+      - name: Smoke tests
+        run: |
+          set -eu
+          B=http://localhost:8080
+          code() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
+          hdr()  { curl -s -D - -o /dev/null "$@" | tr -d '\r'; }
+          fail() { echo "FAIL: $*"; exit 1; }
+
+          for p in / /fitment.html /wget.html /Dualshock-tool/ /app.js /styles.css /static/images/rims/Rim0.svg; do
+            [ "$(code $B$p)" = 200 ] || fail "$p not 200"
+          done
+          # Build/config files must not be served
+          for p in /cloudbuild.yaml /Dockerfile /HANDOFF.md /default.conf.template /Dualshock-tool/package.json /.gitignore; do
+            [ "$(code $B$p)" = 404 ] || fail "$p should be 404"
+          done
+          # Compression
+          hdr -H 'Accept-Encoding: gzip' $B/app.js | grep -qi '^content-encoding: gzip' || fail "app.js not gzipped"
+          # Security headers on pages and assets
+          for p in / /app.js /Dualshock-tool/; do
+            h=$(hdr $B$p)
+            echo "$h" | grep -qi '^content-security-policy:' || fail "$p missing CSP"
+            echo "$h" | grep -qi '^x-content-type-options: nosniff' || fail "$p missing nosniff"
+          done
+          # Caching: versioned assets long-lived, HTML revalidates
+          hdr "$B/app.js?v=ci" | grep -qi 'max-age=31536000' || fail "versioned asset not long-cached"
+          hdr $B/fitment.html | grep -qi '^cache-control: no-cache' || fail "HTML not no-cache"
+          # Wheel-Size proxy: unknown endpoints 404, no Referer 403
+          [ "$(code $B/api/wheel-size/users/)" = 404 ] || fail "proxy allowlist"
+          [ "$(code $B/api/wheel-size/makes/)" = 403 ] || fail "proxy referer check"
+          # Rim directory listing still works (fitment app relies on it)
+          curl -fs $B/static/images/rims/ | grep -q 'Rim0.svg' || fail "rim autoindex"
+          echo "Smoke tests passed."
+      - name: Logs
+        if: failure()
+        run: docker logs tmu || true
+
+  lighthouse:
+    name: Lighthouse (page-weight budget)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true

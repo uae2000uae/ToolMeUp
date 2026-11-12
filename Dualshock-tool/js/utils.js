@@ -83,20 +83,14 @@ export function reverse_str(s) {
   return s.split('').reverse().join('');
 }
 
-export let la = undefined;
+// ToolMeUp: upstream sent usage events (including controller serials and
+// Bluetooth addresses) to the original author's server at the.al. That is
+// disabled: la() is a no-op, so call sites keep working and nothing leaves
+// the browser.
+export let la = (_k, _v = {}) => {};
 export function lf(operation, data) { la(operation, buf2hex(data.buffer)); return data; }
 
-export function initAnalyticsApi({gj, gu}) {
-  la = (k, v = {}) => {
-    $.ajax({
-      type: 'POST', 
-      url: "https://the.al/ds4_a/l",
-      data: JSON.stringify({u: gu, j: gj, k, v}),
-      contentType: "application/json", 
-      dataType: 'json'
-    });
-  }
-}
+export function initAnalyticsApi(_app) { /* analytics disabled */ }
 
 export function lerp_color(a, b, t) {
   // a, b: hex color strings, t: 0.0-1.0

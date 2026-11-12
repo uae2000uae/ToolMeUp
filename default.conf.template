@@ -2,6 +2,40 @@
 # (Google's internal resolver is available inside Cloud Run.)
 resolver 8.8.8.8 1.1.1.1 ipv6=off valid=300s;
 
+# ---- http-level settings (this file is included inside nginx's http{}) ----
+
+# Compression. nginx:alpine ships with gzip off; text assets shrink ~70%.
+gzip on;
+gzip_comp_level 6;
+gzip_min_length 1024;
+gzip_vary on;
+gzip_proxied any;
+gzip_types text/css text/plain text/xml application/javascript application/json
+           application/manifest+json image/svg+xml image/x-icon;
+
+# Real client IP for rate limiting. On Cloud Run every request reaches nginx
+# from Google's front end, so $remote_addr is useless; the front end appends
+# the caller's IP as the LAST entry of X-Forwarded-For (earlier entries are
+# client-supplied and can be forged, so they are ignored).
+map $http_x_forwarded_for $client_ip {
+    "~(?<last_ip>[^,\s]+)\s*$" $last_ip;
+    default                    $remote_addr;
+}
+
+# Wheel-Size proxy rate limit: 10 requests/minute per client IP (per
+# instance). The OEM dialog makes ~4 calls per vehicle lookup, and responses
+# are cached in the page, so real users stay far below this.
+limit_req_zone $client_ip zone=wheelsize:10m rate=10r/m;
+limit_req_status 429;
+
+# Cache policy by query string: assets requested with ?v=... are versioned
+# (the HTML bumps v= when the file changes), so they can be cached for a
+# year. Unversioned assets (e.g. rim SVGs loaded from JS) get one hour.
+map $args $asset_cache_control {
+    "~(^|&)v="  "public, max-age=31536000, immutable";
+    default     "public, max-age=3600";
+}
+
 server {
     listen       ${PORT};
     server_name  _;
@@ -9,13 +43,34 @@ server {
     root   /usr/share/nginx/html;
     index  index.html;
 
+    # Don't advertise the nginx version.
+    server_tokens off;
+
+    # Security headers (CSP etc.). nginx drops server-level add_header lines
+    # in any location that has its own add_header, so every location below
+    # that adds headers includes the snippet again.
+    include /etc/nginx/snippets/security-headers.conf;
+
     # ---- Wheel-Size fitment API proxy -------------------------------------
     # The browser calls same-origin /api/wheel-size/<endpoint>?<query>.
     # We forward to https://api.wheel-size.com/v2/<endpoint> and append the
     # secret user_key server-side, so the key is NEVER exposed to the client
     # and there are no CORS issues. WHEEL_SIZE_KEY is injected by envsubst at
     # container start (from a Cloud Run secret / env var).
-    location ~ ^/api/wheel-size/(?<ws_path>.*)$ {
+    #
+    # Only the four endpoints oem-presets.js uses are allowed; everything
+    # else under /api/ is 404. Requests must come from our own pages
+    # (Referer check) and are rate limited per client IP, so the key's quota
+    # can't be drained by third parties hot-linking the proxy.
+    location ~ ^/api/wheel-size/(?<ws_path>(?:makes|models|years|search/by_model)/?)$ {
+        # Allowed page origins: the Cloud Run URLs of this service, local
+        # testing, and an optional custom domain from ALLOWED_REFERER_HOST
+        # (e.g. "toolmeup.com"; empty = none).
+        valid_referers ~^toolmeup-[^/]*\.run\.app/ ~^localhost[:/] ~^127\.0\.0\.1[:/] ${ALLOWED_REFERER_HOST};
+        if ($invalid_referer) { return 403; }
+
+        limit_req zone=wheelsize burst=10 nodelay;
+
         # Build the upstream query string with the key appended.
         set $ws_query "user_key=${WHEEL_SIZE_KEY}";
         if ($args) { set $ws_query "$args&user_key=${WHEEL_SIZE_KEY}"; }
@@ -24,14 +79,26 @@ server {
         proxy_ssl_server_name on;
         proxy_set_header Host api.wheel-size.com;
         proxy_set_header Accept "application/json";
+        # Don't leak our page URLs (or the client's cookies) upstream.
+        proxy_set_header Referer "";
+        proxy_set_header Cookie "";
 
         # Cache-friendly: fitment catalog data changes rarely.
         proxy_set_header Accept-Encoding "";
-        add_header Cache-Control "public, max-age=3600";
+        proxy_hide_header Cache-Control;
+        add_header Cache-Control "public, max-age=3600" always;
+        include /etc/nginx/snippets/security-headers.conf;
 
         # Keep the client from seeing upstream infra headers.
         proxy_hide_header Set-Cookie;
     }
+    location /api/ { return 404; }
+
+    # Never serve dotfiles or build/config/source files, even if one slips
+    # past .dockerignore.
+    location ~ /\. { return 404; }
+    location ~* \.(?:md|ya?ml|template|conf|sh|py|lock|ai|tif|psd)$ { return 404; }
+    location ~* (?:^|/)(?:package(?:-lock)?\.json|Dockerfile|gulpfile\.js|dev-server\.js)$ { return 404; }
 
     # Fender artwork folder: expose a JSON directory listing so the fitment
     # app can auto-discover new fender SVGs dropped into the folder
@@ -48,14 +115,42 @@ server {
         autoindex_format json;
     }
 
+    # The DualShock tool uses inline event handlers and CDN scripts, so it
+    # gets a looser CSP than the rest of the site.
+    location ^~ /Dualshock-tool/ {
+        include /etc/nginx/snippets/security-headers-dualshock.conf;
+        location ~* \.(?:css|js|png|jpg|jpeg|svg|ico|webmanifest|json|woff2?)$ {
+            add_header Cache-Control $asset_cache_control always;
+            include /etc/nginx/snippets/security-headers-dualshock.conf;
+        }
+        location ~* \.html?$ {
+            add_header Cache-Control "no-cache" always;
+            include /etc/nginx/snippets/security-headers-dualshock.conf;
+        }
+        location = /Dualshock-tool/ {
+            add_header Cache-Control "no-cache" always;
+            include /etc/nginx/snippets/security-headers-dualshock.conf;
+        }
+    }
+
     # SPA-ish fallback is not needed; this is a multi-page static site.
     location / {
         try_files $uri $uri/ =404;
     }
 
-    # Light caching for static assets; HTML stays fresh.
-    location ~* \.(?:css|js|png|jpg|jpeg|svg|ico|webmanifest|json)$ {
-        expires 1h;
-        add_header Cache-Control "public";
+    # HTML always revalidates so new ?v= asset versions are picked up.
+    location ~* \.html?$ {
+        add_header Cache-Control "no-cache" always;
+        include /etc/nginx/snippets/security-headers.conf;
+    }
+    location = / {
+        add_header Cache-Control "no-cache" always;
+        include /etc/nginx/snippets/security-headers.conf;
+    }
+
+    # Static assets: one year when versioned (?v=), otherwise one hour.
+    location ~* \.(?:css|js|png|jpg|jpeg|webp|avif|svg|ico|webmanifest|json|woff2?)$ {
+        add_header Cache-Control $asset_cache_control always;
+        include /etc/nginx/snippets/security-headers.conf;
     }
 }

@@ -1,2 +1,16 @@
 /Drawing/
 /Expantion-ideas/
+
+# IDE settings (kept locally, not in git)
+.idea/
+*.iml
+
+# Source / reference artwork (archived outside git)
+/static/images/temp/
+/static/images/wheels/
+*.ai
+*.tif
+
+# Build output
+node_modules/
+Dualshock-tool/dist/

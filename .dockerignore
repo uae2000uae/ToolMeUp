@@ -1,6 +1,10 @@
 # Keep the build context (and image) small and free of local cruft.
+# Note: Dualshock-tool/ must stay in the context; the Dockerfile builds it
+# in its own stage and only the bundled dist/ is served.
 .git
 .gitignore
+.github
+.claude
 .idea
 *.iml
 .venv
@@ -8,13 +12,20 @@
 **/*.pyc
 node_modules
 **/node_modules
+Dualshock-tool/dist
 
-# Source/design files not needed to serve the site
+# Build / deploy / docs: never served
+Dockerfile
+.dockerignore
+cloudbuild.yaml
+lighthouserc.json
+**/*.md
+scripts
+
+# Source and reference artwork not used by the site
 fitment calculator.xlsx
-Dualshock-tool/scripts
-Dualshock-tool/.github
-Dualshock-tool/dev-server.js
-Dualshock-tool/gulpfile.js
-Dualshock-tool/setup-dev.sh
-Dualshock-tool/package-lock.json
-/Drawing/
+static/images/temp
+static/images/wheels
+**/*.ai
+**/*.tif
+**/*.psd

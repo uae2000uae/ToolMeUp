@@ -1,0 +1,17 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": ".",
+      "url": ["http://localhost/index.html", "http://localhost/fitment.html", "http://localhost/wget.html"],
+      "numberOfRuns": 1
+    },
+    "assert": {
+      "assertions": {
+        "total-byte-weight": ["warn", { "maxNumericValue": 3000000 }],
+        "largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
+        "categories:performance": ["warn", { "minScore": 0.8 }],
+        "categories:accessibility": ["warn", { "minScore": 0.9 }]
+      }
+    }
+  }
+}

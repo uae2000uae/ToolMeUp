@@ -29,7 +29,8 @@ const paths = {
       entry: 'js/core.js',
       all: 'js/**/*.js'
     },
-    css: ['css/main.css', 'css/finetune.css'],
+    // toolmeup-theme.css must stay last so its overrides win
+    css: ['css/main.css', 'css/finetune.css', 'css/toolmeup-theme.css'],
     html: {
       main: 'index.html',
       templates: 'templates/**/*.html'
@@ -37,7 +38,6 @@ const paths = {
     lang: 'lang/**/*.json',
     assets: [
       'favicon.ico',
-      'favicon.svg',
       'favicon-16x16.png',
       'favicon-32x32.png',
       'favicon-96x96.png',
@@ -46,7 +46,6 @@ const paths = {
       'web-app-manifest-512x512.png',
       'site.webmanifest',
       'assets/donate.png',
-      'googlec4c2e36a49e62fa3.html',
       'fa.min.css'
     ],
     svg: 'assets/**/*.svg'
@@ -205,6 +204,7 @@ async function html() {
   htmlContent = htmlContent.replace('<script type="module" src="js/core.js"></script>', `<script type="module" src="${jsFile}"></script>`);
   htmlContent = htmlContent.replace('<link rel="stylesheet" href="css/main.css">', '');
   htmlContent = htmlContent.replace('<link rel="stylesheet" href="css/finetune.css">', `<link rel="stylesheet" href="${cssFile}">`);
+  htmlContent = htmlContent.replace('<link rel="stylesheet" href="css/toolmeup-theme.css">', '');
 
   // In production, inject bundled assets
   if (isProduction && global.bundledAssets) {
