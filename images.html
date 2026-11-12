@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="images">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261112p"></script>
+  <title>Image Compressor & Resizer — Shrink JPG, PNG, WebP in Your Browser | ToolMeUp</title>
+  <meta name="description" content="Compress and resize images for free without uploading them. Batch JPG, PNG and WebP, convert to WebP or AVIF, compare before and after, and download all as a ZIP.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Image Compressor & Resizer — ToolMeUp">
+  <meta property="og:description" content="Shrink and resize photos privately in your browser.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Image Compressor & Resizer","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Compress, resize and convert images in the browser without uploading them."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp" data-hue="rose">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5M15.5 9.5h.01"/></svg></div>
+      <div>
+        <h1 data-t="i_title">Image Compressor &amp; Resizer</h1>
+        <p data-t="i_lead">Make photos smaller for email, websites and messaging. Your images are processed on this device and never uploaded.</p>
+        <span class="badge-private"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span data-t="privacy_badge">Works on your device — nothing is uploaded</span></span>
+      </div>
+    </div>
+
+    <div class="img-layout">
+      <div>
+        <label class="drop" id="i_drop">
+          <input type="file" accept="image/*" multiple>
+          <span class="drop__icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></span>
+          <b data-t="i_drop_t">Drop images here</b>
+          <span data-t="i_drop_s">or click to choose · you can also paste (Ctrl+V) · JPG, PNG, WebP, GIF, AVIF</span>
+        </label>
+
+        <div class="img-summary card" id="i_summary" hidden>
+          <div class="img-summary__stats">
+            <div><small data-t="i_images">Images</small><b id="i_count">0</b></div>
+            <div><small data-t="i_before">Before</small><b id="i_before">—</b></div>
+            <div><small data-t="i_after">After</small><b id="i_after">—</b></div>
+            <div><small data-t="i_saved">Saved</small><b id="i_saved" class="up">—</b></div>
+          </div>
+          <div class="row">
+            <button type="button" class="btn btn--primary" id="i_zip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/></svg><span data-t="i_zip">Download all (ZIP)</span></button>
+            <button type="button" class="btn btn--ghost" id="i_clear" data-t="clear">Clear</button>
+          </div>
+        </div>
+        <ul class="img-list" id="i_list"></ul>
+      </div>
+
+      <aside class="card img-settings">
+        <h2 class="card__title" data-t="i_settings">Settings</h2>
+        <div class="f mt"><span class="f__label" data-t="i_format">Output format</span>
+          <div class="pills" id="i_fmt" role="group">
+            <button type="button" data-f="same" aria-pressed="true" data-t="i_same">Same</button>
+            <button type="button" data-f="image/jpeg">JPG</button>
+            <button type="button" data-f="image/webp">WebP</button>
+            <button type="button" data-f="image/png">PNG</button>
+            <button type="button" data-f="image/avif" id="i_avif" hidden>AVIF</button>
+          </div>
+        </div>
+        <label class="f mt" id="i_q_wrap"><span><span data-t="i_quality">Quality</span> <b class="q-badge" id="i_q_v">80</b></span>
+          <input type="range" id="i_q" min="10" max="100" value="80">
+          <span class="row row--between small2 muted"><span data-t="i_smaller">Smaller file</span><span data-t="i_better">Better quality</span></span>
+        </label>
+        <div class="f mt"><span class="f__label" data-t="i_resize">Resize</span>
+          <div class="pills" id="i_rmode" role="group">
+            <button type="button" data-r="none" aria-pressed="true" data-t="i_none">Original size</button>
+            <button type="button" data-r="max" data-t="i_maxside">Max size</button>
+            <button type="button" data-r="pct">%</button>
+          </div>
+        </div>
+        <div class="row mt" id="i_max_wrap" hidden>
+          <label class="f"><span data-t="i_maxw">Max width</span><input id="i_mw" type="number" min="16" value="1920" inputmode="numeric"></label>
+          <label class="f"><span data-t="i_maxh">Max height</span><input id="i_mh" type="number" min="16" value="1920" inputmode="numeric"></label>
+        </div>
+        <div class="pills mt" id="i_presets" hidden>
+          <button type="button" data-p="1920">Full HD</button><button type="button" data-p="1280">1280</button>
+          <button type="button" data-p="1080">Instagram</button><button type="button" data-p="800" data-t="i_email">Email</button>
+        </div>
+        <label class="f mt" id="i_pct_wrap" hidden><span><span data-t="i_scale">Scale</span> <b class="q-badge" id="i_pct_v">50%</b></span>
+          <input type="range" id="i_pct" min="5" max="100" value="50">
+        </label>
+        <p class="muted small2 mt" data-t="i_meta_note">Photos are re-encoded, which also removes hidden metadata such as GPS location.</p>
+      </aside>
+    </div>
+
+    <dialog class="cmp" id="i_cmp">
+      <div class="cmp__head"><b id="i_cmp_name"></b><button type="button" class="icon-btn" id="i_cmp_close" aria-label="Close">×</button></div>
+      <div class="cmp__stage" id="i_cmp_stage" dir="ltr">
+        <img id="i_cmp_a" alt="">
+        <div class="cmp__after" id="i_cmp_clip"><img id="i_cmp_b" alt=""></div>
+        <div class="cmp__handle" id="i_cmp_handle"><span></span></div>
+        <span class="cmp__tag cmp__tag--a" data-t="i_before">Before</span><span class="cmp__tag cmp__tag--b" data-t="i_after">After</span>
+      </div>
+      <input type="range" id="i_cmp_range" min="0" max="100" value="50" aria-label="Compare">
+    </dialog>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="i_how1">Drop one or more images (or paste a screenshot). They're compressed straight away with the settings on the right.</li>
+        <li data-t="i_how2">Tune quality, format and size — every image updates. Click a thumbnail to compare before and after with a slider.</li>
+        <li data-t="i_how3">Download images one by one, or all at once as a ZIP.</li>
+      </ol>
+      <details><summary data-t="i_faq1_q">Which format should I choose?</summary><p data-t="i_faq1_a">WebP gives the smallest files that every modern browser supports — great for websites. JPG is best for compatibility (email, older apps). PNG keeps sharp edges and transparency but is large for photos. AVIF is even smaller than WebP where supported.</p></details>
+      <details><summary data-t="i_faq2_q">Why did an image get bigger?</summary><p data-t="i_faq2_a">Already well-compressed images (or PNG screenshots converted to JPG at high quality) can grow. When that happens the original is kept automatically and marked "kept original".</p></details>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261112p"></script>
+  <script src="kit.js?v=20261112p"></script>
+  <script src="vendor/jszip-3.10.1.min.js?v=1"></script>
+  <script src="images.js?v=20261112p"></script>
+</body>
+</html>

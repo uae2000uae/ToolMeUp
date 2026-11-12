@@ -42,7 +42,7 @@ jobs:
           hdr()  { curl -s -D - -o /dev/null "$@" | tr -d '\r'; }
           fail() { echo "FAIL: $*"; exit 1; }
 
-          for p in / /fitment.html /wget.html /Dualshock-tool/ /app.js /styles.css /static/images/rims/Rim0.svg; do
+          for p in / /fitment.html /wget.html /calculators.html /units.html /datetime.html /devtools.html /qr.html /images.html /pdf.html /tires.html /sitemap.xml /robots.txt /vendor/pdf-lib-1.17.1.min.js /devtools-regex-worker.js /Dualshock-tool/ /app.js /styles.css /ui.css /static/images/rims/Rim0.svg; do
             [ "$(code $B$p)" = 200 ] || fail "$p not 200"
           done
           # Build/config files must not be served

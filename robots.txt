@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://toolmeup-qdyz5ldcyq-uc.a.run.app/sitemap.xml

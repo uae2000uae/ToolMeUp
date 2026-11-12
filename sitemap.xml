@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Absolute URLs are required. If you add a custom domain, replace the host below (one search-and-replace). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/</loc><lastmod>2026-11-12</lastmod><priority>1.0</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/fitment.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/tires.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/calculators.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/units.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/datetime.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/devtools.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/wget.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/qr.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/images.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/pdf.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://toolmeup-qdyz5ldcyq-uc.a.run.app/Dualshock-tool/index.html</loc><lastmod>2026-11-12</lastmod><priority>0.8</priority></url>
+</urlset>

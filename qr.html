@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="qr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261112p"></script>
+  <title>Free QR Code Generator — URL, Wi-Fi, Contact, WhatsApp, PNG & SVG | ToolMeUp</title>
+  <meta name="description" content="Create QR codes for links, text, Wi-Fi, contacts (vCard), email, phone, SMS and WhatsApp. Custom colors, rounded or dot styles, add a logo, download PNG or SVG. Free, no sign-up, no expiry.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="QR Code Generator — ToolMeUp">
+  <meta property="og:description" content="Styled QR codes for links, Wi-Fi, contacts and more. PNG & SVG.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"QR Code Generator","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Create styled QR codes for links, Wi-Fi, contacts, email, SMS and WhatsApp; download PNG or SVG."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp" data-hue="rose">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"/></svg></div>
+      <div>
+        <h1 data-t="q_title">QR Code Generator</h1>
+        <p data-t="q_lead">Make a QR code for a link, Wi-Fi network, contact card and more. Style it, add a logo, and download — free, with no expiry and no tracking redirects.</p>
+      </div>
+    </div>
+
+    <div class="qr-layout">
+      <div>
+        <div class="card">
+          <div class="pills qr-types" id="q_type" role="group">
+            <button type="button" data-q="url" aria-pressed="true" data-t="q_t_url">Link / text</button>
+            <button type="button" data-q="wifi">Wi-Fi</button>
+            <button type="button" data-q="vcard" data-t="q_t_vcard">Contact</button>
+            <button type="button" data-q="whatsapp">WhatsApp</button>
+            <button type="button" data-q="email" data-t="q_t_email">Email</button>
+            <button type="button" data-q="tel" data-t="q_t_tel">Phone</button>
+            <button type="button" data-q="sms">SMS</button>
+          </div>
+
+          <div class="qform mt" data-form="url">
+            <label class="f"><span data-t="q_content">Link or text</span><textarea id="q_url" class="area" rows="3" dir="auto" placeholder="https://example.com">https://</textarea></label>
+          </div>
+          <div class="qform mt g2" data-form="wifi" hidden>
+            <label class="f"><span data-t="q_ssid">Network name (SSID)</span><input id="q_ssid" dir="auto" autocomplete="off"></label>
+            <label class="f"><span data-t="q_pass">Password</span><input id="q_pass" type="text" dir="ltr" autocomplete="off"></label>
+            <label class="f"><span data-t="q_enc">Security</span><select id="q_encr"><option value="WPA">WPA / WPA2 / WPA3</option><option value="WEP">WEP</option><option value="nopass" data-t="q_open">None (open)</option></select></label>
+            <label class="switch q-hidden"><input type="checkbox" id="q_hidden"><span data-t="q_hidden_net">Hidden network</span></label>
+          </div>
+          <div class="qform mt g2" data-form="vcard" hidden>
+            <label class="f"><span data-t="q_name">Full name</span><input id="q_vn" dir="auto" autocomplete="off"></label>
+            <label class="f"><span data-t="q_org">Company</span><input id="q_vo" dir="auto"></label>
+            <label class="f"><span data-t="q_phone">Phone</span><input id="q_vp" type="tel" dir="ltr"></label>
+            <label class="f"><span data-t="q_email">Email</span><input id="q_ve" type="email" dir="ltr"></label>
+            <label class="f"><span data-t="q_title_job">Job title</span><input id="q_vt" dir="auto"></label>
+            <label class="f"><span data-t="q_web">Website</span><input id="q_vw" type="url" dir="ltr"></label>
+          </div>
+          <div class="qform mt g2" data-form="whatsapp" hidden>
+            <label class="f"><span data-t="q_wa_num">Phone with country code</span><input id="q_wn" type="tel" dir="ltr" placeholder="971501234567"></label>
+            <label class="f"><span data-t="q_msg">Message (optional)</span><input id="q_wm" dir="auto"></label>
+          </div>
+          <div class="qform mt g2" data-form="email" hidden>
+            <label class="f"><span data-t="q_to">To</span><input id="q_et" type="email" dir="ltr"></label>
+            <label class="f"><span data-t="q_subject">Subject</span><input id="q_es" dir="auto"></label>
+            <label class="f q-span"><span data-t="q_body">Message</span><textarea id="q_eb" class="area" rows="2" dir="auto"></textarea></label>
+          </div>
+          <div class="qform mt" data-form="tel" hidden>
+            <label class="f"><span data-t="q_phone">Phone</span><input id="q_tn" type="tel" dir="ltr" placeholder="+971 50 123 4567"></label>
+          </div>
+          <div class="qform mt g2" data-form="sms" hidden>
+            <label class="f"><span data-t="q_phone">Phone</span><input id="q_sn" type="tel" dir="ltr"></label>
+            <label class="f"><span data-t="q_msg">Message (optional)</span><input id="q_sm" dir="auto"></label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card__title" data-t="q_style">Style</h2>
+          <div class="g2 mt">
+            <div class="f"><span class="f__label" data-t="q_dots">Dots</span>
+              <div class="pills" id="q_dot" role="group">
+                <button type="button" data-d="square" aria-pressed="true" data-t="q_square">Square</button>
+                <button type="button" data-d="rounded" data-t="q_rounded">Rounded</button>
+                <button type="button" data-d="dots" data-t="q_dotted">Dots</button>
+              </div>
+            </div>
+            <div class="f"><span class="f__label" data-t="q_colors">Colors</span>
+              <div class="row">
+                <input type="color" id="q_fg" value="#111827" aria-label="Foreground color">
+                <input type="color" id="q_bg" value="#ffffff" aria-label="Background color">
+                <div class="pills" id="q_swatches">
+                  <button type="button" data-fg="#111827" data-bg="#ffffff" class="sw"><i class="sw-1"></i></button>
+                  <button type="button" data-fg="#1d4ed8" data-bg="#eff6ff" class="sw"><i class="sw-2"></i></button>
+                  <button type="button" data-fg="#be123c" data-bg="#fff1f2" class="sw"><i class="sw-3"></i></button>
+                  <button type="button" data-fg="#047857" data-bg="#ecfdf5" class="sw"><i class="sw-4"></i></button>
+                  <button type="button" data-fg="#6d28d9" data-bg="#f5f3ff" class="sw"><i class="sw-5"></i></button>
+                </div>
+              </div>
+            </div>
+            <label class="f"><span><span data-t="q_ecc">Error correction</span> <b id="q_ecc_v" class="q-badge">M</b></span>
+              <input type="range" id="q_ecc" min="0" max="3" value="1" step="1">
+            </label>
+            <label class="f"><span><span data-t="q_margin">Quiet zone</span> <b id="q_margin_v" class="q-badge">4</b></span>
+              <input type="range" id="q_margin" min="0" max="8" value="4" step="1">
+            </label>
+          </div>
+          <div class="row mt">
+            <label class="btn btn--sm q-logo-btn">
+              <input type="file" id="q_logo" accept="image/*" hidden>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5"/></svg>
+              <span data-t="q_add_logo">Add a logo</span>
+            </label>
+            <button type="button" class="btn btn--ghost btn--sm" id="q_logo_rm" hidden data-t="q_rm_logo">Remove logo</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="qr-preview card">
+        <div class="qr-canvas-wrap" id="q_wrap"><canvas id="q_canvas" width="320" height="320" aria-label="QR code preview"></canvas></div>
+        <div id="q_warn" class="note note--bad mt" hidden></div>
+        <div class="qr-meta muted small2" id="q_meta"></div>
+        <label class="f mt"><span><span data-t="q_size">Download size</span> <b id="q_size_v" class="q-badge">1024 px</b></span>
+          <input type="range" id="q_size" min="256" max="2048" step="128" value="1024">
+        </label>
+        <div class="qr-actions mt">
+          <button type="button" class="btn btn--primary" id="q_png">PNG</button>
+          <button type="button" class="btn" id="q_svg">SVG</button>
+          <button type="button" class="btn" id="q_copy" data-t="q_copy_img">Copy image</button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="q_how1">Pick what the code should contain — a link, Wi-Fi login, contact card, WhatsApp chat, email, phone or SMS — and fill in the fields.</li>
+        <li data-t="q_how2">Style it: dot shape, colors and an optional logo. The preview checks that it still scans (enough contrast, logo not too big).</li>
+        <li data-t="q_how3">Download as PNG for sharing or SVG for print, or copy the image straight into a document.</li>
+      </ol>
+      <details><summary data-t="q_faq1_q">Do these QR codes expire?</summary><p data-t="q_faq1_a">No. The content is stored directly inside the code — there's no redirect service in between, so it works forever and nobody tracks the scans.</p></details>
+      <details><summary data-t="q_faq2_q">What does error correction do?</summary><p data-t="q_faq2_a">Higher levels (Q, H) add redundancy so the code still scans when part of it is covered or damaged — needed when you add a logo. The trade-off is a denser code. Adding a logo switches to H automatically.</p></details>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261112p"></script>
+  <script src="kit.js?v=20261112p"></script>
+  <script src="vendor/qrcode-generator-1.4.4.js?v=1"></script>
+  <script src="qr.js?v=20261112p"></script>
+</body>
+</html>

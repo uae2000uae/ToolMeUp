@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="tires">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261112p"></script>
+  <title>Tire Size Comparison & Speedometer Error Calculator | ToolMeUp</title>
+  <meta name="description" content="Compare two tire sizes side by side (diameter, width, sidewall, circumference, revolutions) with a to-scale drawing, and see how a new tire size changes your speedometer reading. Metric and flotation sizes.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tire Size & Speedometer Calculator — ToolMeUp">
+  <meta property="og:description" content="Compare tire sizes and calculate speedometer error.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Tire Size & Speedometer Calculator","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Compare tire sizes and calculate speedometer error after changing tire size."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp" data-hue="amber">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zM4.5 12H7m10 0h2.5M12 4.5V7m0 10v2.5"/></svg></div>
+      <div>
+        <h1 data-t="t_title">Tire Size &amp; Speedometer</h1>
+        <p data-t="t_lead">See exactly how a new tire size compares with your current one — and what your speedometer will really mean.</p>
+      </div>
+    </div>
+
+    <div class="tire-inputs card">
+      <label class="f tire-in tire-in--a"><span data-t="t_current">Current size</span>
+        <input id="t_a" class="inp inp-big mono" dir="ltr" value="225/45R17" autocomplete="off" spellcheck="false" data-keep>
+        <small class="muted" id="t_a_ok"></small>
+      </label>
+      <button type="button" class="icon-btn uconv__swap" id="t_swap" data-t-aria="t_swap" aria-label="Swap sizes"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16m0 0l-3-3m3 3l3-3M17 20V4m0 0l-3 3m3-3l3 3"/></svg></button>
+      <label class="f tire-in tire-in--b"><span data-t="t_new">New size</span>
+        <input id="t_b" class="inp inp-big mono" dir="ltr" value="235/40R18" autocomplete="off" spellcheck="false" data-keep>
+        <small class="muted" id="t_b_ok"></small>
+      </label>
+      <div class="pills tire-common" id="t_common"></div>
+    </div>
+
+    <div class="seg" data-tabs="tires">
+      <button type="button" data-tab="compare" data-t="t_tab_compare">Compare sizes</button>
+      <button type="button" data-tab="speedo" data-t="t_tab_speedo">Speedometer</button>
+    </div>
+
+    <section class="pane" data-pane="compare">
+      <div id="t_verdict" class="verdict"></div>
+      <div class="tire-viz card">
+        <svg id="t_side" class="tire-svg" viewBox="0 0 400 300" role="img" aria-label="Side view"></svg>
+        <svg id="t_front" class="tire-svg" viewBox="0 0 300 300" role="img" aria-label="Front view"></svg>
+        <div class="tire-legend small2"><span class="lg lg--a" data-t="t_current">Current size</span><span class="lg lg--b" data-t="t_new">New size</span></div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" id="t_table">
+          <thead><tr><th></th><th class="num" data-t="t_current">Current size</th><th class="num" data-t="t_new">New size</th><th class="num" data-t="t_diff">Difference</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="row row--end mt"><div class="pills" id="t_units"><button type="button" data-u="mm" aria-pressed="true">mm</button><button type="button" data-u="in">inch</button></div></div>
+    </section>
+
+    <section class="pane" data-pane="speedo" hidden>
+      <div class="speedo card">
+        <svg id="t_dial" class="dial" viewBox="0 0 300 220" role="img" aria-label="Speedometer"></svg>
+        <div class="speedo__side">
+          <div class="pills" id="t_spunit"><button type="button" data-s="kmh" aria-pressed="true">km/h</button><button type="button" data-s="mph">mph</button></div>
+          <label class="f mt"><span><span data-t="t_indicated">Speedometer shows</span> <b class="q-badge" id="t_ind_v">100</b></span>
+            <input type="range" id="t_ind" min="10" max="200" step="5" value="100">
+          </label>
+          <div class="stats mt">
+            <div class="stat stat--hero"><div class="stat__label" data-t="t_actual">Your real speed</div><div class="stat__value" id="t_act">—</div><div class="stat__sub" id="t_act_sub"></div></div>
+          </div>
+          <p class="muted small2 mt" id="t_sp_note"></p>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" id="t_sptable">
+          <thead><tr><th data-t="t_shows">Speedometer shows</th><th class="num" data-t="t_real">Real speed</th><th class="num" data-t="t_diff">Difference</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="t_how1">Enter your current tire size and the size you're considering, exactly as printed on the sidewall — e.g. <code>225/45R17</code>, <code>LT265/70R17</code> or <code>33x12.50R20</code>.</li>
+        <li data-t="t_how2"><b>Compare sizes</b> shows every dimension, a to-scale drawing and a verdict. Most makers recommend keeping the overall diameter within ±3%.</li>
+        <li data-t="t_how3"><b>Speedometer</b> shows your real speed for any reading, assuming your speedometer was accurate on the current size.</li>
+      </ol>
+      <details><summary data-t="t_faq1_q">How do I read a tire size like 225/45R17?</summary><p data-t="t_faq1_a">225 is the tread width in millimetres, 45 is the sidewall height as a percentage of that width (45% of 225 mm ≈ 101 mm), R means radial construction, and 17 is the wheel diameter in inches.</p></details>
+      <details><summary data-t="t_faq2_q">Why does a bigger tire make my speedometer read low?</summary><p data-t="t_faq2_a">A taller tire travels further per turn. The speedometer counts turns, so at a reading of 100 the car is actually going faster. Smaller tires do the opposite.</p></details>
+      <p class="muted small2" data-t="t_more">Need offsets, spacers and fender clearance? Use the full <a href="fitment.html">Wheel &amp; Tire Fitment</a> calculator.</p>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261112p"></script>
+  <script src="kit.js?v=20261112p"></script>
+  <script src="tires.js?v=20261112p"></script>
+</body>
+</html>

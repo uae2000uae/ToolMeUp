@@ -4,7 +4,7 @@
 set -eu
 
 echo "== JS syntax (site scripts)"
-for f in app.js shared.js oem-presets.js wget.js $(ls calculators.js 2>/dev/null || true); do
+for f in *.js; do
   node --check "$f"
 done
 

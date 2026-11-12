@@ -1,37 +1,29 @@
 <!--
   ToolMeUp • shared top navigation bar
   Injected by shared.js into <header class="app-header" data-shared-header>
-  on every page. Edit the nav in this one file only.
+  on every page. The tool links inside the menu are generated from the
+  TOOLS list in shared.js — don't add them here.
   Per-page brand text comes from the header's data-brand attribute.
 -->
 <a class="brand" href="index.html" aria-label="ToolMeUp home">
-  <img class="brand-logo" src="static/images/logo.svg" alt="ToolMeUp" width="34" height="26">
+  <img class="brand-logo" src="static/images/logo.svg" alt="" width="34" height="26">
   <span class="brand-text">ToolMeUp</span>
 </a>
 <div class="header-controls menu-wrap">
+  <button id="paletteBtn" class="search-btn" type="button" aria-label="Search tools">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 100 14 7 7 0 000-14zm9 16l-4.3-4.3"/></svg>
+    <span class="search-btn__label" data-t="nav_search">Search</span>
+    <kbd class="kbd">Ctrl K</kbd>
+  </button>
   <button id="menuBtn" class="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-haspopup="true">
     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
   </button>
   <div id="menuDropdown" class="menu-dropdown" hidden>
-    <a href="index.html">
-      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>
-      Home</a>
-    <a href="fitment.html">
-      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 4a5 5 0 110 10 5 5 0 010-10zm0 3a2 2 0 100 4 2 2 0 000-4z"/></svg>
-      Fitment</a>
-    <a href="wget.html">
-      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2"/></svg>
-      Wget</a>
-    <a href="calculators.html">
-      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm1 3h8v3H8V6zm0 6h.01M12 12h.01M16 12h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
-      Calculators</a>
-    <a href="Dualshock-tool/index.html">
-      <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 10h4M8 8v4m6-1h.01M17 10h.01M7 6h10a4 4 0 014 4l1 6a2.5 2.5 0 01-4.6 1.4L15 14H9l-2.4 3.4A2.5 2.5 0 012 16l1-6a4 4 0 014-4z"/></svg>
-      DualShock-Tool</a>
+    <nav class="menu-tools" data-tool-links aria-label="Tools"></nav>
     <div class="menu-sep"></div>
     <label class="toggle">
       <svg class="menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-      <span>Dark</span>
+      <span data-t="nav_dark">Dark</span>
       <input type="checkbox" id="themeToggle">
     </label>
     <label class="toggle">

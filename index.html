@@ -1,48 +1,72 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-i18n="full">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ToolMeUp — Free browser tools</title>
-  <meta name="description" content="ToolMeUp is a small collection of free, browser-based utilities: a wheel & tire fitment calculator, a wget-style downloader, a DualShock controller tuner, and more.">
+  <script src="boot.js?v=20261112p"></script>
+  <title>ToolMeUp — Free browser tools: converters, calculators, PDF, images, QR & more</title>
+  <meta name="description" content="Free, private tools that run entirely in your browser: unit converter, calculators, time zones, JSON & regex tools, QR codes, image compressor, PDF merge/split, tire size and wheel fitment calculators. No sign-up, no tracking.">
   <meta name="theme-color" content="#2563eb">
-
-  <!-- Open Graph / social -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="ToolMeUp — Free browser tools">
-  <meta property="og:description" content="A small collection of free, browser-based utilities.">
+  <meta property="og:description" content="Private, free tools that run in your browser. Nothing is uploaded.">
   <meta property="og:image" content="web-app-icon-512.png">
-
-  <!-- Icons / PWA -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
   <link rel="icon" href="favicon.ico?v=2" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261112a">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"ToolMeUp","description":"Free tools that run entirely in your browser."}
+  </script>
 </head>
 <body>
-  <!-- Shared top navigation: injected from base.html by shared.js -->
   <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
 
   <main class="container">
-    <section class="hero">
-      <img class="hero__logo" src="static/images/logo.svg" alt="ToolMeUp — Wheel Fitment" width="240" height="182">
-      <h1 class="hero__title">Free browser tools</h1>
-      <p class="hero__lead">A small, growing collection of utilities that run entirely in your browser — no tracking, and your data stays on your device.</p>
+    <section class="home-hero">
+      <span class="home-hero__eyebrow"><span class="dot"></span><span data-t="home_eyebrow">Private by design • No sign-up • No tracking</span></span>
+      <h1 data-t="home_title">Free tools that <span class="grad">run in your browser</span></h1>
+      <p data-t="home_lead">A growing collection of handy utilities. Everything runs on your device — your files and data never leave it.</p>
+      <div class="home-search">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 100 14 7 7 0 000-14zm9 16l-4.3-4.3"/></svg>
+        <input type="search" data-home-search data-t-ph="home_search_ph" placeholder="Search tools… (press / )" aria-label="Search tools" autocomplete="off">
+      </div>
+      <div class="chips" data-home-chips></div>
     </section>
 
-    <section class="tool-grid" data-tool-cards>
-      <!-- Cards are rendered from the TOOLS manifest in shared.js -->
+    <div data-home>
+      <noscript>
+        <ul>
+          <li><a href="fitment.html">Wheel &amp; Tire Fitment</a></li>
+          <li><a href="tires.html">Tire Size &amp; Speedometer</a></li>
+          <li><a href="calculators.html">Calculator Suite</a></li>
+          <li><a href="units.html">Unit Converter</a></li>
+          <li><a href="datetime.html">Date &amp; Time Tools</a></li>
+          <li><a href="devtools.html">Developer Tools</a></li>
+          <li><a href="wget.html">Wget Downloader</a></li>
+          <li><a href="qr.html">QR Code Generator</a></li>
+          <li><a href="images.html">Image Compressor &amp; Resizer</a></li>
+          <li><a href="pdf.html">PDF Merge &amp; Split</a></li>
+          <li><a href="Dualshock-tool/index.html">DualShock / DualSense Calibration</a></li>
+        </ul>
+      </noscript>
+    </div>
+
+    <section class="home-promise">
+      <div class="promise"><b data-t="promise1_t">Runs on your device</b><span data-t="promise1">Files are processed in your browser. Nothing is uploaded to a server.</span></div>
+      <div class="promise"><b data-t="promise2_t">No account, no tracking</b><span data-t="promise2">No sign-up, no ads, no analytics. Settings are kept only in your browser.</span></div>
+      <div class="promise"><b data-t="promise3_t">English &amp; العربية</b><span data-t="promise3">Switch language and dark mode from the menu. Tools fully support right-to-left.</span></div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
+    <span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span>
   </footer>
 
-  <script src="shared.js?v=20261112a"></script>
+  <script src="shared.js?v=20261112p"></script>
 </body>
 </html>

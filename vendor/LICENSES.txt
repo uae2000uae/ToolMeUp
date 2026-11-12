@@ -1,0 +1,16 @@
+Third-party libraries bundled with ToolMeUp (served from this site, not a CDN)
+
+qrcode-generator 1.4.4 — vendor/qrcode-generator-1.4.4.js
+  Copyright (c) 2009 Kazuhiko Arase. MIT License.
+  https://github.com/kazuhikoarase/qrcode-generator
+
+pdf-lib 1.17.1 — vendor/pdf-lib-1.17.1.min.js
+  Copyright (c) 2019 Andrew Dillon. MIT License.
+  https://github.com/Hopding/pdf-lib
+
+JSZip 3.10.1 — vendor/jszip-3.10.1.min.js
+  Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger,
+  António Afonso. Dual licensed MIT or GPLv3; used here under the MIT License.
+  https://github.com/Stuk/jszip
+
+MIT License text: https://opensource.org/license/mit

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="datetime">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261112p"></script>
+  <title>Time Zone Converter, Countdown Timer, Age Calculator & Days Between Dates | ToolMeUp</title>
+  <meta name="description" content="Free date & time tools: world clock and time zone meeting planner, shareable countdown timer, age calculator with Hijri date, days between dates, business days and date add/subtract.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Date & Time Tools — ToolMeUp">
+  <meta property="og:description" content="Time zones, countdowns, age and date differences.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Date & Time Tools","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Time zone converter, countdown timer, age calculator and days between dates."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp" data-hue="indigo">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2M12 3a9 9 0 100 18 9 9 0 000-18z"/></svg></div>
+      <div>
+        <h1 data-t="d_title">Date &amp; Time Tools</h1>
+        <p data-t="d_lead">Plan across time zones, count down to anything, work out ages and the days between dates.</p>
+      </div>
+    </div>
+
+    <div class="seg" data-tabs="dt">
+      <button type="button" data-tab="zones" data-t="d_tab_zones">World clock</button>
+      <button type="button" data-tab="countdown" data-t="d_tab_countdown">Countdown</button>
+      <button type="button" data-tab="age" data-t="d_tab_age">Age</button>
+      <button type="button" data-tab="diff" data-t="d_tab_diff">Date difference</button>
+    </div>
+
+    <!-- ============ World clock ============ -->
+    <section class="pane" data-pane="zones">
+      <div class="card">
+        <div class="row row--between">
+          <div>
+            <h2 class="card__title" data-t="d_zones_t">World clock &amp; meeting planner</h2>
+            <p class="card__sub" data-t="d_zones_sub">Drag the slider to shift time and see it everywhere at once.</p>
+          </div>
+          <div class="row">
+            <input id="tz_add" class="inp" list="tz_list" data-t-ph="d_add_ph" placeholder="Add a city or time zone…" autocomplete="off">
+            <datalist id="tz_list"></datalist>
+          </div>
+        </div>
+        <div class="shift">
+          <input type="range" id="tz_shift" min="-1440" max="1440" step="15" value="0" aria-label="Shift time">
+          <div class="row row--between small2 muted"><span>−24h</span><b id="tz_shift_label" class="shift__label"></b><span>+24h</span></div>
+          <div class="row row--end"><button type="button" class="btn btn--sm" id="tz_now" data-t="d_now">Back to now</button></div>
+        </div>
+        <div class="clocks" id="tz_clocks"></div>
+      </div>
+    </section>
+
+    <!-- ============ Countdown ============ -->
+    <section class="pane" data-pane="countdown" hidden>
+      <div class="card">
+        <div class="g3">
+          <label class="f"><span data-t="d_event">Event name</span><input id="cd_name" type="text" data-t-ph="d_event_ph" placeholder="My big day" maxlength="60"></label>
+          <label class="f"><span data-t="d_target">Date &amp; time</span><input id="cd_target" type="datetime-local"></label>
+          <div class="f"><span class="f__label" data-t="d_quick">Quick picks</span>
+            <div class="pills" id="cd_quick">
+              <button type="button" data-q="1h">+1h</button>
+              <button type="button" data-q="eod" data-t="d_eod">End of day</button>
+              <button type="button" data-q="weekend" data-t="d_weekend">Weekend</button>
+              <button type="button" data-q="newyear" data-t="d_newyear">New Year</button>
+            </div>
+          </div>
+        </div>
+        <div class="cd" id="cd_box">
+          <div class="cd__name" id="cd_title"></div>
+          <div class="cd__grid" dir="ltr">
+            <div class="cd__cell"><b id="cd_d">0</b><span data-t="d_days">days</span></div>
+            <div class="cd__cell"><b id="cd_h">00</b><span data-t="d_hours">hours</span></div>
+            <div class="cd__cell"><b id="cd_m">00</b><span data-t="d_minutes">minutes</span></div>
+            <div class="cd__cell"><b id="cd_s">00</b><span data-t="d_seconds">seconds</span></div>
+          </div>
+          <div class="cd__when muted" id="cd_when"></div>
+        </div>
+        <div class="row row--end mt">
+          <button type="button" class="btn" id="cd_share">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>
+            <span data-t="d_share">Copy share link</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Age ============ -->
+    <section class="pane" data-pane="age" hidden>
+      <div class="card">
+        <div class="g3">
+          <label class="f"><span data-t="d_birth">Date of birth</span><input id="age_birth" type="date" data-keep></label>
+          <label class="f"><span data-t="d_on">Age on</span><input id="age_on" type="date"></label>
+        </div>
+        <div id="age_out" class="mt" hidden>
+          <div class="stats">
+            <div class="stat stat--hero"><div class="stat__label" data-t="d_age">Age</div><div class="stat__value" id="age_main">—</div><div class="stat__sub" id="age_sub"></div></div>
+            <div class="stat"><div class="stat__label" data-t="d_next_bday">Next birthday</div><div class="stat__value" id="age_next">—</div><div class="stat__sub" id="age_next_sub"></div></div>
+            <div class="stat"><div class="stat__label" data-t="d_born_on">Born on a</div><div class="stat__value" id="age_wday">—</div><div class="stat__sub" id="age_hijri"></div></div>
+          </div>
+          <div class="stats mt" id="age_totals"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Date difference ============ -->
+    <section class="pane" data-pane="diff" hidden>
+      <div class="card">
+        <h2 class="card__title" data-t="d_between">Days between two dates</h2>
+        <div class="g3 mt">
+          <label class="f"><span data-t="d_start">Start date</span><input id="df_a" type="date"></label>
+          <label class="f"><span data-t="d_end">End date</span><input id="df_b" type="date"></label>
+          <div class="f"><span class="f__label" data-t="d_options">Options</span>
+            <label class="switch"><input type="checkbox" id="df_incl"><span data-t="d_include_end">Include end day</span></label>
+            <label class="switch"><input type="checkbox" id="df_frisat" data-keep><span data-t="d_frisat">Weekend is Fri–Sat</span></label>
+          </div>
+        </div>
+        <div class="stats mt" id="df_out"></div>
+      </div>
+      <div class="card">
+        <h2 class="card__title" data-t="d_add_t">Add or subtract</h2>
+        <div class="row mt">
+          <input id="ad_date" class="inp w-auto" type="date">
+          <select id="ad_sign" class="inp w-auto"><option value="1">+</option><option value="-1">−</option></select>
+          <input id="ad_n" class="inp w-num" type="number" value="30" min="0" inputmode="numeric">
+          <select id="ad_unit" class="inp w-auto">
+            <option value="d" data-t="d_u_days">days</option><option value="w" data-t="d_u_weeks">weeks</option>
+            <option value="m" data-t="d_u_months">months</option><option value="y" data-t="d_u_years">years</option>
+            <option value="bd" data-t="d_u_bdays">business days</option>
+          </select>
+          <span>=</span>
+          <output id="ad_out" class="ad-out">—</output>
+        </div>
+      </div>
+    </section>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="d_how1"><b>World clock:</b> add cities with the search box, then drag the slider to find a time that works for everyone. Night hours are shaded.</li>
+        <li data-t="d_how2"><b>Countdown:</b> name an event and pick a date. Copy the share link to send a live countdown to someone else.</li>
+        <li data-t="d_how3"><b>Age</b> and <b>Date difference</b> work out exact years, months and days, plus totals and working days.</li>
+      </ol>
+      <details><summary data-t="d_faq1_q">How are business days counted?</summary><p data-t="d_faq1_a">Every day between the two dates is counted except weekend days. By default the weekend is Saturday–Sunday (as in the UAE since 2022); switch it to Friday–Saturday if needed. Public holidays aren't excluded.</p></details>
+      <details><summary data-t="d_faq2_q">How accurate is the Hijri date?</summary><p data-t="d_faq2_a">It uses your browser's built-in Umm al-Qura calendar. Official dates can differ by a day because they depend on moon sighting.</p></details>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261112p"></script>
+  <script src="kit.js?v=20261112p"></script>
+  <script src="datetime.js?v=20261112p"></script>
+</body>
+</html>

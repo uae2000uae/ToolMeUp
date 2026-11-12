@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="pdf">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261112p"></script>
+  <title>Merge PDF & Split PDF Free — Combine, Extract or Remove Pages | ToolMeUp</title>
+  <meta name="description" content="Merge PDF files in any order, split a PDF into single pages or chunks, extract or delete pages. Free and private: your PDFs are processed in your browser and never uploaded.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PDF Merge & Split — ToolMeUp">
+  <meta property="og:description" content="Combine, split and extract PDF pages privately in your browser.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20261112p">
+  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"PDF Merge & Split","applicationCategory":"BusinessApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Merge PDFs, split PDFs and extract or remove pages without uploading files."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp" data-hue="rose">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M9.5 13h5M9.5 17h5"/></svg></div>
+      <div>
+        <h1 data-t="p_title">PDF Merge &amp; Split</h1>
+        <p data-t="p_lead">Combine PDFs, pull out the pages you need, or split a document into parts — without uploading anything.</p>
+        <span class="badge-private"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg><span data-t="privacy_badge">Works on your device — nothing is uploaded</span></span>
+      </div>
+    </div>
+
+    <div class="seg" data-tabs="pdf">
+      <button type="button" data-tab="merge" data-t="p_tab_merge">Merge</button>
+      <button type="button" data-tab="split" data-t="p_tab_split">Split &amp; extract</button>
+    </div>
+
+    <!-- ============ Merge ============ -->
+    <section class="pane" data-pane="merge">
+      <label class="drop" id="m_drop">
+        <input type="file" accept="application/pdf,.pdf" multiple>
+        <span class="drop__icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></span>
+        <b data-t="p_drop_many">Drop PDF files here</b>
+        <span data-t="p_drop_many_s">or click to choose several · drag the cards to change the order</span>
+      </label>
+      <ol class="pdf-list" id="m_list"></ol>
+      <div class="card pdf-bar" id="m_bar" hidden>
+        <div class="muted small2" id="m_total"></div>
+        <div class="row">
+          <input id="m_name" class="inp w-name" value="merged.pdf" aria-label="File name">
+          <button type="button" class="btn btn--primary" id="m_go"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span data-t="p_merge_btn">Merge &amp; download</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Split ============ -->
+    <section class="pane" data-pane="split" hidden>
+      <label class="drop" id="s_drop">
+        <input type="file" accept="application/pdf,.pdf">
+        <span class="drop__icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></span>
+        <b data-t="p_drop_one">Drop a PDF here</b>
+        <span data-t="p_drop_one_s">or click to choose one file</span>
+      </label>
+      <div id="s_work" hidden>
+        <div class="card">
+          <div class="row row--between">
+            <div><b id="s_name"></b> <span class="muted small2" id="s_meta"></span></div>
+            <div class="pills" id="s_sel">
+              <button type="button" data-s="all" data-t="p_all">All</button>
+              <button type="button" data-s="none" data-t="p_none">None</button>
+              <button type="button" data-s="odd" data-t="p_odd">Odd</button>
+              <button type="button" data-s="even" data-t="p_even">Even</button>
+            </div>
+          </div>
+          <label class="f mt"><span data-t="p_ranges">Selected pages</span>
+            <input id="s_ranges" class="inp mono" dir="ltr" placeholder="1-3, 5, 8-10" autocomplete="off">
+          </label>
+          <p class="muted small2" data-t="p_tiles_hint">Click pages to select them. Shift-click selects a range.</p>
+          <div class="pages" id="s_pages" dir="ltr"></div>
+        </div>
+        <div class="pdf-actions">
+          <button type="button" class="act" id="s_extract"><b data-t="p_extract">Extract selected</b><span data-t="p_extract_s">Selected pages → one PDF</span></button>
+          <button type="button" class="act" id="s_remove"><b data-t="p_remove">Remove selected</b><span data-t="p_remove_s">Everything except selected → one PDF</span></button>
+          <div class="act act--n"><b data-t="p_every">Split every</b>
+            <div class="row"><input id="s_n" class="inp w-num" type="number" min="1" value="1" inputmode="numeric"><span data-t="p_pages_word">pages</span><button type="button" class="btn btn--sm btn--primary" id="s_split" data-t="p_split_zip">ZIP</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="busy" id="p_busy" hidden><span class="spinner"></span><span id="p_busy_t"></span></div>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="p_how1"><b>Merge:</b> drop several PDFs, drag them into order, optionally enter page ranges per file (e.g. <code>1-3, 7</code>), then merge.</li>
+        <li data-t="p_how2"><b>Split &amp; extract:</b> drop one PDF, select pages by clicking or typing ranges, then extract them, remove them, or split the file every N pages into a ZIP.</li>
+        <li data-t="p_how3">Files are processed in this browser tab. Large PDFs may take a few seconds.</li>
+      </ol>
+      <details><summary data-t="p_faq1_q">Are my PDFs uploaded?</summary><p data-t="p_faq1_a">No. The PDF library runs inside your browser, so your documents never leave your device — useful for contracts, IDs and invoices.</p></details>
+      <details><summary data-t="p_faq2_q">Why won't my PDF open?</summary><p data-t="p_faq2_a">Password-protected (encrypted) PDFs can't be edited here. Open the file in a PDF reader, remove the password (or "print to PDF"), then try again.</p></details>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261112p"></script>
+  <script src="kit.js?v=20261112p"></script>
+  <script src="vendor/pdf-lib-1.17.1.min.js?v=1"></script>
+  <script src="vendor/jszip-3.10.1.min.js?v=1"></script>
+  <script src="pdftool.js?v=20261112p"></script>
+</body>
+</html>

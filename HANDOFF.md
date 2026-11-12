@@ -180,3 +180,60 @@ What this means:
   - The rim and fender JSON listings work. DualShock is bundled, and GA is gone.
 - **Browser (local, same CSP headers):** all four pages load with no CSP errors. DualShock modals, icons and theme work. Fenders draw from the single fetch, and JSZip loads with the corrected hash.
 - **Not tested:** the live Wheel-Size API with the real key (the test used a dummy key), and a real controller over WebHID.
+
+---
+
+## 7. Phase 0 & 1: tool platform and new tools (2026-11-12)
+
+The scope was set by the user (see `Expantion-ideas/` in the main checkout): **only features that run in the browser, with no extra hosting cost.**
+
+### What was built
+| Page | Tool | Notes |
+|---|---|---|
+| `index.html` | New home | Hero, live search (`/` key), category chips, "recently used", privacy promises |
+| `calculators.html` | Calculator Suite (finished from the WIP) | Basic calculator with keyboard input and history; percentage; loan with yearly chart; savings with monthly deposits; video ratio and resolution comparison; BMI gauge |
+| `units.html` | Unit Converter | 11 categories, including fuel economy, power and torque. Shows every unit at once; arithmetic in the input (`5*12`) |
+| `datetime.html` | Date & Time | World clock with a time-shift slider; shareable countdown (`#countdown?t=…&n=…`); age with Hijri date; date difference with business days (Sat–Sun or Fri–Sat weekend); add/subtract dates |
+| `devtools.html` | Developer Tools | JSON (exact error line and column, syntax colors, sort keys); regex (runs in a Web Worker with a 1.2 s kill switch); Base64 (UTF-8, URL-safe, file → data URL); UUID v4/v7 plus inspector; lorem ipsum (Latin and Arabic) |
+| `qr.html` | QR Generator | Link, Wi-Fi, vCard, WhatsApp, email, phone, SMS; square/rounded/dot styles; colors; logo (forces ECC H); contrast warning; PNG/SVG/copy |
+| `images.html` | Image Compressor | Batch processing; JPG/WebP/PNG/AVIF; quality; max size or %; before/after slider; ZIP; keeps the original if it would grow |
+| `pdf.html` | PDF Merge & Split | Merge with drag-to-reorder and per-file page ranges; split via a page-tile grid (shift-click ranges): extract, remove, or split every N pages to a ZIP |
+| `tires.html` | Tire Size & Speedometer | Metric and flotation sizes; table plus to-scale side and front drawings; ±3% verdict; speedometer dial and table (km/h or mph) |
+
+### Architecture (how to add the next tool)
+- **`shared.js`:** `TOOLS` and `CATEGORIES` are the single source of truth. The header menu (grouped), home cards and chips, the **Ctrl/⌘K quick-search palette**, breadcrumbs and "recently used" are all generated from them. To add a tool, add one entry (en + ar text, icon path, tags) and create the page.
+- **Page template:** copy any new tool page (e.g. `units.html`). The page needs:
+  - `<html data-i18n="full" data-tool="<id>">`;
+  - `boot.js` in `<head>`, which applies theme and RTL before first paint;
+  - `styles.css` + `ui.css`;
+  - `<main class="container tp" data-hue="<category hue>">`;
+  - `shared.js` → `kit.js` → page script at the end of `<body>`.
+- **`ui.css`:** the design system: tokens, cards, segmented tabs, fields, stats, pills, switches, drop zones, toasts, how-to sections, plus one section per tool. It uses logical CSS properties, so RTL works automatically.
+- **`kit.js`:** helpers: `Kit.tabs` (deep links via `#tab` and remembers the last tab), `copy`/`toast`, `download`, `drop` (drag, click or paste), `keepInputs` (`data-keep` inputs persist), number formatting, `onLang`/`onTheme`.
+- **i18n:**
+  - Static text uses `data-t="key"`, and placeholders, titles and aria labels use `data-t-ph`, `data-t-title` and `data-t-aria`.
+  - Each page registers its Arabic strings with `ToolMeUp.addStrings({...})`. Dynamic text uses `ToolMeUp.t(key, englishFallback, vars)`.
+  - Numbers always use Western digits.
+  - `fitment.html` and `wget.html` keep the older "hints only" Arabic mode.
+- **Libraries are hosted on the site** in `vendor/` (licenses in `vendor/LICENSES.txt`): qrcode-generator 1.4.4, pdf-lib 1.17.1 and JSZip 3.10.1. They load with `?v=1`, so they're cached for a year. Keep the CSP strict: never add a CDN for a new tool.
+- **Cache versions:** all pages now load `styles.css`, `ui.css`, `shared.js`, `kit.js` and the page scripts with `?v=20261112p`. When you change any of them, **bump the version on every page** (one search-and-replace).
+
+### SEO
+- Every page has a descriptive `<title>`, meta description, Open Graph tags, a JSON-LD `WebApplication` block, a breadcrumb, and a visible "How to use" + FAQ section in both languages.
+- `sitemap.xml` and `robots.txt` use the run.app URL. If you add a custom domain, update both, and set `ALLOWED_REFERER_HOST` (see §6).
+
+### Verified (local server sending the production CSP headers)
+- Every page in English and Arabic: the header and menu render, there are no runtime errors, and every `data-t` string is translated (only "ZIP" is identical by design). There is no horizontal overflow at 375 px.
+- Functional checks:
+  - Loan 100,000 @ 4.5% / 5 y = 1,864.30/month; compound savings 10,000 @ 5% / 10 y = 16,470.09.
+  - 8 L/100km = 29.40 mpg (US).
+  - Age, Hijri date and business days are correct.
+  - JSON error location and regex highlight/replace work, and a catastrophic regex is stopped by the timeout. UTF-8 Base64 and ordered UUID v7 work.
+  - Images: 1.77 MB → 164 KB WebP; ZIP and compare view work.
+  - PDF: merge with ranges, remove pages, split every 3 → ZIP.
+  - Tires: 225/45R17 vs 235/40R18 = +1.72%.
+- **Not verified:**
+  - Visual screenshots of most pages (the browser window was minimized during testing).
+  - Real-device mobile testing.
+  - Scanning the QR output with a phone.
+  - Very large PDFs and images (memory limits depend on the device).
