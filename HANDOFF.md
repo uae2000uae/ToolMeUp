@@ -169,5 +169,14 @@ What this means:
 - **Merging this branch into `master` will delete `.idea/` from your working copy** (it is now untracked). Afterwards, restore it from `Drawing/repo-archive-2026-11-12/.idea/`. Git now ignores it.
 - **DualShock edits** go in `Dualshock-tool/` sources. Production serves the gulp bundle (`npm run build:prod` in that folder to preview it; output in `dist/`).
 
-### Not verified
-The nginx config and Dockerfile have **not** been run, because Docker isn't installed on this machine. The CI `container` job builds the image and runs `nginx -t` plus the smoke tests on the first push. Pages were tested locally under the exact CSP headers: all four pages load with no CSP errors, and DualShock modals, icons and the theme work.
+### Verification
+- **Container (Cloud Build `6db69935`, build + test only, nothing pushed or deployed):** the image builds, including the DualShock gulp stage. `nginx -t` passes on nginx 1.28.3. The web root is 44.9 MB, down from about 68 MB; the remaining bulk is the rim SVGs.
+- **Smoke tests: 47/47 passed.**
+  - Pages return 200; build, config and source files return 404.
+  - gzip works on JS and SVG.
+  - The right CSP is served on main pages and on DualShock, along with `nosniff`.
+  - Cache headers: 1 year for `?v=` assets, 1 h for unversioned assets, `no-cache` for HTML. `server_tokens` is off.
+  - Wheel-Size proxy: unknown endpoints return 404; a missing or foreign Referer returns 403; an allowed Referer is forwarded to Wheel-Size. The rate limit returns 429 per client IP and doesn't affect other IPs.
+  - The rim and fender JSON listings work. DualShock is bundled, and GA is gone.
+- **Browser (local, same CSP headers):** all four pages load with no CSP errors. DualShock modals, icons and theme work. Fenders draw from the single fetch, and JSZip loads with the corrected hash.
+- **Not tested:** the live Wheel-Size API with the real key (the test used a dummy key), and a real controller over WebHID.
