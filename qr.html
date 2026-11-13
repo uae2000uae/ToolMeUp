@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113i">
+  <link rel="stylesheet" href="ui.css?v=20261113n">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"QR Code Generator","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Create styled QR codes for links, Wi-Fi, contacts, email, SMS and WhatsApp; download PNG or SVG."}
   </script>
@@ -38,7 +38,7 @@
 
     <div class="qr-layout">
       <div>
-        <div class="card">
+        <div class="card" id="q_input">
           <div class="pills qr-types" id="q_type" role="group">
             <button type="button" data-q="url" aria-pressed="true" data-t="q_t_url">Link / text</button>
             <button type="button" data-q="wifi">Wi-Fi</button>
@@ -123,21 +123,32 @@
             <button type="button" class="btn btn--ghost btn--sm" id="q_logo_rm" hidden data-t="q_rm_logo">Remove logo</button>
           </div>
         </div>
-      </div>
 
-      <aside class="qr-preview card">
-        <div class="qr-canvas-wrap" id="q_wrap"><canvas id="q_canvas" width="320" height="320" aria-label="QR code preview"></canvas></div>
-        <div id="q_warn" class="note note--bad mt" hidden></div>
-        <div class="qr-meta muted small2" id="q_meta"></div>
-        <label class="f mt"><span><span data-t="q_size">Download size</span> <b id="q_size_v" class="q-badge">1024 px</b></span>
-          <input type="range" id="q_size" min="256" max="2048" step="128" value="1024">
-        </label>
-        <div class="qr-actions mt">
-          <button type="button" class="btn btn--primary" id="q_png">PNG</button>
-          <button type="button" class="btn" id="q_svg">SVG</button>
-          <button type="button" class="btn" id="q_copy" data-t="q_copy_img">Copy image</button>
-        </div>
-      </aside>
+        <section class="qr-preview card" id="q_preview" aria-label="QR code">
+          <div class="qr-canvas-wrap" id="q_wrap"><canvas id="q_canvas" width="320" height="320" aria-label="QR code preview"></canvas></div>
+          <div class="qr-side">
+          <div id="q_warn" class="note note--bad mt" hidden></div>
+          <div class="qr-meta muted small2" id="q_meta"></div>
+          <label class="f mt"><span><span data-t="q_size">Download size</span> <b id="q_size_v" class="q-badge">1024 px</b></span>
+            <input type="range" id="q_size" min="256" max="2048" step="128" value="1024">
+          </label>
+          <div class="qr-actions mt">
+            <button type="button" class="btn btn--primary" id="q_png">PNG</button>
+            <button type="button" class="btn" id="q_svg">SVG</button>
+            <button type="button" class="btn" id="q_copy" data-t="q_copy_img">Copy image</button>
+          </div>
+          </div>
+        </section>
+
+        <section class="card" id="q_hist_card" hidden>
+          <div class="row qr-hist__head">
+            <h2 class="card__title" data-t="q_hist">Download history</h2>
+            <button type="button" class="btn btn--ghost btn--sm" id="q_hist_clear" data-t="q_hist_clear">Clear</button>
+          </div>
+          <p class="muted small2" data-t="q_hist_note">Saved only in this browser. Tap one to load it back.</p>
+          <ul class="qr-hist" id="q_hist"></ul>
+        </section>
+      </div>
     </div>
 
     <section class="howto">
@@ -152,11 +163,13 @@
     </section>
   </main>
 
+  <button type="button" class="qr-mini" id="q_mini" hidden aria-label="Show QR code" data-t-aria="q_mini"><canvas id="q_mini_cv" width="96" height="96"></canvas></button>
+
   <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
 
   <script src="shared.js?v=20261113i"></script>
   <script src="kit.js?v=20261112p"></script>
   <script src="vendor/qrcode-generator-1.4.4.js?v=1"></script>
-  <script src="qr.js?v=20261112p"></script>
+  <script src="qr.js?v=20261113f"></script>
 </body>
 </html>

@@ -18,7 +18,8 @@
     q_wa_num: "رقم الهاتف مع رمز الدولة", q_msg: "الرسالة (اختياري)", q_to: "إلى", q_subject: "الموضوع", q_body: "الرسالة",
     q_style: "التصميم", q_dots: "النقاط", q_square: "مربعة", q_rounded: "مستديرة", q_dotted: "دوائر", q_colors: "الألوان",
     q_ecc: "تصحيح الأخطاء", q_margin: "الهامش", q_add_logo: "إضافة شعار", q_rm_logo: "إزالة الشعار",
-    q_size: "حجم التنزيل", q_copy_img: "نسخ الصورة",
+    q_size: "حجم التنزيل", q_copy_img: "نسخ الصورة", q_mini: "عرض رمز QR",
+    q_hist: "سجل التنزيلات", q_hist_clear: "مسح", q_hist_note: "محفوظ في هذا المتصفح فقط. اضغط على أي عنصر لاستعادته.", q_hist_rm: "حذف", q_hist_copy: "نسخ", q_hist_logo: "الشعار غير محفوظ", q_hist_loaded: "تم تحميله في المحرر",
     q_meta: "{v} · {n}×{n} وحدة · {c} حرف · تصحيح {e}",
     q_low_contrast: "التباين منخفض جداً — قد لا يُقرأ الرمز. استخدم لوناً داكناً على خلفية فاتحة.",
     q_inverted: "الألوان معكوسة (فاتح على داكن). بعض القارئات لا تقرأ الرموز المعكوسة.",
@@ -186,22 +187,117 @@
       $("q_meta").textContent = t("q_empty", "Enter some content to create a code.");
       warn.hidden = !warnings.length; warn.textContent = warnings.join(" ");
       const ctx = cv.getContext("2d"); ctx.clearRect(0, 0, cv.width, cv.height);
+      updateMini();
       return;
     }
     try { matrix = build(text, ECC[eccIdx]); }
     catch (_) {
       matrix = null; wrap.classList.add("is-empty");
       warn.hidden = false; warn.textContent = t("q_too_long", "That's too much content for a QR code. Shorten it (e.g. use a shorter link).");
-      $("q_meta").textContent = ""; return;
+      $("q_meta").textContent = ""; updateMini(); return;
     }
     lastText = text;
     wrap.classList.remove("is-empty");
-    const dpr = window.devicePixelRatio || 1, css = Math.min(wrap.clientWidth || 320, 360);
+    // Size from the wrap's content box (clientWidth includes its padding),
+    // otherwise max-width shrinks only the width and the code is squashed.
+    const ws = getComputedStyle(wrap);
+    const avail = wrap.clientWidth - parseFloat(ws.paddingLeft) - parseFloat(ws.paddingRight);
+    const dpr = window.devicePixelRatio || 1, css = Math.floor(Math.min(avail > 0 ? avail : 320, 360,
+      Math.max(180, window.innerHeight - 140))); // keep it on-screen in landscape
     cv.width = cv.height = Math.round(css * dpr);
     cv.style.width = cv.style.height = css + "px";
     paint(cv.getContext("2d"), cv.width, matrix);
+    updateMini();
     warn.hidden = !warnings.length; warn.textContent = warnings.join(" ");
     $("q_meta").textContent = t("q_meta", "Version {v} · {n}×{n} modules · {c} characters · ECC {e}", { v: matrix.ver, n: matrix.n, c: text.length, e: ECC[eccIdx] });
+  }
+
+  // Corner mini preview: a copy of the code, visible only while the main
+  // preview is scrolled out of view.
+  let previewVisible = true;
+  function updateMini() {
+    const mini = $("q_mini");
+    mini.hidden = !matrix;
+    mini.classList.toggle("is-off", previewVisible);
+    if (!matrix) return;
+    const mc = $("q_mini_cv"), px = Math.round(88 * (window.devicePixelRatio || 1));
+    if (mc.width !== px) mc.width = mc.height = px;
+    paint(mc.getContext("2d"), px, matrix);
+  }
+
+  // ---- Download history (this browser only) ------------------------------------------------
+  const HIST_KEY = "qr:history", HIST_MAX = 20;
+  const FIELDS = { url: ["q_url"], wifi: ["q_ssid", "q_pass", "q_encr", "q_hidden"], vcard: ["q_vn", "q_vo", "q_vp", "q_ve", "q_vt", "q_vw"],
+    whatsapp: ["q_wn", "q_wm"], email: ["q_et", "q_es", "q_eb"], tel: ["q_tn"], sms: ["q_sn", "q_sm"] };
+  const TYPE_LABEL = { url: ["q_t_url", "Link / text"], wifi: ["", "Wi-Fi"], vcard: ["q_t_vcard", "Contact"], whatsapp: ["", "WhatsApp"],
+    email: ["q_t_email", "Email"], tel: ["q_t_tel", "Phone"], sms: ["", "SMS"] };
+  const loadHist = () => { const h = K.load(HIST_KEY, []); return Array.isArray(h) ? h : []; };
+  function summary(e) {
+    const f = e.fields || {};
+    switch (e.type) {
+      case "wifi": return f.q_ssid;
+      case "vcard": return f.q_vn || f.q_vp || f.q_ve;
+      case "whatsapp": return "+" + f.q_wn;
+      case "email": return f.q_et;
+      case "tel": return f.q_tn;
+      case "sms": return f.q_sn;
+      default: return f.q_url;
+    }
+  }
+  function addHistory(fmt) {
+    if (!matrix) return;
+    const fields = {};
+    FIELDS[type].forEach((id) => { const el = $(id); fields[id] = el.type === "checkbox" ? el.checked : el.value; });
+    const th = document.createElement("canvas"); th.width = th.height = 96; paint(th.getContext("2d"), 96, matrix);
+    const e = { at: Date.now(), fmt: fmt, type: type, fields: fields, dot: dot, fg: $("q_fg").value, bg: $("q_bg").value,
+      ecc: $("q_ecc").value, margin: $("q_margin").value, size: $("q_size").value, logo: !!logo, text: lastText, thumb: th.toDataURL("image/png") };
+    const sig = (x) => [x.text, x.dot, x.fg, x.bg, x.ecc, x.margin, x.logo].join("|");
+    const h = loadHist().filter((x) => sig(x) !== sig(e)); // the same code again moves to the top
+    h.unshift(e);
+    K.save(HIST_KEY, h.slice(0, HIST_MAX));
+    renderHistory();
+  }
+  function restore(e) {
+    Object.keys(e.fields || {}).forEach((id) => {
+      const el = $(id); if (!el) return;
+      if (el.type === "checkbox") el.checked = !!e.fields[id]; else el.value = e.fields[id];
+    });
+    dot = e.dot || "square"; K.save("qr:dot", dot);
+    $("q_dot").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.d === dot)));
+    $("q_fg").value = e.fg; $("q_bg").value = e.bg; K.save("qr:colors", [e.fg, e.bg]);
+    $("q_ecc").value = e.ecc; $("q_margin").value = e.margin; $("q_size").value = e.size;
+    const btn = $("q_type").querySelector('[data-q="' + e.type + '"]');
+    if (btn) btn.click(); else render();
+    // Bring the filled-in form into view and flash it so the load is obvious.
+    const box = $("q_input");
+    box.scrollIntoView({ block: "start" });
+    box.classList.remove("is-loaded"); void box.offsetWidth; box.classList.add("is-loaded");
+    K.toast(t("q_hist_loaded", "Loaded into the editor") + (e.logo ? " — " + t("q_hist_logo", "logo not saved") : ""));
+  }
+  function renderHistory() {
+    const h = loadHist(), list = $("q_hist");
+    $("q_hist_card").hidden = !h.length;
+    list.textContent = "";
+    const ar = TM.lang ? TM.lang() === "ar" : document.documentElement.lang === "ar";
+    h.forEach((e, i) => {
+      const li = document.createElement("li");
+      const use = document.createElement("button"); use.type = "button"; use.className = "qr-hist__use";
+      const img = document.createElement("img"); img.src = e.thumb; img.alt = ""; img.width = img.height = 48;
+      const txt = document.createElement("span"); txt.className = "qr-hist__txt";
+      const b = document.createElement("b"); b.textContent = summary(e) || e.text || ""; b.dir = "auto";
+      const meta = document.createElement("span");
+      const tl = TYPE_LABEL[e.type] || TYPE_LABEL.url;
+      let when = "";
+      try { when = new Date(e.at).toLocaleString(ar ? "ar" : undefined, { dateStyle: "medium", timeStyle: "short" }); } catch (_) { /* ignore */ }
+      meta.textContent = [tl[0] ? t(tl[0], tl[1]) : tl[1], e.fmt === "copy" ? t("q_hist_copy", "Copy") : String(e.fmt).toUpperCase(), when]
+        .concat(e.logo ? [t("q_hist_logo", "logo not saved")] : []).join(" · ");
+      txt.append(b, meta); use.append(img, txt);
+      use.addEventListener("click", () => restore(e));
+      const rm = document.createElement("button"); rm.type = "button"; rm.className = "btn btn--ghost btn--sm qr-hist__rm";
+      rm.textContent = "\u00d7"; rm.setAttribute("aria-label", t("q_hist_rm", "Remove"));
+      rm.addEventListener("click", () => { const all = loadHist(); all.splice(i, 1); K.save(HIST_KEY, all); renderHistory(); });
+      li.append(use, rm); list.appendChild(li);
+    });
   }
 
   function exportPng() {
@@ -253,16 +349,26 @@
       $("q_logo").value = "";
     });
     $("q_logo_rm").addEventListener("click", () => { logo = null; $("q_logo_rm").hidden = true; render(); });
-    $("q_png").addEventListener("click", () => { if (matrix) exportPng().then((b) => K.download(b, fileBase() + ".png")); });
-    $("q_svg").addEventListener("click", () => { if (matrix) K.download(svgString(matrix), fileBase() + ".svg", "image/svg+xml"); });
+    $("q_png").addEventListener("click", () => { if (matrix) { addHistory("png"); exportPng().then((b) => K.download(b, fileBase() + ".png")); } });
+    $("q_svg").addEventListener("click", () => { if (matrix) { addHistory("svg"); K.download(svgString(matrix), fileBase() + ".svg", "image/svg+xml"); } });
     $("q_copy").addEventListener("click", () => {
       if (!matrix) return;
       if (!window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write) { K.toast(t("q_copy_fail", "Your browser can't copy images — download the PNG instead."), true); return; }
       navigator.clipboard.write([new ClipboardItem({ "image/png": exportPng() })])
-        .then(() => K.toast(t("q_copied_img", "Image copied")), () => K.toast(t("q_copy_fail", "Your browser can't copy images — download the PNG instead."), true));
+        .then(() => { addHistory("copy"); K.toast(t("q_copied_img", "Image copied")); }, () => K.toast(t("q_copy_fail", "Your browser can't copy images — download the PNG instead."), true));
     });
     window.addEventListener("resize", K.debounce(render, 150));
-    K.onLang(render);
+    $("q_mini").addEventListener("click", () => $("q_preview").scrollIntoView({ behavior: "smooth", block: "center" }));
+    if ("IntersectionObserver" in window) {
+      // "Visible" once a third of the code itself is on screen, not a sliver of the card.
+      new IntersectionObserver((es) => {
+        const v = es[0].isIntersecting && es[0].intersectionRatio >= 0.33;
+        if (v !== previewVisible) { previewVisible = v; $("q_mini").classList.toggle("is-off", v); }
+      }, { threshold: [0, 0.33, 0.66, 1] }).observe($("q_canvas"));
+    }
+    K.onLang(() => { render(); renderHistory(); });
+    $("q_hist_clear").addEventListener("click", () => { K.save(HIST_KEY, []); renderHistory(); });
+    renderHistory();
     const savedType = K.load("qr:type", "url");
     const btn = $("q_type").querySelector('[data-q="' + savedType + '"]');
     if (btn) btn.click(); else render();
