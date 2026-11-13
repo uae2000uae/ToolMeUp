@@ -1,7 +1,7 @@
 /*
   ToolMeUp • shared site chrome
   - TOOLS / CATEGORIES: the single source of truth for every tool. The header
-    menu, the home page, the quick-search palette and the "recent tools" list
+    menu, the home page (cards + category chips) and the "recent tools" list
     are all generated from it. To add a tool: add one entry below + its page.
   - Theme (light/dark) and language (English/Arabic) toggles, persisted.
   - i18n: pages marked <html data-i18n="full"> switch fully to Arabic + RTL;
@@ -25,7 +25,7 @@
   // cat:   category id (above)
   // href:  page to open
   // icon:  SVG path data (24x24, stroked)
-  // tags:  extra search words (English + Arabic)
+  // tags:  extra keywords (English + Arabic); not used by the UI since search was removed
   // en/ar: { name, title, desc }
   const TOOLS = [
     {
@@ -154,15 +154,22 @@
     rep_circumference_desc: "طول محيط الإطار",
     rep_revs_mile_desc: "عدد دورات الإطار في الميل الواحد",
     rep_revs_km_desc: "عدد دورات الإطار في الكيلومتر الواحد",
+    opt_adv_title: "الفاصل (سبيسر)، تصحيح العرض والانتفاخ",
+    opt_adv_desc: "عند إخفائها تُستخدم القيم الافتراضية: بلا فاصل، تصحيح 0%، انتفاخ 5%.",
+    opt_stag_title: "مقاسات مختلفة للأمام والخلف",
+    opt_stag_desc: "يضيف عموداً خلفياً لكل تركيب. حتى تركيبين في هذا الوضع.",
+    axle_front: "أمامي",
+    axle_rear: "خلفي",
+    sv_tire_height: "ارتفاع الإطار",
+    sv_ride_height: "ارتفاع السيارة",
+    sv_fender_gap: "خلوص الرفرف",
 
     // Site chrome
     nav_home: "الرئيسية",
     nav_all_tools: "كل الأدوات",
     nav_dark: "الوضع الداكن",
-    nav_search: "بحث",
-    palette_ph: "ابحث عن أداة…",
-    palette_empty: "لا توجد أداة مطابقة.",
-    palette_hint: "↑↓ للتنقل • Enter للفتح • Esc للإغلاق",
+    nav_menu: "القائمة",
+    nav_close: "إغلاق القائمة",
     home_eyebrow: "خصوصية تامة • بلا تسجيل • بلا تتبّع",
     home_title: "أدوات مجانية <span class=\"grad\">تعمل في متصفحك</span>",
     home_lead: "مجموعة متنامية من الأدوات المفيدة. كل شيء يعمل على جهازك — ملفاتك وبياناتك لا تغادره أبداً.",
@@ -172,11 +179,9 @@
     promise2: "لا تسجيل ولا إعلانات ولا تحليلات. الإعدادات تُحفظ في متصفحك فقط.",
     promise3_t: "English و العربية",
     promise3: "بدّل اللغة والوضع الداكن من القائمة. الأدوات تدعم الكتابة من اليمين إلى اليسار بالكامل.",
-    home_search_ph: "ابحث في الأدوات… (اضغط / )",
     home_all: "الكل",
     home_recent: "استخدمتها مؤخراً",
     home_new: "جديد",
-    home_none: "لا توجد أداة مطابقة لبحثك.",
     home_count: "{n} أداة",
     footer_text: "HTML/CSS/JS ثابتة • تعمل بالكامل في متصفحك • بلا تتبّع",
     crumb_home: "الرئيسية",
@@ -320,21 +325,6 @@
     try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (_) { /* ignore */ }
   }
 
-  // ---- Search ----------------------------------------------------------
-  function norm(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[̀-ًͯ-ْ]/g, ""); }
-  function matches(tool, q) {
-    if (!q) return true;
-    const hay = norm([tool.en.name, tool.en.title, tool.en.desc, tool.ar.name, tool.ar.title, tool.ar.desc, tool.tags, catName(tool.cat)].join(" "));
-    return norm(q).split(/\s+/).filter(Boolean).every(function (w) { return hay.indexOf(w) !== -1; });
-  }
-  function score(tool, q) {
-    const nq = norm(q);
-    if (!nq) return 0;
-    if (norm(L(tool, "name")).indexOf(nq) === 0) return 3;
-    if (norm(L(tool, "title")).indexOf(nq) !== -1) return 2;
-    return 1;
-  }
-
   // ---- Header: tool links in the menu ------------------------------------
   function renderToolLinks() {
     const mount = document.querySelector("[data-tool-links]");
@@ -369,7 +359,6 @@
   }
 
   // ---- Home page -------------------------------------------------------
-  let homeQuery = "";
   let homeCat = "";
   function cardHtml(x) {
     return '<a class="tcard" href="' + x.href + '" data-hue="' + hueOf(x) + '">' +
@@ -395,47 +384,31 @@
             '" data-hue="' + c.hue + '">' + esc(currentLang() === "ar" ? c.ar : c.en) + ' <span class="chip__n">' + n + "</span></button>";
         }).join("");
     }
-    const list = TOOLS.filter(function (x) { return (!homeCat || x.cat === homeCat) && matches(x, homeQuery); });
+    const list = TOOLS.filter(function (x) { return !homeCat || x.cat === homeCat; });
     let html = "";
-    if (homeQuery) {
-      list.sort(function (a, b) { return score(b, homeQuery) - score(a, homeQuery); });
-      html = list.length ? '<div class="tgrid">' + list.map(cardHtml).join("") + "</div>" :
-        '<p class="empty">' + esc(t("home_none", "No tool matches your search.")) + "</p>";
-    } else {
-      const rec = recent().map(function (id) { return TOOLS.find(function (x) { return x.id === id; }); }).filter(Boolean);
-      if (!homeCat && rec.length) {
-        html += '<section class="tsection tsection--recent"><h2 class="tsection__title">' + esc(t("home_recent", "Recently used")) + "</h2>" +
-          '<div class="recent-row">' + rec.map(function (x) {
-            return '<a class="recent" href="' + x.href + '" data-hue="' + hueOf(x) + '">' + iconSvg(x.icon, 18) + "<span>" + esc(L(x, "name")) + "</span></a>";
-          }).join("") + "</div></section>";
-      }
-      CATEGORIES.forEach(function (c) {
-        if (homeCat && homeCat !== c.id) return;
-        const items = list.filter(function (x) { return x.cat === c.id; });
-        if (!items.length) return;
-        html += '<section class="tsection" id="' + c.id + '"><h2 class="tsection__title" data-hue="' + c.hue + '">' +
-          esc(currentLang() === "ar" ? c.ar : c.en) + "</h2>" + '<div class="tgrid">' + items.map(cardHtml).join("") + "</div></section>";
-      });
+    const rec = recent().map(function (id) { return TOOLS.find(function (x) { return x.id === id; }); }).filter(Boolean);
+    if (!homeCat && rec.length) {
+      html += '<section class="tsection tsection--recent"><h2 class="tsection__title">' + esc(t("home_recent", "Recently used")) + "</h2>" +
+        '<div class="recent-row">' + rec.map(function (x) {
+          return '<a class="recent" href="' + x.href + '" data-hue="' + hueOf(x) + '">' + iconSvg(x.icon, 18) + "<span>" + esc(L(x, "name")) + "</span></a>";
+        }).join("") + "</div></section>";
     }
+    CATEGORIES.forEach(function (c) {
+      if (homeCat && homeCat !== c.id) return;
+      const items = list.filter(function (x) { return x.cat === c.id; });
+      if (!items.length) return;
+      html += '<section class="tsection" id="' + c.id + '"><h2 class="tsection__title" data-hue="' + c.hue + '">' +
+        esc(currentLang() === "ar" ? c.ar : c.en) + "</h2>" + '<div class="tgrid">' + items.map(cardHtml).join("") + "</div></section>";
+    });
     mount.innerHTML = html;
     const count = document.querySelector("[data-home-count]");
     if (count) count.textContent = t("home_count", "{n} tools", { n: TOOLS.length });
   }
   function wireHome() {
-    const input = document.querySelector("[data-home-search]");
     const chips = document.querySelector("[data-home-chips]");
-    if (!input && !chips) return;
+    if (!chips) return;
     if (location.hash && CATEGORIES.some(function (c) { return "#" + c.id === location.hash; })) homeCat = location.hash.slice(1);
-    if (input) {
-      input.addEventListener("input", function () { homeQuery = input.value.trim(); renderHome(); });
-      input.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") {
-          const first = document.querySelector("[data-home] .tcard");
-          if (first) first.click();
-        } else if (e.key === "Escape") { input.value = ""; homeQuery = ""; renderHome(); }
-      });
-    }
-    if (chips) chips.addEventListener("click", function (e) {
+    chips.addEventListener("click", function (e) {
       const b = e.target.closest("[data-cat]");
       if (!b) return;
       homeCat = b.getAttribute("data-cat");
@@ -443,76 +416,6 @@
       renderHome();
     });
   }
-
-  // ---- Quick search palette (Ctrl/⌘ K, or "/") --------------------------------
-  let palette = null;
-  function buildPalette() {
-    const wrap = document.createElement("div");
-    wrap.className = "palette";
-    wrap.hidden = true;
-    wrap.innerHTML =
-      '<div class="palette__backdrop" data-close></div>' +
-      '<div class="palette__box" role="dialog" aria-modal="true" aria-label="Search tools">' +
-        '<div class="palette__field">' + iconSvg("M11 4a7 7 0 100 14 7 7 0 000-14zm9 16l-4.3-4.3", 18) +
-          '<input type="search" class="palette__input" autocomplete="off" spellcheck="false">' +
-          '<kbd class="kbd">Esc</kbd></div>' +
-        '<div class="palette__list" role="listbox"></div>' +
-        '<div class="palette__foot"></div>' +
-      "</div>";
-    document.body.appendChild(wrap);
-    const input = wrap.querySelector(".palette__input");
-    const list = wrap.querySelector(".palette__list");
-    let sel = 0, items = [];
-    function draw() {
-      const q = input.value.trim();
-      items = TOOLS.filter(function (x) { return matches(x, q); });
-      if (q) items.sort(function (a, b) { return score(b, q) - score(a, q); });
-      if (sel >= items.length) sel = Math.max(0, items.length - 1);
-      list.innerHTML = items.length ? items.map(function (x, i) {
-        return '<a class="palette__item' + (i === sel ? " is-sel" : "") + '" role="option" href="' + prefix() + x.href +
-          '" data-hue="' + hueOf(x) + '"><span class="palette__icon">' + iconSvg(x.icon, 18) + "</span>" +
-          '<span class="palette__text"><b>' + esc(L(x, "title")) + "</b><small>" + esc(catName(x.cat)) + "</small></span></a>";
-      }).join("") : '<p class="palette__empty">' + esc(t("palette_empty", "No matching tool.")) + "</p>";
-      const cur = list.querySelector(".is-sel");
-      if (cur) cur.scrollIntoView({ block: "nearest" });
-    }
-    input.addEventListener("input", function () { sel = 0; draw(); });
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowDown") { sel = Math.min(items.length - 1, sel + 1); draw(); e.preventDefault(); }
-      else if (e.key === "ArrowUp") { sel = Math.max(0, sel - 1); draw(); e.preventDefault(); }
-      else if (e.key === "Enter" && items[sel]) { location.href = prefix() + items[sel].href; }
-      else if (e.key === "Escape") { close(); }
-    });
-    wrap.addEventListener("click", function (e) { if (e.target.hasAttribute("data-close")) close(); });
-    function open() {
-      input.placeholder = t("palette_ph", "Search tools…");
-      wrap.querySelector(".palette__foot").textContent = t("palette_hint", "↑↓ to move • Enter to open • Esc to close");
-      wrap.hidden = false;
-      document.documentElement.classList.add("no-scroll");
-      input.value = ""; sel = 0; draw();
-      setTimeout(function () { input.focus(); }, 0);
-    }
-    function close() {
-      wrap.hidden = true;
-      document.documentElement.classList.remove("no-scroll");
-    }
-    return { open: open, close: close, el: wrap };
-  }
-  function openPalette() {
-    if (!palette) palette = buildPalette();
-    palette.open();
-  }
-  function isTyping(el) {
-    return el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable);
-  }
-  document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) { e.preventDefault(); openPalette(); }
-    else if (e.key === "/" && !isTyping(document.activeElement)) {
-      const homeSearch = document.querySelector("[data-home-search]");
-      e.preventDefault();
-      if (homeSearch) homeSearch.focus(); else openPalette();
-    }
-  });
 
   // ---- Shared header (base.html) ----------------------------------------
   function loadSharedHeader() {
@@ -534,30 +437,43 @@
           const b = mount.querySelector(".brand-text");
           if (b) b.textContent = brand;
         }
+        // The header's backdrop-filter makes it the containing block for
+        // fixed children, so the drawer and its backdrop live on <body>.
+        ["menuBackdrop", "menuDropdown"].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (el) document.body.appendChild(el);
+        });
       })
       .catch(function () { /* keep whatever is in the page as fallback */ });
   }
+  // Main menu: a drawer that slides in from the start side (left in
+  // English, right in Arabic), over a dimmed backdrop.
   function wireMenu() {
     const btn = document.getElementById("menuBtn");
-    const dd = document.getElementById("menuDropdown");
-    if (btn && dd) {
-      const close = function () { dd.hidden = true; btn.setAttribute("aria-expanded", "false"); };
-      btn.addEventListener("click", function (e) {
-        e.stopPropagation();
-        dd.hidden = !dd.hidden;
-        btn.setAttribute("aria-expanded", String(!dd.hidden));
-      });
-      document.addEventListener("click", function (e) {
-        if (!dd.hidden && !dd.contains(e.target) && e.target !== btn) close();
-      });
-      document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
-    }
-    const search = document.getElementById("paletteBtn");
-    if (search) {
-      const kbd = search.querySelector("kbd");
-      if (kbd && /Mac|iPhone|iPad/.test(navigator.platform || "")) kbd.textContent = "⌘K";
-      search.addEventListener("click", openPalette);
-    }
+    const drawer = document.getElementById("menuDropdown");
+    const backdrop = document.getElementById("menuBackdrop");
+    const closeBtn = document.getElementById("menuClose");
+    if (!btn || !drawer) return;
+    const isOpen = function () { return drawer.classList.contains("is-open"); };
+    const setOpen = function (open) {
+      drawer.classList.toggle("is-open", open);
+      if (backdrop) backdrop.classList.toggle("is-open", open);
+      drawer.setAttribute("aria-hidden", String(!open));
+      drawer.inert = !open; // closed drawer is skipped by Tab and screen readers
+      btn.setAttribute("aria-expanded", String(open));
+      document.documentElement.classList.toggle("no-scroll", open);
+      if (open) {
+        const here = drawer.querySelector("a.is-here") || drawer.querySelector("a, button");
+        setTimeout(function () { if (here) here.focus({ preventScroll: true }); }, 50);
+      } else if (drawer.contains(document.activeElement)) {
+        btn.focus();
+      }
+    };
+    setOpen(false);
+    btn.addEventListener("click", function () { setOpen(!isOpen()); });
+    if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
+    if (backdrop) backdrop.addEventListener("click", function () { setOpen(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && isOpen()) setOpen(false); });
   }
 
   function init() {
@@ -593,7 +509,6 @@
       Object.keys(en || {}).forEach(function (k) { EXTRA_EN[k] = en[k]; });
     },
     // Re-translate a freshly rendered DOM subtree.
-    translate: function (root) { translateTree(root || document, currentLang()); },
-    openSearch: openPalette
+    translate: function (root) { translateTree(root || document, currentLang()); }
   };
 })();

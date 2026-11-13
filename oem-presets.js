@@ -267,7 +267,7 @@
     var wrap = el("div", { class: "oem-fit-list" });
     wrap.appendChild(el("div", { class: "oem-capture__title" }, oe.length ? "Factory (OE) fitments" : "Available fitments"));
     list.forEach(function (w, i) {
-      var staggered = w.rear && w.front && (w.rear.tire !== w.front.tire || w.rear.rim_width !== w.front.rim_width);
+      var staggered = isStaggeredFitment(w);
       var id = "oemFit" + i;
       var row = el("label", { class: "oem-fit" });
       row.innerHTML =
@@ -294,39 +294,63 @@
   }
 
   // ---- apply -----------------------------------------------------------
+  // A fitment is staggered when its rear corner differs from the front
+  function isStaggeredFitment(w) {
+    var fr = w && w.front, rr = w && w.rear;
+    if (!fr || !rr) return false;
+    return ["tire", "rim_diameter", "rim_width", "rim_offset"].some(function (k) {
+      return rr[k] != null && String(rr[k]) !== String(fr[k]);
+    });
+  }
+
+  // Fill one axle of the baseline ("base" = front, "base_r" = rear)
+  function fillAxle(prefix, f, changed) {
+    var tire = f.tire || f.tire_full;
+    if (ui.applyTire.checked && tire) {
+      // Normalize to the partial tire-field format (no rim suffix);
+      // the rim diameter goes into the wheel field instead.
+      var norm = (window.TMU && window.TMU.stripRimFromTireSize)
+        ? window.TMU.stripRimFromTireSize(tire)
+        : { size: String(tire).replace(/\s+/g, ""), rimIn: null };
+      setVal(prefix + "_tire", norm.size);
+      changed.push(prefix + "_tire");
+      // If the wheel isn't being applied (or has no diameter), still set the
+      // rim diameter from the tire size so the R-suffix stays correct.
+      if (norm.rimIn != null && !(ui.applyWheel.checked && f.rim_diameter != null)) {
+        setVal(prefix + "_rim_diam", norm.rimIn);
+        changed.push(prefix + "_rim_diam");
+      }
+    }
+    if (ui.applyWheel.checked) {
+      if (f.rim_diameter != null) { setVal(prefix + "_rim_diam", f.rim_diameter); changed.push(prefix + "_rim_diam"); }
+      if (f.rim_width != null) { setVal(prefix + "_rim_width", f.rim_width); changed.push(prefix + "_rim_width"); }
+      if (f.rim_offset != null) { setVal(prefix + "_offset", f.rim_offset); changed.push(prefix + "_offset"); }
+    }
+  }
+
   function applyToBaseline() {
     if (!selectedFitment) return;
     var f = selectedFitment.front || {};
     var changed = [];
+    var tmu = window.TMU || {};
 
-    if (ui.applyTire.checked && f.tire) {
-      // Normalize to the partial tire-field format (no rim suffix);
-      // the rim diameter goes into the wheel field instead.
-      var norm = (window.TMU && window.TMU.stripRimFromTireSize)
-        ? window.TMU.stripRimFromTireSize(f.tire)
-        : { size: String(f.tire).replace(/\s+/g, ""), rimIn: null };
-      setVal("base_tire", norm.size);
-      changed.push("base_tire");
-      // If the wheel isn't being applied (or has no diameter), still set the
-      // rim diameter from the tire size so the R-suffix stays correct.
-      if (norm.rimIn != null && !(ui.applyWheel.checked && f.rim_diameter != null)) {
-        setVal("base_rim_diam", norm.rimIn);
-        changed.push("base_rim_diam");
-      }
+    // A staggered factory fitment switches the calculator to front/rear
+    // mode (the user may decline if it would remove setups).
+    if (isStaggeredFitment(selectedFitment) && tmu.setStaggered && !(tmu.isStaggered && tmu.isStaggered())) {
+      tmu.setStaggered(true);
     }
-    if (ui.applyWheel.checked) {
-      if (f.rim_diameter != null) { setVal("base_rim_diam", f.rim_diameter); changed.push("base_rim_diam"); }
-      if (f.rim_width != null) { setVal("base_rim_width", f.rim_width); changed.push("base_rim_width"); }
-      if (f.rim_offset != null) { setVal("base_offset", f.rim_offset); changed.push("base_offset"); }
+    fillAxle("base", f, changed);
+    // Rear column: the factory rear corner, or the front one for a square fitment
+    if (tmu.isStaggered && tmu.isStaggered()) {
+      fillAxle("base_r", selectedFitment.rear || f, changed);
     }
 
-    // Fire input/change so any listeners react, then click Apply to recompute.
+    // Fire input/change so any listeners react, then recompute the baseline.
     changed.forEach(function (id) {
       var e = document.getElementById(id);
       if (e) { e.dispatchEvent(new Event("input", { bubbles: true })); e.dispatchEvent(new Event("change", { bubbles: true })); }
     });
-    var applyBtn = document.getElementById("saveBaseline");
-    if (applyBtn) applyBtn.click();
+    if (window.TMU && window.TMU.applyBaseline) window.TMU.applyBaseline();
 
     close();
   }

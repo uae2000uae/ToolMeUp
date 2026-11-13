@@ -77,6 +77,41 @@ h3 { margin: 12px 0 8px; color: var(--warn); font-weight: 600; }
   font: inherit; resize: vertical;
 }
 .hint { color: var(--muted); font-size: 12px; padding-top: 6px; }
+
+/* ---- Fitment options bar (top of page) ---- */
+.fit-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin: 0 0 14px; }
+.fit-opt {
+  display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px;
+  background: color-mix(in oklab, var(--panel) 92%, var(--fg) 8%);
+  transition: border-color .15s, background .15s;
+}
+.fit-opt:hover { border-color: color-mix(in oklab, var(--border) 50%, #4aa3ff 50%); }
+.fit-opt:has(input:checked) { border-color: #4aa3ff; background: color-mix(in oklab, var(--panel) 86%, #4aa3ff 14%); }
+.fit-opt input { margin-top: 3px; width: 18px; height: 18px; accent-color: #4aa3ff; flex: none; }
+.fit-opt__text { display: grid; gap: 2px; }
+.fit-opt__text small { color: var(--muted); font-size: 12px; }
+
+/* Spacer / width correction / bulge stay hidden until the user opts in */
+.adv-field { display: none; }
+body.fit-adv .adv-field { display: block; }
+
+/* Front/rear (staggered) columns */
+.fr-pair { display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; width: 100%; max-width: 200px; }
+.fr-pair > input, .fr-pair > .tire-wrap { flex: 1 1 auto; min-width: 0; }
+.fr-pair > .tire-wrap input { width: 100%; }
+body.fit-staggered .fr-pair { width: auto; max-width: none; margin-inline-start: auto; }
+.rear-only, .fr-head { display: none !important; }
+body.fit-staggered .rear-only { display: inline-flex !important; }
+body.fit-staggered .fr-head { display: flex !important; }
+.fr-head { justify-content: flex-end; gap: 6px; margin: -2px 0 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.fr-head span { width: 110px; text-align: center; }
+.fr-head span { color: var(--fg); }
+body.fit-staggered .fr-pair > input, body.fit-staggered .fr-pair > .tire-wrap { width: 110px; max-width: 110px; }
+body.fit-staggered .fr-pair .tire-wrap input { width: 100%; }
+body.fit-staggered .field label { flex-wrap: wrap; }
+.muted-note { color: var(--muted); }
+#addSetup:disabled { opacity: .5; cursor: not-allowed; }
 .hint-bold { color: var(--fg); font-size: 12px; }
 
 .actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; margin-bottom: 8px; }
@@ -128,10 +163,19 @@ button:disabled:hover { filter: none; }
 /* Main setups header row above the section tables (padding matches section border+padding) */
 .report-head-wrap { padding: 0 15px; margin-top: 10px; }
 .report-head-wrap .report-table { margin-top: 0; }
+.report-head-wrap .report-table th:not(:first-child) { text-align: center; }
 .report-col-sub { color: var(--muted); font-size: 12px; font-weight: 500; }
+/* Front/rear mode: group name centered over its Front/Rear columns */
+.report-table th.report-grp { text-align: center; padding-bottom: 0; }
+.report-axle { font-weight: 700; color: var(--fg); }
+/* Setup columns: gray shade, an empty gap (panel color) between column groups */
+.report-table .is-setup { background: color-mix(in oklab, var(--panel) 88%, #808080 12%); }
+.report-table .grp-start { border-inline-start: 4px solid var(--panel); }
+#comparison.is-staggered .report-table th:first-child, #comparison.is-staggered .report-table td:first-child { width: 26%; }
+#comparison.is-staggered .report-table { min-width: 720px; }
 .report-label { font-weight: 600; }
 .report-desc { color: var(--muted); font-size: 12px; font-weight: 400; max-width: 320px; }
-.report-value { font-weight: 600; text-align: right; }
+.report-value { font-weight: 400; text-align: right; }
 .val-good { color: #22c55e; }
 .val-warn { color: var(--warn); }
 .val-bad { color: #ef4444; }
@@ -161,17 +205,9 @@ html.compact { font-size: 87.5%; }
 .header-controls a { color: var(--muted); text-decoration: none; padding: 6px 8px; border-radius: 8px; font-weight: 500; }
 .header-controls a:hover { color: var(--fg); background: color-mix(in oklab, var(--fg) 8%, transparent); }
 
-/* Header kebab (three-dots) dropdown menu */
-.menu-wrap { position: relative; }
-.menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--fg); cursor: pointer; }
+/* Header menu (three-dots) button; the drawer itself is styled in ui.css */
+.menu-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--fg); cursor: pointer; }
 .menu-btn:hover { background: color-mix(in oklab, var(--fg) 8%, transparent); }
-.menu-dropdown { position: absolute; right: 0; top: calc(100% + 6px); min-width: 220px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 1001; }
-.menu-dropdown[hidden] { display: none; }
-.menu-dropdown a, .menu-dropdown .toggle { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-weight: 500; cursor: pointer; }
-.menu-dropdown a:hover, .menu-dropdown .toggle:hover { background: color-mix(in oklab, var(--fg) 8%, transparent); }
-.menu-dropdown .menu-icon { flex: 0 0 auto; color: var(--muted); }
-.menu-dropdown .toggle input { margin-left: auto; }
-.menu-sep { height: 1px; background: var(--border); margin: 4px 6px; }
 
 /* Layout utilities (replacing former inline styles) */
 .preset { margin: 8px 0; }

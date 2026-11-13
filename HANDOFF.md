@@ -201,7 +201,7 @@ The scope was set by the user (see `Expantion-ideas/` in the main checkout): **o
 | `tires.html` | Tire Size & Speedometer | Metric and flotation sizes; table plus to-scale side and front drawings; ±3% verdict; speedometer dial and table (km/h or mph) |
 
 ### Architecture (how to add the next tool)
-- **`shared.js`:** `TOOLS` and `CATEGORIES` are the single source of truth. The header menu (grouped), home cards and chips, the **Ctrl/⌘K quick-search palette**, breadcrumbs and "recently used" are all generated from them. To add a tool, add one entry (en + ar text, icon path, tags) and create the page.
+- **`shared.js`:** `TOOLS` and `CATEGORIES` are the single source of truth. The header menu (grouped), home cards and category chips, breadcrumbs and "recently used" are all generated from them. To add a tool, add one entry (en + ar text, icon path, tags) and create the page.
 - **Page template:** copy any new tool page (e.g. `units.html`). The page needs:
   - `<html data-i18n="full" data-tool="<id>">`;
   - `boot.js` in `<head>`, which applies theme and RTL before first paint;

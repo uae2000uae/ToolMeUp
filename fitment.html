@@ -20,8 +20,8 @@
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261112p">
-  <link rel="stylesheet" href="ui.css?v=20261112p">
+  <link rel="stylesheet" href="styles.css?v=20261113h">
+  <link rel="stylesheet" href="ui.css?v=20261113i">
 </head>
 <body>
   <!-- Shared top navigation: injected from base.html by shared.js -->
@@ -34,6 +34,16 @@
     </div>
 	  <br>
     <div id="sessionNameBar" class="session-name" hidden></div>
+    <div class="fit-options" role="group" aria-label="Calculator options">
+      <label class="fit-opt">
+        <input type="checkbox" id="opt_adv">
+        <span class="fit-opt__text"><b data-i18n="opt_adv_title">Spacer, width correction &amp; bulge</b><small data-i18n="opt_adv_desc">Hidden fields use the defaults: no spacer, 0% correction, 5% bulge.</small></span>
+      </label>
+      <label class="fit-opt">
+        <input type="checkbox" id="opt_staggered">
+        <span class="fit-opt__text"><b data-i18n="opt_stag_title">Different front &amp; rear sizes</b><small data-i18n="opt_stag_desc">Adds a rear column to every setup. Up to 2 setups in this mode.</small></span>
+      </label>
+    </div>
     <section id="base" class="panel">
       <h2>1) Baseline Setup</h2>
       <div class="preset preset-row">
@@ -64,7 +74,7 @@
             </label>
 			 <div class="hint" data-i18n="hint_offset">The distance (mm) from the wheel's mounting face to its centerline: a higher number tucks the wheel further inward, a lower or negative number pushes it outward.</div>
           </div>
-          <div class="field">
+          <div class="field adv-field">
             <label>Spacer
               <input id="base_spacer" type="number" step="1" placeholder="mm">
             </label>
@@ -75,11 +85,11 @@
           <h3>Tire</h3>
           <div class="field"><label>Tire size<span class="tire-wrap" ><input id="base_tire" placeholder="e.g., 235/45" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label>
 			 <div class="hint" data-i18n="hint_tire_size">The first number is the tire width in (mm); the second is  sidewall height as a (%) of that width. The R number is taken from your rim diameter.</div></div>
-          <div class="field"><label>Width correction (%)
+          <div class="field adv-field"><label>Width correction (%)
           <input id="base_correction" type="number" step="1" min="-20" max="20" placeholder="%"></label>
 			 <div class="hint" data-i18n="hint_correction">Some tire types run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
 		  </div>
-          <div class="field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label>
+          <div class="field adv-field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label>
 			 <div class="hint" data-i18n="hint_bulge">Sidewall bulge past the rim edge, shown in the drawing. 5% is typical.</div>
 		  </div>
         </div>
@@ -135,7 +145,7 @@
       <div id="setups"></div>
       <div class="actions">
         <button id="addSetup" type="button" class="green">+ Add Setup</button>
-        <button id="saveBaseline" type="button" class="primary">Apply</button>
+        <span id="setupLimit" class="small muted-note"></span>
       </div>
     </section>
 
@@ -194,8 +204,8 @@
     <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
   </footer>
 
-  <script src="shared.js?v=20261112p"></script>
-  <script src="app.js?v=20261112b"></script>
-  <script src="oem-presets.js?v=20260716a"></script>
+  <script src="shared.js?v=20261113i"></script>
+  <script src="app.js?v=20261113e"></script>
+  <script src="oem-presets.js?v=20261113a"></script>
 </body>
 </html>
