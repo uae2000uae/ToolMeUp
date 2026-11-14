@@ -692,6 +692,7 @@
       btn.setAttribute("aria-expanded", String(open));
       document.documentElement.classList.toggle("no-scroll", open);
       if (open) {
+        playFan(drawer.querySelector(".brand-fan"), 140); // fans open as the drawer slides in
         const here = drawer.querySelector("a.is-here") || drawer.querySelector("a, button");
         setTimeout(function () { if (here) here.focus({ preventScroll: true }); }, 50);
       } else if (drawer.contains(document.activeElement)) {
@@ -717,6 +718,8 @@
       if (lang === "ar") applyLang("ar");
       else { renderToolLinks(); renderHome(); renderCrumbs(); }
       document.documentElement.classList.add("is-ready");
+      // Home page: the header logo fans open as the page loads
+      if (document.querySelector("[data-home]")) playFan(document.querySelector(".app-header .brand-fan"), 120);
       document.dispatchEvent(new CustomEvent("toolmeup:headerready"));
     });
   }
@@ -812,6 +815,17 @@
     el.textContent = msg;
     toastHost.appendChild(el);
     setTimeout(function () { el.remove(); }, 2600);
+  }
+
+  // ---- Logo: play the fan-opening animation on an inline .brand-fan mark ----
+  // (CSS in ui.css; the global prefers-reduced-motion rule turns it off)
+  function playFan(svg, delay) {
+    if (!svg) return;
+    setTimeout(function () {
+      svg.classList.remove("is-opening");
+      void svg.getBoundingClientRect(); // restart the animation if it already ran
+      svg.classList.add("is-opening");
+    }, delay || 0);
   }
 
   // ---- Skip link: first stop for keyboard users, jumps past the header ----

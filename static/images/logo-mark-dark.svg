@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ToolMeUp">
+  <!-- ToolMeUp multi-tool fan: six blades, one per tool category. Generated; edit the generator, not this file. -->
+  <g transform="rotate(-82 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#fbbf24"/></g><g transform="rotate(-67 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#fb7185"/></g><g transform="rotate(-52 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#a78bfa"/></g><g transform="rotate(-37 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#818cf8"/></g><g transform="rotate(-22 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#60a5fa"/></g><g transform="rotate(-7 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#2dd4bf"/></g>
+  <circle cx="12" cy="52" r="6.5" fill="#e2e8f0" stroke="#475569" stroke-width="3"/>
+</svg>

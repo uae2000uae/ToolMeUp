@@ -897,3 +897,21 @@ html[lang="ar"] .fuel-car--b .card__title::before { content: "ب"; }
 .ucats > a.ulink svg:first-child { color: #d97706; }
 .ulink__go { position: absolute; top: 6px; inset-inline-end: 8px; opacity: .55; }
 html[dir="rtl"] .ulink__go { transform: scaleX(-1); }
+/* ---------------- Logo: multi-tool fan (inline SVG from base.html) ----------------
+   Six blades, one per tool category, pivoting on one hub. Colours are inline
+   for the light theme; dark mode swaps to lighter tints. .is-opening plays the
+   fan opening (home page load, menu drawer open); reduced motion skips it. */
+.brand-fan { width: 30px; height: 30px; overflow: visible; }
+.brand-fan .fan-blade { transform-box: view-box; transform-origin: 12px 52px; transform: rotate(var(--a)); }
+.brand-fan .fan-pivot { transform-box: view-box; transform-origin: 12px 52px; }
+html[data-theme="dark"] .brand-fan .b1 rect { fill: #fbbf24; }
+html[data-theme="dark"] .brand-fan .b2 rect { fill: #fb7185; }
+html[data-theme="dark"] .brand-fan .b3 rect { fill: #a78bfa; }
+html[data-theme="dark"] .brand-fan .b4 rect { fill: #818cf8; }
+html[data-theme="dark"] .brand-fan .b5 rect { fill: #60a5fa; }
+html[data-theme="dark"] .brand-fan .b6 rect { fill: #2dd4bf; }
+html[data-theme="dark"] .brand-fan .fan-pivot { fill: #e2e8f0; stroke: #475569; }
+@keyframes fan-open { from { transform: rotate(-7deg); } }
+@keyframes fan-hub { from { transform: scale(.4); } 60% { transform: scale(1.15); } }
+.brand-fan.is-opening .fan-blade { animation: fan-open .7s cubic-bezier(.2, .9, .25, 1.12) both; animation-delay: calc(var(--i) * 45ms); }
+.brand-fan.is-opening .fan-pivot { animation: fan-hub .45s ease-out both; }

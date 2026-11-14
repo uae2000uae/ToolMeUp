@@ -1,16 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="ToolMeUp">
-  <!-- ToolMeUp mark: a 2x2 grid of tool tiles (a collection of tools), one
-       tile per category colour family. Replaces the older wheel-fitment badge
-       in the header; that artwork is kept as logo.svg / logo.png. -->
-  <defs>
-    <linearGradient id="tmu-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#7c3aed"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="8" fill="url(#tmu-bg)"/>
-  <rect x="7" y="7" width="8" height="8" rx="2.2" fill="#fff"/>
-  <rect x="17" y="7" width="8" height="8" rx="2.2" fill="#fff" fill-opacity=".55"/>
-  <rect x="7" y="17" width="8" height="8" rx="2.2" fill="#fff" fill-opacity=".55"/>
-  <rect x="17" y="17" width="8" height="8" rx="4" fill="#fbbf24"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ToolMeUp">
+  <!-- ToolMeUp multi-tool fan: six blades, one per tool category. Generated; edit the generator, not this file. -->
+  <g transform="rotate(-82 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#d97706"/></g><g transform="rotate(-67 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#e11d48"/></g><g transform="rotate(-52 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#7c3aed"/></g><g transform="rotate(-37 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#4f46e5"/></g><g transform="rotate(-22 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#2563eb"/></g><g transform="rotate(-7 12 52)"><rect x="12" y="48.75" width="46" height="6.5" rx="3.25" fill="#0f766e"/></g>
+  <circle cx="12" cy="52" r="6.5" fill="#ffffff" stroke="#334155" stroke-width="3"/>
 </svg>
