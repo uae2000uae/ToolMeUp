@@ -879,8 +879,9 @@ html[dir="rtl"] .escale__tick { translate: 50% 0; }
 .fuel .inp-group select { max-width: 60%; font-size: 14px; }
 .fuel-switch { justify-content: center; min-height: 42px; }
 /* Cosmetic currency label between the price and its unit */
-.fuel .inp-group > .fuel-cur { flex: none !important; width: 4.4em !important; min-width: 0; margin-inline-start: -1px; border-radius: 0; text-align: center; text-transform: uppercase; font-weight: 600; padding-inline: 6px; }
-.fuel .inp-group > .fuel-cur:last-child { border-start-end-radius: var(--radius-sm); border-end-end-radius: var(--radius-sm); }
+.fuel .inp-group > .fuel-cur { flex: none !important; width: 4.4em !important; min-width: 0; text-align: center; text-transform: uppercase; font-weight: 600; padding-inline: 6px; }
+.fuel .inp-group > .fuel-cur + input { margin-inline-start: -1px; border-start-start-radius: 0; border-end-start-radius: 0; }
+.fuel .inp-group > .fuel-cur + input:not(:last-child) { border-radius: 0; }
 .fuel .inp-group > input:not(.fuel-cur) { min-width: 0; flex: 1; }
 .fuel .tbl td small, .fuel .stat__value small { font-size: 14px; font-weight: 600; color: var(--text-2); }
 @media (max-width: 760px) { .fuel-fields, .fuel-cars { grid-template-columns: 1fr; } }

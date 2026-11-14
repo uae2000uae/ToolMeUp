@@ -212,9 +212,10 @@
   const money = (n) => K.fmt(n, n >= 100 ? 0 : 2);
   // Currency is cosmetic only: a label shown after every cost, never used in maths.
   S.cur = typeof S.cur === "string" ? S.cur.slice(0, 3) : "";
-  const withCur = (s) => (S.cur.trim() ? s + " " + S.cur.trim() : s);
+  // Currency goes before the amount; the isolate marks keep "AED 52" in order inside Arabic text.
+  const withCur = (s) => (S.cur.trim() ? "⁦" + S.cur.trim() + " " + s + "⁩" : s);
   const moneyC = (n) => withCur(money(n));
-  const curHtml = (s) => TM.esc(s) + (S.cur.trim() ? " <small>" + TM.esc(S.cur.trim()) + "</small>" : "");
+  const curHtml = (s) => (S.cur.trim() ? "<small>" + TM.esc(S.cur.trim()) + "</small> " : "") + TM.esc(s);
   const plain = (s) => String(s).replace(/,/g, "");
 
   // ---- Rendering helpers ----
@@ -404,9 +405,9 @@
     ];
     const hasCost = Number.isFinite(A.cost) && Number.isFinite(B.cost);
     if (hasCost) {
-      rows.push([t("f_r_cost100", "Cost per 100 {d}", { d: d }), moneyC(per100(A)), moneyC(per100(B)), diff(per100(A), per100(B), moneyC)]);
-      rows.push([t("f_r_year", "Cost per year"), moneyC(A.cost), moneyC(B.cost), diff(A.cost, B.cost, moneyC)]);
-      rows.push([t("f_r_years", "Cost over {n} years", { n: years }), moneyC(A.cost * years), moneyC(B.cost * years), diff(A.cost * years, B.cost * years, moneyC)]);
+      rows.push([t("f_r_cost100", "Cost per 100 {d}", { d: d }), moneyC(per100(A)), moneyC(per100(B)), withCur(diff(per100(A), per100(B), money))]);
+      rows.push([t("f_r_year", "Cost per year"), moneyC(A.cost), moneyC(B.cost), withCur(diff(A.cost, B.cost, money))]);
+      rows.push([t("f_r_years", "Cost over {n} years", { n: years }), moneyC(A.cost * years), moneyC(B.cost * years), withCur(diff(A.cost * years, B.cost * years, money))]);
     }
     rows.push([t("f_r_co2", "CO₂ per year (kg)"), K.fmt(A.co2, 0), K.fmt(B.co2, 0), diff(A.co2, B.co2, (x) => K.fmt(x, 0))]);
     body.innerHTML = rows.map((r) => "<tr><th scope=\"row\">" + TM.esc(r[0]) + "</th>" + r.slice(1).map((c) => '<td class="num" dir="ltr">' + TM.esc(c) + "</td>").join("") + "</tr>").join("");

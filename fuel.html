@@ -18,7 +18,7 @@
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css?v=20261114r">
-  <link rel="stylesheet" href="ui.css?v=20261114z">
+  <link rel="stylesheet" href="ui.css?v=20261115a">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"Fuel & Energy Consumption Converter","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Convert L/100km, mpg, km/L, kWh/100km, MPGe and CO2 g/km for petrol, diesel, E85, LPG, CNG, hydrogen and electric cars; calculate fill-up consumption, trip cost and compare two cars."}
   </script>
@@ -100,7 +100,7 @@
             <div class="inp-group"><input id="fl_amt" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="fl_au" class="inp" aria-label="Amount unit"></select></div>
           </label>
           <label class="f"><span data-t="f_paid">Amount paid (optional)</span>
-            <div class="inp-group"><input id="fl_paid" class="inp" type="text" inputmode="decimal" autocomplete="off"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"></div>
+            <div class="inp-group"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><input id="fl_paid" class="inp" type="text" inputmode="decimal" autocomplete="off"></div>
           </label>
         </div>
       </div>
@@ -121,7 +121,7 @@
             <div class="inp-group"><input id="tr_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_u" class="inp" aria-label="Consumption unit"></select></div>
           </label>
           <label class="f"><span data-t="f_price">Price</span>
-            <div class="inp-group"><input id="tr_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><select id="tr_pu" class="inp" aria-label="Price unit"></select></div>
+            <div class="inp-group"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><input id="tr_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_pu" class="inp" aria-label="Price unit"></select></div>
           </label>
           <label class="f"><span data-t="f_people">People sharing the cost</span>
             <input id="tr_people" class="inp" type="number" min="1" step="1" inputmode="numeric">
@@ -147,7 +147,7 @@
               <div class="inp-group"><input id="ca_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="ca_u" class="inp" aria-label="Consumption unit"></select></div>
             </label>
             <label class="f"><span data-t="f_price">Price</span>
-              <div class="inp-group"><input id="ca_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><select id="ca_pu" class="inp" aria-label="Price unit"></select></div>
+              <div class="inp-group"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><input id="ca_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="ca_pu" class="inp" aria-label="Price unit"></select></div>
             </label>
           </div>
         </div>
@@ -159,7 +159,7 @@
               <div class="inp-group"><input id="cb_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="cb_u" class="inp" aria-label="Consumption unit"></select></div>
             </label>
             <label class="f"><span data-t="f_price">Price</span>
-              <div class="inp-group"><input id="cb_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><select id="cb_pu" class="inp" aria-label="Price unit"></select></div>
+              <div class="inp-group"><input class="inp fuel-cur" type="text" data-cur maxlength="3" autocomplete="off" spellcheck="false" dir="ltr" placeholder="$€£" aria-label="Currency (optional, 3 letters)" data-t-aria="f_cur" title="Currency (optional, 3 letters)" data-t-title="f_cur"><input id="cb_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="cb_pu" class="inp" aria-label="Price unit"></select></div>
             </label>
           </div>
         </div>
@@ -199,6 +199,6 @@
 
   <script src="shared.js?v=20261114x"></script>
   <script src="kit.js?v=20261114t"></script>
-  <script src="fuel.js?v=20261114x"></script>
+  <script src="fuel.js?v=20261115a"></script>
 </body>
 </html>
