@@ -29,3 +29,6 @@ static/images/wheels
 **/*.ai
 **/*.tif
 **/*.psd
+
+# Firebase rules: pasted into the console, never served
+firestore.rules

@@ -4,7 +4,7 @@
   on every page. The tool links inside the menu are generated from the
   TOOLS list in shared.js — don't add them here.
   Per-page brand text comes from the header's data-brand attribute.
-  Layout: [menu][brand] ……… [theme][language]. The menu is a drawer that
+  Layout: [menu][brand] ……… [account][theme][language]. The menu is a drawer that
   slides in from the start side (left; right in Arabic). shared.js moves
   the drawer and its backdrop to <body> so they cover the whole page.
 -->
@@ -18,6 +18,8 @@
   </a>
 </div>
 <div class="header-controls quick-settings">
+  <!-- Account (Google sign-in + sync). Hidden until account.js is configured. -->
+  <button id="accountBtn" class="quick-btn account-btn" type="button" aria-haspopup="dialog" aria-label="Account" hidden></button>
   <!-- Quick settings: the hidden checkboxes keep their ids (#themeToggle,
        #langToggle) so existing page scripts keep working. -->
   <label class="quick-btn" title="Dark mode" data-t-title="nav_dark">

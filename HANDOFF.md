@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-14 · live commit `4a9a812` · Cloud Run revision `toolmeup-00037`_
 
-A **static multi-page website** of free browser tools. Everything runs in the visitor's browser; there's no backend code apart from one nginx proxy. It is served by **nginx on Google Cloud Run**.
+A **static multi-page website** of free browser tools. Everything runs in the visitor's browser; there's no backend code apart from one nginx proxy. It is served by **nginx on Google Cloud Run**. Optional **Google sign-in** (Firebase Auth + Firestore, called straight from the browser) syncs each user's saved tool data; see §8.
 
 Scope rule from the owner: **only features that run in the browser, with no extra hosting cost.**
 
@@ -73,7 +73,7 @@ Open http://localhost:8123/. The Wheel-Size OEM presets on the fitment page won'
 - **Cache versions.** Assets loaded with `?v=` are cached for one year (`immutable`), and HTML is `no-cache`. When you change a JS or CSS file, bump its `?v=` in **every** HTML page that loads it (one search-and-replace). `ui.css`, `styles.css`, `shared.js` and `kit.js` are loaded by all tool pages.
 - **No CDNs for new tools.** Libraries live in `vendor/` (qrcode-generator 1.4.4, pdf-lib 1.17.1, JSZip 3.10.1; licenses in `vendor/LICENSES.txt`) and load with `?v=1`. Keep the CSP strict.
 - **i18n.** Static text uses `data-t="key"`; placeholders, titles and aria labels use `data-t-ph`, `data-t-title` and `data-t-aria`. Each page registers its Arabic strings with `ToolMeUp.addStrings({...})`, and dynamic text uses `ToolMeUp.t(key, englishFallback, vars)`. Numbers always use Western digits. `fitment.html` and `wget.html` keep the older "hints only" Arabic mode.
-- **Browser storage.** Use `Kit.save` / `Kit.load` (localStorage under the `toolmeup:` prefix, errors swallowed). Nothing is sent to a server.
+- **Browser storage.** Use `Kit.save` / `Kit.load` (localStorage under the `toolmeup:` prefix, errors swallowed). Signed-in users get every `toolmeup:*`, `toolmeup_*` and `tmu_*` key synced to their account automatically (§8). Keys under `toolmeup:tab:`, `toolmeup:__*` and `toolmeup:inputs:devtools` never leave the device; add to `NEVER` in `account.js` for anything else that must stay local.
 - **DualShock edits** go in the `Dualshock-tool/` sources. Production serves the gulp bundle built inside the Docker image (`npm run build:prod` in that folder to preview it; output in `dist/`).
 - **Custom domain:** set the Cloud Run env var `ALLOWED_REFERER_HOST` (e.g. `toolmeup.com`), or OEM presets return 403 on that domain. Also update `sitemap.xml` and `robots.txt`, which use the run.app URL.
 
@@ -161,3 +161,30 @@ Kept for comparison. The code and transfer numbers improved after gzip and bundl
 - Production timing (one curl sample each): `/` 1.11 s (cold start), `/fitment.html` 0.40 s, `Rim2.svg` 3.89 s for 8.8 MB.
 - Container verification (Cloud Build `6db69935`): the image builds, `nginx -t` passes, and the web root is 44.9 MB. **Smoke tests: 47/47 passed** (status codes, gzip, CSP, cache headers, proxy allow-list, Referer check and 429 rate limit).
 - **Method:** Node `zlib` for sizes; `python -m http.server` + the Chromium Performance API for page metrics; `curl -w` for production.
+
+---
+
+## 8. Accounts: Google sign-in + cloud sync
+
+**Files:** `account.js` (all logic and UI, injected by `shared.js` after the header loads; bump `ACCOUNT_V` in `shared.js` when it changes), `vendor/firebase-13.3.0/` (self-hosted Firebase SDK: app, auth, firestore-lite), `firestore.rules`, the `#accountBtn` button in `base.html`, and the `.acct-*` styles in `ui.css`.
+
+**Off until configured.** While `FIREBASE_CONFIG` in `account.js` is `null`, the button stays hidden and nothing extra loads.
+
+**How it works**
+- Sign-in: Firebase Auth, Google provider, popup. The SDK (~108 KB gzipped) loads only when someone opens the account dialog, or on every page for a remembered session (`toolmeup:__auth`).
+- Data: `users/{uid}` holds the profile (name, email, photo, created, lastSeen) and `rev` (key → last-write ms). `users/{uid}/data/{key}` holds one localStorage value per document (`k`, `v`, `t`). Values over 900 KB are skipped and shown as "too large" in the dialog.
+- Sync: on page load it reads 1 profile doc and then fetches only the keys whose `rev` differs from this device's copy (`toolmeup:__sync`). Local changes are pushed every 15 s and on tab hide, as one batch per change. If the same key changed both places (e.g. the first sign-in on a device that already has data), lists such as histories and sessions are merged, and anything else takes the cloud copy. If newer data was pulled, the page reloads once.
+- Dialog: profile, sync status, a "Saved in your account" list per tool with last-updated times, Sync now, Sign out (asks whether to wipe this browser's copy), and Delete my data (deletes all Firestore docs for the user).
+
+**Live setup (2026-11-14):** Firebase project **`toolmeup-accounts`** (separate GCP project, **no billing account → Spark plan, hard free caps, cannot bill**). Firestore `(default)` in `us-central1`, rules from `firestore.rules` released, web app "ToolMeUp web". Its config is in `account.js`. To update rules: paste `firestore.rules` into Firebase console → Firestore → Rules → Publish.
+
+**One-time setup** (how it was done / for a new project):
+1. Create a Firebase project. Recommended: a **separate project on the free Spark plan**, so usage has hard caps and can never bill. If you add Firebase to the existing `toolmeup` GCP project instead, it inherits that project's billing (Blaze): the free quotas still apply, but overage would bill.
+2. Authentication → Sign-in method → enable **Google**. Authentication → Settings → Authorized domains: add `toolmeup-qdyz5ldcyq-uc.a.run.app` (and any custom domain). `localhost` is there by default.
+3. Firestore Database → Create database (production mode, a US region such as `us-central1`). Rules tab → paste `firestore.rules` → Publish.
+4. Project settings → Your apps → add a **Web app** → copy the `firebaseConfig` object into `FIREBASE_CONFIG` in `account.js`, bump `ACCOUNT_V` in `shared.js`, and deploy.
+5. Optional: in Google Cloud console → APIs & Services → Credentials, restrict the auto-created browser API key to your domains (HTTP referrers).
+
+**Cost (free tier, per day):** 50k Firestore reads, 20k writes, 20k deletes, 1 GiB stored, 10 GiB/month egress. Google sign-in on Firebase Auth is free (the paid Identity Platform upgrade isn't needed). A signed-in page view costs about 1 read; each changed setting about 2 writes.
+
+**CSP:** `nginx/security-headers.conf` allows `https://apis.google.com` (script, loaded by the auth SDK), `frame-src https://*.firebaseapp.com` (auth iframe/popup handler) and `img-src https://*.googleusercontent.com` (profile photos). `frame-src` is pinned to `toolmeup-accounts.firebaseapp.com`; change it if the project changes. Don't click "Upgrade to Identity Platform" in the console: it requires billing.

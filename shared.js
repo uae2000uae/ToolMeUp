@@ -391,13 +391,13 @@
     nav_dark: "الوضع الداكن",
     nav_menu: "القائمة",
     nav_close: "إغلاق القائمة",
-    home_eyebrow: "خصوصية تامة • بلا تسجيل • بلا تتبّع",
+    home_eyebrow: "خصوصية تامة • التسجيل اختياري • بلا تتبّع",
     home_title: "أدوات مجانية <span class=\"grad\">تعمل في متصفحك</span>",
     home_lead: "مجموعة متنامية من الأدوات المفيدة. كل شيء يعمل على جهازك — ملفاتك وبياناتك لا تغادره أبداً.",
     promise1_t: "تعمل على جهازك",
     promise1: "تتم معالجة الملفات داخل متصفحك، ولا يُرفع أي شيء إلى خادم.",
-    promise2_t: "بلا حساب وبلا تتبّع",
-    promise2: "لا تسجيل ولا إعلانات ولا تحليلات. الإعدادات تُحفظ في متصفحك فقط.",
+    promise2_t: "حساب اختياري وبلا تتبّع",
+    promise2: "لا إعلانات ولا تحليلات. تبقى بياناتك المحفوظة في هذا المتصفح ما لم تسجّل الدخول بحساب Google لمزامنتها بين أجهزتك.",
     promise3_t: "English و العربية",
     promise3: "بدّل اللغة والوضع الداكن من القائمة. الأدوات تدعم الكتابة من اليمين إلى اليسار بالكامل.",
     home_all: "الكل",
@@ -706,6 +706,17 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && isOpen()) setOpen(false); });
   }
 
+  // ---- Account: Google sign-in + cloud sync (account.js, loaded after the
+  // header so its button exists). Bump ACCOUNT_V when account.js changes.
+  const ACCOUNT_V = "20261114c";
+  function loadAccount() {
+    if (document.querySelector("script[data-account]")) return;
+    const s = document.createElement("script");
+    s.src = prefix() + "account.js?v=" + ACCOUNT_V;
+    s.setAttribute("data-account", "");
+    document.body.appendChild(s);
+  }
+
   function init() {
     addSkipLink();
     loadSharedHeader().then(function () {
@@ -721,6 +732,7 @@
       // Home page: the header logo fans open as the page loads
       if (document.querySelector("[data-home]")) playFan(document.querySelector(".app-header .brand-fan"), 120);
       document.dispatchEvent(new CustomEvent("toolmeup:headerready"));
+      loadAccount();
     });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

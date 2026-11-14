@@ -13,6 +13,12 @@ JSZip 3.10.1 — vendor/jszip-3.10.1.min.js
   António Afonso. Dual licensed MIT or GPLv3; used here under the MIT License.
   https://github.com/Stuk/jszip
 
+Firebase JS SDK 13.3.0 (app, auth, firestore-lite) — vendor/firebase-13.3.0/
+  Copyright Google LLC. Apache License 2.0.
+  https://github.com/firebase/firebase-js-sdk
+  Taken from the official gstatic ES-module builds; the only edit is that the
+  import of firebase-app.js points at the local copy (./firebase-app.js?v=1).
+
 MIT License text: https://opensource.org/license/mit
 
 Inter (Latin subset, variable) — static/fonts/inter-latin.woff2

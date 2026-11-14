@@ -1,0 +1,35 @@
+rules_version = '2';
+// ToolMeUp: Firestore security rules (paste into Firebase console →
+// Firestore → Rules, or deploy with `firebase deploy --only firestore:rules`).
+// Each signed-in user can read and write only their own profile and data.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // users/{uid}: name, email, photo, created, lastSeen, rev (map of key -> ms)
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'email', 'photo', 'created', 'lastSeen', 'rev'])
+        && (!('rev' in request.resource.data) || request.resource.data.rev is map);
+
+      // users/{uid}/data/{key}: one saved localStorage entry { k, v, t }
+      match /data/{key} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['k', 'v', 't'])
+          && request.resource.data.k is string
+          && request.resource.data.v is string
+          && request.resource.data.v.size() <= 1000000
+          && request.resource.data.t is int;
+      }
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
