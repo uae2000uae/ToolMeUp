@@ -109,7 +109,7 @@ server {
     }
 
     # Rim artwork folder: same JSON listing, so the fitment app knows the full
-    # RimN.svg set and can preload all of them up front (see preloadRims).
+    # Rim-NN.png set and can preload all of them up front (see preloadRims).
     location = /static/images/rims/ {
         autoindex on;
         autoindex_format json;

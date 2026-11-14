@@ -127,7 +127,7 @@ Open http://localhost:8123/. The Wheel-Size OEM presets on the fitment page won'
 
 | Priority | Item | Notes |
 |---|---|---|
-| P0 | **Shrink the rim/brake artwork** | Still ~41 MB on the fitment page (Break-disk 11 MB, Rim2 8.5 MB). These are Illustrator exports with embedded bitmaps. Export WebP/AVIF at ~1024 px, or `svgo --multipass` and strip the embedded PNG: about 1–2 MB in total. Keep the master files outside `static/` |
+| P0 | **Shrink the brake artwork** | The rims are done: `Rim-01.png` … `Rim-07.png` (2.2 MB in total) replaced the 28 MB of `RimN.svg` files. `Break-disk.svg` is still 11 MB: an Illustrator export with an embedded bitmap. Export it as PNG/WebP at ~1024 px. Keep the master files outside `static/` |
 | P1 | Real-device testing | QR landscape layout and scanning, very large PDFs and images, and a real controller over WebHID haven't been tested on hardware |
 | P2 | DualShock dev toolchain | 16 `npm audit` findings remain (no critical); they need breaking upgrades. Build-only, so users aren't exposed |
 | P2 | Cold starts | `/` took ~1.1 s on a first hit. `--min-instances=1` fixes it for a few $/month; it's skipped because of the no-extra-cost rule |

@@ -56,11 +56,12 @@
   hubImg.onerror = function () { hubImgLoaded = false; };
   hubImg.src = HUB_IMG_SRC;
 
-  // Ask the server for a directory listing and return the .svg file names in
-  // it. Works with the nginx autoindex JSON used in production (see
+  // Ask the server for a directory listing and return the file names in it
+  // with the given extension (.svg unless told otherwise). Works with the nginx autoindex JSON used in production (see
   // default.conf.template) and with the HTML index simple dev servers return.
   // Resolves to [] when no listing is available (e.g. file://).
-  function listSvgDir(dir) {
+  function listSvgDir(dir, ext) {
+    const extRe = new RegExp('\\.' +(ext || 'svg') + '$', 'i');
     if (typeof fetch !== 'function') return Promise.resolve([]);
     return fetch(dir)
       .then(res => {
@@ -73,20 +74,23 @@
         if (isJson) {
           names = JSON.parse(txt).filter(e => e.type === 'file').map(e => e.name);
         } else {
-          const re = /href="([^"?#]+\.svg)"/gi;
+          const re = /href="([^"?#]+)"/gi;
           let m;
           while ((m = re.exec(txt))) names.push(decodeURIComponent(m[1].split('/').pop()));
         }
-        return names.filter(n => /\.svg$/i.test(n));
+        return names.filter(n => extRe.test(n));
       })
       .catch(() => []);
   }
 
   // Rim face drawings for the side view, loaded from static/images/rims/
-  // (Rim0.svg, Rim1.svg, ...). Clicking a wheel in the side view cycles that
-  // wheel's rim to the next file, wrapping back to Rim0 after the last one.
-  // New RimN.svg files dropped into the folder are picked up automatically.
+  // (Rim-01.png, Rim-02.png, ...: square PNGs, transparent outside the rim).
+  // Clicking a wheel in the side view cycles that wheel's rim to the next
+  // file, wrapping back to the first after the last one. New Rim-NN.png files
+  // dropped into the folder are picked up automatically. Rim index i (from 0)
+  // is file number i + 1; "Rim0" in the comments below means index 0.
   const RIM_DIR = 'static/images/rims/';
+  const rimFile = (i) => 'Rim-' + String(i + 1).padStart(2, '0') + '.png';
   const rimCache = {};    // index -> {img, loaded, failed, fx, fy, cxF, cyF}
   const rimSel = [0, 0];  // current rim index per wheel: [base, setup]
 
@@ -121,7 +125,7 @@
         return;
       }
     } catch (_) { /* tainted canvas (file://) or draw error: use defaults */ }
-    entry.fx = entry.fy = 0.983; // Rim0.svg-like default (353.81/360)
+    entry.fx = entry.fy = 1; // the rim PNGs fill their square
     entry.cxF = entry.cyF = 0.5;
   }
 
@@ -181,7 +185,7 @@
       }
       if (changed) renderSoon();
     };
-    e.img.src = RIM_DIR + 'Rim' + i + '.svg';
+    e.img.src = RIM_DIR + rimFile(i);
     return e;
   }
   getRimEntry(0); // the default rim is always needed first
@@ -197,19 +201,21 @@
   // one at a time: Rim1 (the next click) finishes first instead of all rims
   // sharing the bandwidth and arriving together at the end. A rim the user
   // clicks to before its turn is requested immediately by getRimEntry.
-  // The directory listing gives the exact RimN.svg set; without one
+  // The directory listing gives the exact Rim-NN.png set; without one
   // (file://, no autoindex) we walk upward and stop at the first miss.
   // PRELOAD_PROBE_MAX caps that walk so a gap can't spin forever.
   const PRELOAD_PROBE_MAX = 40;
+  let rimLast = null; // highest rim index in the listing, once known
   function preloadRims() {
-    listSvgDir(RIM_DIR).then(names => {
+    listSvgDir(RIM_DIR, 'png').then(names => {
       const idx = [];
       names.forEach(n => {
-        const m = /^Rim(\d+)\.svg$/i.exec(n);
-        if (m) idx.push(parseInt(m[1], 10));
+        const m = /^Rim-(\d+)\.png$/i.exec(n);
+        if (m && parseInt(m[1], 10) >= 1) idx.push(parseInt(m[1], 10) - 1);
       });
       if (idx.length) {
         const queue = idx.sort((a, b) => a - b);
+        rimLast = queue[queue.length - 1];
         (function next() {
           if (queue.length) whenRimSettled(queue.shift()).then(next);
         })();
@@ -246,13 +252,24 @@
   brakeImg.onerror = function () { brakeImgLoaded = false; };
   brakeImg.src = BRAKE_IMG_SRC;
 
+  // Tire photo for the side view (tires/1.png: a low-profile tire filling its
+  // square). One file serves every sidewall height: see drawTire.
+  const TIRE_IMG_HOLE = 0.78;  // hole radius as a fraction of the outer radius
+  const TIRE_IMG_TREAD = 0.9;  // the tread band starts here (same fraction)
+  const tireImg = new Image();
+  let tireImgLoaded = false;
+  tireImg.decoding = 'async';
+  tireImg.onload = function () { tireImgLoaded = true; renderSoon(); };
+  tireImg.src = 'static/images/tires/1.png';
+
   // Advance a wheel to its next rim. Repeated clicks while waiting step on
   // from the pending rim, so clicks are never lost. The current drawing
   // stays up until the target is ready (see settlePending).
   function cycleRim(slot) {
     const from = rimPending[slot] != null ? rimPending[slot] : rimSel[slot];
     let next = from + 1;
-    if (getRimEntry(next).failed) next = 0; // wrap immediately if known missing
+    // wrap past the last listed rim, or immediately if known missing
+    if ((rimLast != null && next > rimLast) || getRimEntry(next).failed) next = 0;
     const e = getRimEntry(next);
     if (e.ready) {
       rimSel[slot] = next; rimPending[slot] = null;
@@ -276,11 +293,26 @@
   //     i.e. the circle is the fender-to-wheel gap boundary.
   // The w/h/cx/cy/r values below are the same numbers hardcoded as a
   // fallback for when the SVG source can't be fetched (e.g. file://).
+  //
+  // FULL-BODY files (whole car, facing left) carry TWO opening circles: the
+  // left one is the front wheel opening, the right one the rear. The same
+  // image serves both views: it is pinned and scaled by the circle of the
+  // axle on show (the rear one when a "· Rear" tab is selected in front/rear
+  // mode), and only the section around that opening is drawn (see
+  // FULL_BODY_SPAN), fading out towards the middle of the car. A file with a
+  // single circle is drawn whole, the same for both axles.
   const FENDER_DIR = 'static/images/fenders/';
+  const FULL_BODY_SPAN = 2.3; // section kept past the wheel center, in opening radii
+  const FULL_BODY_FADE = 0.7; // width of the fade-out at the cut edge, in opening radii
   const FENDERS = [
-    { file: 'sedan.svg', w: 845.8, h: 736.3, cx: 423.1, cy: 368.4, r: 199.2 },
-    { file: 'sport.svg', w: 510.4, h: 429.3, cx: 255.7, cy: 215.6, r: 111.6 },
-    { file: 'SUV.svg', w: 1001.9, h: 1237.8, cx: 500.9, cy: 619.3, r: 253.9 },
+    { file: 'sedan-body.svg', w: 288, h: 93.83, cx: 51.53, cy: 67.35, r: 22.42,
+      rearGeom: { w: 288, h: 93.83, cx: 221.77, cy: 67.41, r: 22.42 } },
+    { file: 'sport-body.svg', w: 1024, h: 329.6, cx: 207, cy: 234, r: 87,
+      rearGeom: { w: 1024, h: 329.6, cx: 801.5, cy: 234.1, r: 87 } },
+    { file: 'SUV-body.svg', w: 633, h: 275, cx: 103.3, cy: 194.6, r: 58.2,
+      rearGeom: { w: 633, h: 275, cx: 491.6, cy: 198.6, r: 61.1 } },
+    { file: 'hyper-body.svg', w: 1141, h: 353.7, cx: 218, cy: 239, r: 100,
+      rearGeom: { w: 1141, h: 353.7, cx: 893.3, cy: 240, r: 104.4 } },
   ];
   let fenderSel = 0; // current fender index (shared by both wheels)
 
@@ -314,17 +346,32 @@
     if (vb.length !== 4 || !vb.every(isFinite) || vb[2] <= 0 || vb[3] <= 0) return;
     const midX = vb[0] + vb[2] / 2, midY = vb[1] + vb[3] / 2;
     let best = null, bestScore = Infinity;
+    const all = [];
     doc.querySelectorAll('circle').forEach(el => {
       const cx = parseFloat(el.getAttribute('cx'));
       const cy = parseFloat(el.getAttribute('cy'));
       const r = parseFloat(el.getAttribute('r'));
       if (!isFinite(cx) || !isFinite(cy) || !(r > 0)) return;
+      all.push({ cx, cy, r });
       const score = Math.hypot(cx - midX, cy - midY) - r * 1e-3; // nearest to middle, bigger r wins ties
       if (score < bestScore) { bestScore = score; best = { cx, cy, r }; }
     });
     if (!best) return;
     // cx/cy relative to the image top-left (viewBox min-x/min-y)
-    f.geom = { w: vb[2], h: vb[3], cx: best.cx - vb[0], cy: best.cy - vb[1], r: best.r };
+    const toGeom = (c) => ({ w: vb[2], h: vb[3], cx: c.cx - vb[0], cy: c.cy - vb[1], r: c.r });
+    // Full-body image: two similar-sized opening circles side by side
+    // (small decorative circles are ignored). Left = front, right = rear.
+    const maxR = Math.max(...all.map(c => c.r));
+    const openings = all.filter(c => c.r >= maxR * 0.6).sort((a, b) => a.cx - b.cx);
+    // Leftmost and rightmost are used, so a duplicated circle is harmless
+    // (of two at the same spot, the one later in the file wins).
+    const first = openings[0], last = openings[openings.length - 1];
+    if (openings.length >= 2 && last.cx - first.cx > 2 * maxR) {
+      f.geom = toGeom(first);
+      f.rearGeom = toGeom(last);
+      return;
+    }
+    f.geom = toGeom(best);
   }
 
   // Download each fender SVG once: the text gives the geometry, and the
@@ -927,7 +974,7 @@
   let sideViewHits = []; // clickable wheel circles from the last side-view draw
   let sideViewFenderHits = []; // clickable fender rects from the last side-view draw
 
-  function drawSideView(base, selected, unitMode) {
+  function drawSideView(base, selected, unitMode, axle) {
     const c = $("#sideView");
     const ctx = prepareCanvas(c);
     const W = CANVAS_W, H = CANVAS_H;
@@ -958,7 +1005,9 @@
     if (fenderChecked && !fenderEntry) retryFenderImgs(); // self-heal a failed image load
     const showFender = fenderChecked && fenderEntry && !isNaN(archClearMm);
     if (showFender) scale *= 0.5;
-    const baseX = showFender ? W * 0.25 + 30 : W * 0.33; // +20px inward +10px right in fender view
+    // +20px inward +10px right in fender view; a rear view moves the baseline
+    // (blue) wheel 40px left so its tail clears the setup car beside it
+    const baseX = showFender ? W * 0.25 + 30 - (axle === 'rear' ? 40 : 0) : W * 0.33;
     const setupX = showFender ? W * 0.75 + 10 : W * 0.66;
 
     // Car fender background: the wheel-opening circle read from the SVG is
@@ -970,12 +1019,27 @@
     if (showFender) {
       const archRadiusMm = base.tireGeom.overallDiaMm / 2 + archClearMm;
       const f = fenderEntry;
-      const g = f.geom || f; // circle geometry parsed from the SVG, else hardcoded fallback
+      const fullBody = !!f.rearGeom;
+      const rearView = axle === 'rear';
+      // circle geometry parsed from the SVG, else hardcoded fallback; a
+      // full-body image uses the circle of the axle on show
+      const g = (fullBody && rearView) ? f.rearGeom : (f.geom || f);
       const k = (archRadiusMm * scale) / g.r; // canvas px per artwork unit (uniform: no stretching)
       const dw = g.w * k, dh = g.h * k;
+      // Full body: keep only the section around the opening (artwork units),
+      // from the car's nose (front view) or to its tail (rear view).
+      const sec = !fullBody ? null : rearView
+        ? { x0: Math.max(0, g.cx - FULL_BODY_SPAN * g.r), x1: g.w }
+        : { x0: 0, x1: Math.min(g.w, g.cx + FULL_BODY_SPAN * g.r) };
       const drawFender = (set, cx) => {
         const cy = H - margin - (set.tireGeom.overallDiaMm / 2) * scale; // wheel center
         const dx = cx - g.cx * k, dy = cy - g.cy * k; // circle center pinned to wheel center
+        if (sec) {
+          const sx = dx + sec.x0 * k, sw = (sec.x1 - sec.x0) * k;
+          sideViewFenderHits.push({ x: sx, y: dy, w: sw, h: dh });
+          try { drawFenderSection(ctx, f.img, dx, dy, dw, dh, sx, sw, FULL_BODY_FADE * g.r * k, rearView); } catch (_) { /* ignore draw errors */ }
+          return;
+        }
         sideViewFenderHits.push({ x: dx, y: dy, w: dw, h: dh }); // click target for fender cycling
         ctx.save();
         ctx.imageSmoothingEnabled = true;
@@ -984,8 +1048,17 @@
         } catch (_) { /* ignore draw errors */ }
         ctx.restore();
       };
-      drawFender(base, baseX);
-      drawFender(selected, setupX);
+      // The two drawings overlap a little. Front art keeps its detail
+      // (bumper, lights) on the left, rear art on the right, so a rear view
+      // paints the setup first and the baseline over it: the overlap then
+      // hides a door, never the baseline's tail lights.
+      if (axle === 'rear') {
+        drawFender(selected, setupX);
+        drawFender(base, baseX);
+      } else {
+        drawFender(base, baseX);
+        drawFender(selected, setupX);
+      }
     }
 
     // Vector wheel side profile (line-art style: treaded tire + spoked rim)
@@ -1006,8 +1079,25 @@
       // Tread hatch ticks around the outer edge (no inner circle closing
       // them off — the ticks read as tread blocks on their own). Always gray,
       // on both wheels: only the outer circle carries the base/setup color.
+      // With the tire photo loaded, it replaces the ticks: one copy at full
+      // size gives the tread and outer sidewall. A taller sidewall than the
+      // photo's leaves a gap down to the rim, so a second, smaller copy whose
+      // hole meets the rim is laid over it (cut off below its tread); any
+      // band still left between the two is the plain rubber disc above.
+      if (tireImgLoaded) {
+        ctx.drawImage(tireImg, cx - r, cy - r, 2 * r, 2 * r);
+        const r2 = rimR / TIRE_IMG_HOLE;
+        if (r2 < r) {
+          // filler disc again, 3px over the inner edge (bead) of the big copy
+          ctx.beginPath(); ctx.arc(cx, cy, r * TIRE_IMG_HOLE + 3, 0, 2 * PI); ctx.fill();
+          ctx.save();
+          ctx.beginPath(); ctx.arc(cx, cy, r2 * TIRE_IMG_TREAD, 0, 2 * PI); ctx.clip();
+          ctx.drawImage(tireImg, cx - r2, cy - r2, 2 * r2, 2 * r2);
+          ctx.restore();
+        }
+      }
       const tickLen = Math.max(2.25, (r - rimR) * 0.225); // 25% shorter than the original 0.3 / 3px
-      const ticks = 72;
+      const ticks = tireImgLoaded ? 0 : 72;
       const TICK_TILT = 30 * PI / 180; // slant off the radial direction
       ctx.lineWidth = 1;
       ctx.strokeStyle = '#444';
@@ -1044,7 +1134,7 @@
       }
 
       // --- Rim ---
-      // Rim face drawing (rims/RimN.svg per wheel), scaled so its outer
+      // Rim face drawing (rims/Rim-NN.png per wheel), scaled so its outer
       // edge matches rimR. rimSel only ever points at a ready rim (a click
       // waits in rimPending), except before Rim0 itself is ready.
       const sel = getRimEntry(rimSel[slot]);
@@ -1130,6 +1220,35 @@
       label: t('sv_ride_height', 'Ride height'),
       value: displayDeltaSmart(diaDeltaMm / 2, unitMode, 'mm')
     });
+  }
+
+  // Draw the [sx, sx+sw] slice of a full-body car image (placed at dx,dy with
+  // size dw x dh, all in logical canvas units), fading to transparent over
+  // `fade` units at the cut edge: the left edge in a rear view, the right
+  // edge in a front view. Composed on a scratch canvas at device resolution
+  // so the fade leaves what is already on the main canvas untouched.
+  let fenderScratch = null;
+  function drawFenderSection(ctx, img, dx, dy, dw, dh, sx, sw, fade, fadeLeft) {
+    const s = ctx.getTransform().a || 1; // logical -> device px
+    const pw = Math.max(1, Math.ceil(sw * s)), ph = Math.max(1, Math.ceil(dh * s));
+    const oc = fenderScratch || (fenderScratch = document.createElement('canvas'));
+    oc.width = pw; oc.height = ph; // also clears it
+    const o = oc.getContext('2d');
+    o.imageSmoothingEnabled = true;
+    o.imageSmoothingQuality = 'high';
+    o.drawImage(img, (dx - sx) * s, 0, dw * s, dh * s);
+    const fp = Math.min(pw, fade * s);
+    if (fp > 1) {
+      // opaque everywhere except the fade strip (gradient end colors extend)
+      const grad = fadeLeft ? o.createLinearGradient(0, 0, fp, 0) : o.createLinearGradient(pw, 0, pw - fp, 0);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,1)');
+      o.globalCompositeOperation = 'destination-in';
+      o.fillStyle = grad;
+      o.fillRect(0, 0, pw, ph);
+      o.globalCompositeOperation = 'source-over';
+    }
+    ctx.drawImage(oc, sx, dy, sw, dh);
   }
 
   // One measuring flag: a classic "I" dimension mark (vertical bar with
@@ -1845,7 +1964,7 @@
     const sel = valid.find(e => e.key === selectedSetupId) || valid[0];
     const selBase = sel ? sel.base : baseline;
     const selected = sel ? sel.s : undefined;
-    drawSideView(selBase, selected, unitMode);
+    drawSideView(selBase, selected, unitMode, sel?.axle);
     drawRimView(selBase, selected);
 
     // Build alerts: hard errors for any invalid setups + dynamic alerts for selected
