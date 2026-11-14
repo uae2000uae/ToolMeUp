@@ -67,13 +67,14 @@
         </div>
       </div>
       <div class="preset preset-row">
+        <button id="oemPresetBtn" type="button" class="btn btn--sm btn--primary" title="Load factory wheel/tire specs from the OEM database" data-t-title="fit_oem_title"><span data-t="fit_oem_btn">OEM Presets…</span></button>
         <select id="presetSelect" aria-label="Preset sample sizes" data-t-aria="a11y_preset">
           <option value="" data-t="fit_preset_samples">Preset samples</option>
-          <option value="225/45R17">225/45R17 on 17x7.5 ET45</option>
-          <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
-          <option value="265/35R19">265/35R19 on 19x9 ET35</option>
+          <option value="sedan">275/40R19 on 19x9.5 ET26 · Sedan</option>
+          <option value="sport">255/40R19 on 19x8.5 ET42.5 · Sport</option>
+          <option value="SUV">285/45R22 on 22x9.5 ET42.5 · SUV</option>
+          <option value="hyper">245/35R20 on 20x8 ET34 · Hyper</option>
         </select>
-        <button id="oemPresetBtn" type="button" class="btn" title="Load factory wheel/tire specs from the OEM database" data-t-title="fit_oem_title"><span data-t="fit_oem_btn">OEM Presets…</span></button>
       </div>
       <div class="grid two">
         <div>
@@ -236,7 +237,7 @@
   </footer>
 
   <script src="shared.js?v=20261114acct2"></script>
-  <script src="app.js?v=20261114s"></script>
+  <script src="app.js?v=20261115a"></script>
   <script src="oem-presets.js?v=20261114r"></script>
 </body>
 </html>

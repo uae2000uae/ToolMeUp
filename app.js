@@ -1754,11 +1754,16 @@
     return wrap;
   }
 
-  // Presets (basic): map tire size => wheel suggestions
+  // Presets: the factory (OEM) fitment of each car in the side-view images,
+  // keyed by the car image's file prefix (<key>-body.svg). `rear` is given
+  // where the factory rear axle differs; picking a preset also shows its car.
   const presetMap = {
-    '225/45R17': { rim_d: 17, rim_w: 7.5, et: 45, spacer: 0 },
-    '205/55R16': { rim_d: 16, rim_w: 6.5, et: 50, spacer: 0 },
-    '265/35R19': { rim_d: 19, rim_w: 9, et: 35, spacer: 0 }
+    sedan: { tire: '275/40R19', rim_d: 19, rim_w: 9.5, et: 26,     // BMW M5
+             rear: { tire: '285/40R19', rim_d: 19, rim_w: 10.5, et: 28 } },
+    sport: { tire: '255/40R19', rim_d: 19, rim_w: 8.5, et: 42.5 }, // Ford Mustang GT
+    SUV:   { tire: '285/45R22', rim_d: 22, rim_w: 9.5, et: 42.5 }, // Range Rover
+    hyper: { tire: '245/35R20', rim_d: 20, rim_w: 8, et: 34,       // Ferrari Roma
+             rear: { tire: '285/35R20', rim_d: 20, rim_w: 10, et: 45 } }
   };
 
   // Normalize a full/old-format tire size ("225/45R17", "225/45ZR17 91Y",
@@ -1779,19 +1784,12 @@
   window.TMU = window.TMU || {};
   window.TMU.stripRimFromTireSize = stripRimFromTireSize;
 
-  function applyPresetTo(prefixRoot, tire) {
-    if (!tire) return;
-    const norm = stripRimFromTireSize(tire);
-    $(`#${prefixRoot}_tire`).value = norm.size;
-    const p = presetMap[tire];
-    if (p) {
-      $(`#${prefixRoot}_rim_diam`).value = p.rim_d;
-      $(`#${prefixRoot}_rim_width`).value = p.rim_w;
-      $(`#${prefixRoot}_offset`).value = p.et;
-      $(`#${prefixRoot}_spacer`).value = p.spacer;
-    } else if (norm.rimIn != null) {
-      $(`#${prefixRoot}_rim_diam`).value = norm.rimIn;
-    }
+  function applyPresetTo(prefixRoot, p) {
+    $(`#${prefixRoot}_tire`).value = stripRimFromTireSize(p.tire).size;
+    $(`#${prefixRoot}_rim_diam`).value = p.rim_d;
+    $(`#${prefixRoot}_rim_width`).value = p.rim_w;
+    $(`#${prefixRoot}_offset`).value = p.et;
+    $(`#${prefixRoot}_spacer`).value = 0;
     updateTireSuffixes();
   }
 
@@ -2018,12 +2016,15 @@
     const sel = $("#presetSelect");
     if (!sel) return;
     sel.addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (!val) return;
+      const p = presetMap[e.target.value];
+      if (!p) return;
       // Fill baseline inputs from preset and immediately apply as baseline
-      // (both axles in staggered mode: the samples are square setups)
-      applyPresetTo('base', val);
-      if (isStaggered()) applyPresetTo(rearPrefix('base'), val);
+      // (in staggered mode the rear axle gets the factory rear fitment)
+      applyPresetTo('base', p);
+      if (isStaggered()) applyPresetTo(rearPrefix('base'), p.rear || p);
+      // Show the preset's car in the side view
+      const car = FENDERS.findIndex(f => f.file === e.target.value + '-body.svg');
+      if (car >= 0) fenderSel = car;
       saveBaseline();
       renderAll();
     });
