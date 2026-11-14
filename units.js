@@ -1,7 +1,7 @@
 /*
   ToolMeUp • Unit Converter
   Linear units are stored as a factor to the category's base unit;
-  temperature and fuel economy use to/from functions.
+  temperature uses to/from functions. Fuel economy lives in fuel.html.
 */
 (function () {
   "use strict";
@@ -13,15 +13,16 @@
     u_value: "القيمة", u_result: "النتيجة", u_swap: "تبديل الوحدات",
     u_bad: "أدخل رقماً صحيحاً",
     u_formula_lin: "1 {a} = {f} {b}",
-    u_how1: "اختر الفئة: الطول، الوزن، الحرارة، السرعة، الحجم، المساحة، الضغط، البيانات، استهلاك الوقود، القدرة أو عزم الدوران.",
+    u_how1: "اختر الفئة: الطول، الوزن، الحرارة، السرعة، الحجم، المساحة، الضغط، البيانات، القدرة أو عزم الدوران. لاستهلاك الوقود والكهرباء (لتر/100 كم، ميل/غالون، كيلوواط ساعة/100 كم) اضغط على مربّع «<a href=\"fuel.html\">الوقود والطاقة</a>».",
+    u_fuel_link: "الوقود والطاقة",
     u_how2: "اكتب القيمة واختر وحدتها. تتحدّث النتيجة الرئيسية والقائمة الكاملة أثناء الكتابة. يمكنك أيضاً كتابة عمليات بسيطة مثل <code>5*12</code> أو <code>3/4</code>.",
     u_how3: "اضغط على أي قيمة في القائمة لنسخها، أو على اسم الوحدة لتصبح هي وحدة الإدخال.",
     u_faq1_q: "لماذا يختلف الغالون الأمريكي عن البريطاني؟",
-    u_faq1_a: "الغالون الأمريكي يساوي 3.785 لتر، بينما الغالون الإمبراطوري (البريطاني) يساوي 4.546 لتر، لذلك يختلف استهلاك الوقود بالميل لكل غالون بينهما — وكلاهما مدرج.",
+    u_faq1_a: "الغالون الأمريكي يساوي 3.785 لتر، بينما الغالون الإمبراطوري (البريطاني) يساوي 4.546 لتر، وكلاهما مدرج ضمن الحجم. ولهذا يختلف الميل لكل غالون بينهما — حوّله في <a href=\"fuel.html\">محوّل الوقود والطاقة</a>.",
     u_faq2_q: "ما الفرق بين MB و MiB؟",
     u_faq2_a: "الميغابايت (MB) يعتمد على مضاعفات 1000 (1 MB = 1,000,000 بايت) كما تحسبها شركات الأقراص. أما MiB فيعتمد على 1024 (1 MiB = 1,048,576 بايت) كما تعرضها كثير من أنظمة التشغيل.",
     cat_length: "الطول", cat_mass: "الوزن", cat_temp: "الحرارة", cat_speed: "السرعة", cat_volume: "الحجم", cat_area: "المساحة",
-    cat_pressure: "الضغط", cat_data: "البيانات", cat_fuel: "استهلاك الوقود", cat_power: "القدرة", cat_torque: "العزم"
+    cat_pressure: "الضغط", cat_data: "البيانات", cat_power: "القدرة", cat_torque: "العزم"
   });
 
   // [id, English name, Arabic name, factor-to-base | {to, from}]
@@ -64,11 +65,6 @@
       ["GB", "Gigabyte", "غيغابايت", 1e9], ["TB", "Terabyte", "تيرابايت", 1e12], ["KiB", "Kibibyte", "كيبيبايت", 1024],
       ["MiB", "Mebibyte", "ميبيبايت", 1048576], ["GiB", "Gibibyte", "جيبيبايت", 1073741824], ["TiB", "Tebibyte", "تيبيبايت", 1099511627776],
       ["Mbit", "Megabit", "ميغابت", 125000]] },
-    { id: "fuel", en: "Fuel economy", icon: "M5 21V5a2 2 0 012-2h6a2 2 0 012 2v16M4 21h12M15 9h2a2 2 0 012 2v6a1.5 1.5 0 003 0V8l-3-3M8 7h4", def: ["l100", "mpgus"], units: [
-      ["l100", "Litres per 100 km", "لتر لكل 100 كم", { to: (v) => v, from: (v) => v }, "L/100km"],
-      ["kml", "Kilometres per litre", "كيلومتر لكل لتر", { to: (v) => 100 / v, from: (v) => 100 / v }, "km/L"],
-      ["mpgus", "Miles per gallon (US)", "ميل لكل غالون أمريكي", { to: (v) => 235.214583 / v, from: (v) => 235.214583 / v }, "mpg (US)"],
-      ["mpguk", "Miles per gallon (UK)", "ميل لكل غالون بريطاني", { to: (v) => 282.480936 / v, from: (v) => 282.480936 / v }, "mpg (UK)"]] },
     { id: "power", en: "Power", icon: "M13 3L5 14h6l-1 7 8-11h-6z", def: ["hp", "kW"], units: [
       ["W", "Watt", "واط", 1], ["kW", "Kilowatt", "كيلوواط", 1000], ["hp", "Horsepower (mech.)", "حصان ميكانيكي", 745.69987158227, "hp"],
       ["PS", "Metric horsepower (PS)", "حصان متري", 735.49875, "PS"], ["BTUh", "BTU per hour", "وحدة حرارية/ساعة", 0.29307107, "BTU/h"]] },
@@ -82,27 +78,7 @@
   const toBase = (u, v) => (typeof u[3] === "number" ? v * u[3] : u[3].to(v));
   const fromBase = (u, b) => (typeof u[3] === "number" ? b / u[3] : u[3].from(b));
 
-  // Tiny arithmetic parser so "5*12", "(3+4)/2" or "1,5" work. No eval.
-  function parseValue(s) {
-    s = String(s).trim().replace(/,/g, ".").replace(/[×x]/g, "*").replace(/÷/g, "/").replace(/\s+/g, "");
-    if (!s) return NaN;
-    let i = 0;
-    const peek = () => s[i];
-    function num() {
-      const m = /^\d*\.?\d+(?:e[+-]?\d+)?|^\d+\./i.exec(s.slice(i));
-      if (!m) throw 0;
-      i += m[0].length; return parseFloat(m[0]);
-    }
-    function factor() {
-      if (peek() === "-") { i++; return -factor(); }
-      if (peek() === "+") { i++; return factor(); }
-      if (peek() === "(") { i++; const v = expr(); if (peek() !== ")") throw 0; i++; return v; }
-      return num();
-    }
-    function term() { let v = factor(); while (peek() === "*" || peek() === "/") { const op = s[i++]; const r = factor(); v = op === "*" ? v * r : v / r; } return v; }
-    function expr() { let v = term(); while (peek() === "+" || peek() === "-") { const op = s[i++]; const r = term(); v = op === "+" ? v + r : v - r; } return v; }
-    try { const v = expr(); return i === s.length ? v : NaN; } catch (_) { return NaN; }
-  }
+  const parseValue = K.parse;
 
   let cat = CATS[0], fromId, toId;
   const state = K.load("units:state", {});
@@ -110,7 +86,10 @@
   function drawCats() {
     $("u_cats").innerHTML = CATS.map((c) =>
       '<button type="button" role="tab" data-cat="' + c.id + '" aria-selected="' + (c === cat) + '">' + TM.icon(c.icon, 18) +
-      "<span>" + TM.esc(catLabel(c)) + "</span></button>").join("");
+      "<span>" + TM.esc(catLabel(c)) + "</span></button>").join("") +
+      // Fuel economy & EV energy units have their own tool (Automotive)
+      '<a class="ulink" href="fuel.html">' + TM.icon("M4 21V5a2 2 0 012-2h6a2 2 0 012 2v16M3 21h12M14 9h2a2 2 0 012 2v5a1.5 1.5 0 003 0V8l-3-3M9.5 7L7.5 11h3l-2 4", 18) +
+      "<span>" + TM.esc(t("u_fuel_link", "Fuel & energy")) + '</span><svg class="ulink__go" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>';
   }
   function fillSelects() {
     const opts = cat.units.map((u) => '<option value="' + u[0] + '">' + TM.esc(uname(u)) + " (" + TM.esc(sym(u)) + ")</option>").join("");
@@ -135,7 +114,7 @@
     const from = cat.units.find((u) => u[0] === fromId), to = cat.units.find((u) => u[0] === toId);
     state[cat.id] = { from: fromId, to: toId, value: raw };
     K.save("units:state", state);
-    const valid = Number.isFinite(v) && !(cat.id === "fuel" && v <= 0);
+    const valid = Number.isFinite(v);
     $("u_value").classList.toggle("is-bad", raw.trim() !== "" && !valid);
     if (!valid) {
       $("u_out").textContent = "—"; $("u_formula").textContent = raw.trim() ? t("u_bad", "Enter a valid number") : "";
@@ -154,6 +133,9 @@
         ' <small>' + TM.esc(sym(u)) + "</small></button></div>";
     }).join("");
   }
+
+  // Old links to the removed fuel-economy category go to the dedicated tool.
+  if (location.hash === "#fuel") { location.replace("fuel.html"); return; }
 
   K.ready(() => {
     const hash = location.hash.slice(1);

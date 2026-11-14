@@ -33,6 +33,27 @@
     if (v === undefined || v === null || String(v).trim() === "") return NaN;
     return parseFloat(String(v).replace(/,/g, ""));
   }
+  // Tiny arithmetic parser so "5*12", "(3+4)/2" or "1,5" work in number boxes. No eval.
+  function parse(s) {
+    s = String(s).trim().replace(/,/g, ".").replace(/[×x]/g, "*").replace(/÷/g, "/").replace(/\s+/g, "");
+    if (!s) return NaN;
+    let i = 0;
+    const peek = () => s[i];
+    function n() {
+      const m = /^\d*\.?\d+(?:e[+-]?\d+)?|^\d+\./i.exec(s.slice(i));
+      if (!m) throw 0;
+      i += m[0].length; return parseFloat(m[0]);
+    }
+    function factor() {
+      if (peek() === "-") { i++; return -factor(); }
+      if (peek() === "+") { i++; return factor(); }
+      if (peek() === "(") { i++; const v = expr(); if (peek() !== ")") throw 0; i++; return v; }
+      return n();
+    }
+    function term() { let v = factor(); while (peek() === "*" || peek() === "/") { const op = s[i++]; const r = factor(); v = op === "*" ? v * r : v / r; } return v; }
+    function expr() { let v = term(); while (peek() === "+" || peek() === "-") { const op = s[i++]; const r = term(); v = op === "+" ? v + r : v - r; } return v; }
+    try { const v = expr(); return i === s.length ? v : NaN; } catch (_) { return NaN; }
+  }
   function bytes(n) {
     if (!Number.isFinite(n)) return "—";
     const u = ["B", "KB", "MB", "GB"];
@@ -198,5 +219,5 @@
   // Read a CSS custom property (resolved) from an element.
   function cssVar(name, el) { return getComputedStyle(el || document.documentElement).getPropertyValue(name).trim(); }
 
-  window.Kit = { $, $$, fmt, smart, num, bytes, toast, copy, download, tabs, drop, save, load, keepInputs, debounce, onLang, onTheme, ready, cssVar, t };
+  window.Kit = { $, $$, fmt, smart, num, parse, bytes, toast, copy, download, tabs, drop, save, load, keepInputs, debounce, onLang, onTheme, ready, cssVar, t };
 })();

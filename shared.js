@@ -44,6 +44,13 @@
       ar: { name: "مقاس الإطار", title: "مقاس الإطار وعدّاد السرعة", desc: "قارن مقاسين للإطارات جنباً إلى جنب، واعرف كيف يغيّر المقاس الجديد قراءة عدّاد السرعة." }
     },
     {
+      id: "fuel", cat: "automotive", href: "fuel.html", newUntil: "2026-12-14",
+      icon: "M4 21V5a2 2 0 012-2h6a2 2 0 012 2v16M3 21h12M14 9h2a2 2 0 012 2v5a1.5 1.5 0 003 0V8l-3-3M9.5 7L7.5 11h3l-2 4",
+      tags: "fuel economy consumption mpg l/100km km/l kwh/100km wh/km mi/kwh mpge ev electric co2 trip cost petrol diesel lpg cng hydrogen وقود استهلاك كهرباء تكلفة رحلة",
+      en: { name: "Fuel & Energy", title: "Fuel & Energy Converter", desc: "Convert L/100 km, mpg, km/L, kWh/100 km, MPGe and CO₂ for any fuel or EV, then work out trip cost or compare two cars." },
+      ar: { name: "الوقود والطاقة", title: "محوّل الوقود والطاقة", desc: "حوّل لتر/100 كم، ميل/غالون، كم/لتر، كيلوواط ساعة/100 كم، MPGe وCO₂ لأي وقود أو سيارة كهربائية، واحسب تكلفة الرحلة أو قارن بين سيارتين." }
+    },
+    {
       id: "calculators", cat: "calc", href: "calculators.html", newUntil: "2026-12-12",
       icon: "M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm1 3h8v3H8V6zm0 6h.01M12 12h.01M16 12h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
       tags: "calculator percent percentage loan mortgage interest bmi video resolution aspect ratio حاسبة نسبة قرض فائدة كتلة",
@@ -53,9 +60,9 @@
     {
       id: "units", cat: "calc", href: "units.html", newUntil: "2026-12-12",
       icon: "M4 7h11m0 0l-3-3m3 3l-3 3M20 17H9m0 0l3-3m-3 3l3 3",
-      tags: "unit converter length weight mass temperature speed volume area pressure data fuel mpg l/100km km/l psi bar kpa hp kw horsepower torque nm lb-ft celsius fahrenheit km miles kg lb gallon litre liter inch cm feet gb mb تحويل وحدات طول وزن حرارة سرعة ضغط حصان عزم",
-      en: { name: "Units", title: "Unit Converter", desc: "Convert length, weight, temperature, speed, volume, area, pressure, data and fuel economy — see every unit at once." },
-      ar: { name: "الوحدات", title: "محوّل الوحدات", desc: "حوّل الطول والوزن والحرارة والسرعة والحجم والمساحة والضغط والبيانات واستهلاك الوقود — وشاهد كل الوحدات دفعة واحدة." }
+      tags: "unit converter length weight mass temperature speed volume area pressure data psi bar kpa hp kw horsepower torque nm lb-ft celsius fahrenheit km miles kg lb gallon litre liter inch cm feet gb mb تحويل وحدات طول وزن حرارة سرعة ضغط حصان عزم",
+      en: { name: "Units", title: "Unit Converter", desc: "Convert length, weight, temperature, speed, volume, area, pressure, data, power and torque — see every unit at once." },
+      ar: { name: "الوحدات", title: "محوّل الوحدات", desc: "حوّل الطول والوزن والحرارة والسرعة والحجم والمساحة والضغط والبيانات والقدرة والعزم — وشاهد كل الوحدات دفعة واحدة." }
     },
     {
       id: "datetime", cat: "time", href: "datetime.html", newUntil: "2026-12-12",

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n="full" data-tool="fuel">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="boot.js?v=20261114a"></script>
+  <title>Fuel &amp; Energy Consumption Converter — L/100km, mpg, km/L, kWh/100km, MPGe | ToolMeUp</title>
+  <meta name="description" content="Convert fuel economy and EV energy use: L/100km, mpg (US &amp; UK), km/L, kWh/100km, Wh/km, mi/kWh, MPGe, km/kg and CO₂ g/km. Petrol, diesel, E85, LPG, CNG, hydrogen and electric. Fill-up, trip cost and car comparison calculators.">
+  <meta name="theme-color" content="#2563eb">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Fuel &amp; Energy Consumption Converter — ToolMeUp">
+  <meta property="og:description" content="L/100km, mpg, km/L, kWh/100km, MPGe and CO₂ — every unit at once, plus trip cost and car comparison.">
+  <meta property="og:image" content="web-app-icon-512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="icon" href="favicon.ico?v=2" sizes="any">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114w">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebApplication","name":"Fuel & Energy Consumption Converter","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Convert L/100km, mpg, km/L, kWh/100km, MPGe and CO2 g/km for petrol, diesel, E85, LPG, CNG, hydrogen and electric cars; calculate fill-up consumption, trip cost and compare two cars."}
+  </script>
+</head>
+<body>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
+
+  <main class="container tp fuel" data-hue="amber">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 012-2h6a2 2 0 012 2v16M3 21h12M14 9h2a2 2 0 012 2v5a1.5 1.5 0 003 0V8l-3-3M9.5 7L7.5 11h3l-2 4"/></svg></div>
+      <div>
+        <h1 data-t="f_title">Fuel &amp; Energy Consumption Converter</h1>
+        <p data-t="f_lead">Convert between every fuel-economy and EV energy unit — L/100 km, mpg, km/L, kWh/100 km, MPGe and CO₂ — then work out a trip's cost or compare two cars.</p>
+      </div>
+    </div>
+
+    <div class="seg" data-tabs="fuel">
+      <button type="button" data-tab="convert" data-t="f_tab_convert">Convert</button>
+      <button type="button" data-tab="fillup" data-t="f_tab_fill">From a fill-up</button>
+      <button type="button" data-tab="trip" data-t="f_tab_trip">Trip cost</button>
+      <button type="button" data-tab="compare" data-t="f_tab_cmp">Compare two cars</button>
+    </div>
+
+    <div id="f_fuelbar">
+      <p class="f__label fuel-runs" id="f_runs_l" data-t="f_runs_on">Your car runs on</p>
+      <div class="ucats fchips" id="f_fuels" role="radiogroup" aria-labelledby="f_runs_l"></div>
+    </div>
+
+    <!-- 1 · Convert -->
+    <section class="pane" data-pane="convert">
+      <div class="card uconv">
+        <div class="uconv__row">
+          <label class="f uconv__from">
+            <span data-t="f_value">Value</span>
+            <div class="inp-group">
+              <input id="f_value" class="inp inp-big" type="text" inputmode="decimal" autocomplete="off" value="8" aria-label="Value">
+              <select id="f_from" class="inp" aria-label="From unit"></select>
+            </div>
+          </label>
+          <button type="button" class="icon-btn uconv__swap" id="f_swap" data-t-aria="f_swap" aria-label="Swap units" data-t-title="f_swap" title="Swap units">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16m0 0l-3-3m3 3l3-3M17 20V4m0 0l-3 3m3-3l3 3"/></svg>
+          </button>
+          <label class="f uconv__to">
+            <span data-t="f_result">Result</span>
+            <div class="inp-group">
+              <output id="f_out" class="inp inp-big uconv__out" tabindex="0" title="Click to copy">—</output>
+              <select id="f_to" class="inp" aria-label="To unit"></select>
+            </div>
+          </label>
+        </div>
+        <p class="uconv__formula muted small2" id="f_formula"></p>
+      </div>
+
+      <div class="card escale-card" id="f_scalecard">
+        <h2 class="card__title" data-t="f_scale">Where does your car sit?</h2>
+        <p class="card__sub" data-t="f_scale_h">Energy per 100 km compared with typical vehicles. Click an example to try it.</p>
+        <div class="escale">
+          <div class="escale__bar"><span class="escale__mark" id="f_mark" hidden><b><span data-t="f_you">You</span> · <span id="f_mark_v" dir="ltr"></span></b></span></div>
+          <div class="escale__ticks" id="f_ticks"></div>
+        </div>
+        <div class="pills escale__pills" id="f_expills"></div>
+        <p class="muted small2 escale__plain" id="f_plain" aria-live="polite"></p>
+      </div>
+
+      <div id="f_all" aria-live="polite"></div>
+    </section>
+
+    <!-- 2 · Fill-up -->
+    <section class="pane" data-pane="fillup" hidden>
+      <div class="card">
+        <h2 class="card__title" data-t="f_fill_t">Work out consumption from a fill-up</h2>
+        <p class="card__sub" data-t="f_fill_sub">Fill the tank (or charge to the same level), note the distance you drive until the next fill-up, then enter how much you added.</p>
+        <div class="g3 fuel-fields">
+          <label class="f"><span data-t="f_dist">Distance driven</span>
+            <div class="inp-group"><input id="fl_dist" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="fl_du" class="inp" aria-label="Distance unit"></select></div>
+          </label>
+          <label class="f"><span data-t="f_added">Amount added</span>
+            <div class="inp-group"><input id="fl_amt" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="fl_au" class="inp" aria-label="Amount unit"></select></div>
+          </label>
+          <label class="f"><span data-t="f_paid">Amount paid (optional)</span>
+            <input id="fl_paid" class="inp" type="text" inputmode="decimal" autocomplete="off">
+          </label>
+        </div>
+      </div>
+      <div class="stats" id="fl_out" aria-live="polite"></div>
+      <div class="row mt"><button type="button" class="btn btn--primary" id="fl_go" data-t="f_see_all" hidden>See it in every unit</button></div>
+    </section>
+
+    <!-- 3 · Trip cost -->
+    <section class="pane" data-pane="trip" hidden>
+      <div class="card">
+        <h2 class="card__title" data-t="f_trip_t">What will the trip cost?</h2>
+        <p class="card__sub" data-t="f_trip_sub">Enter the distance, your car's consumption and the price of fuel or electricity.</p>
+        <div class="g3 fuel-fields">
+          <label class="f"><span data-t="f_trip_dist">Trip distance</span>
+            <div class="inp-group"><input id="tr_dist" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_du" class="inp" aria-label="Distance unit"></select></div>
+          </label>
+          <label class="f fuel-wide"><span data-t="f_cons">Car's consumption</span>
+            <div class="inp-group"><input id="tr_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_u" class="inp" aria-label="Consumption unit"></select></div>
+          </label>
+          <label class="f"><span data-t="f_price">Price</span>
+            <div class="inp-group"><input id="tr_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_pu" class="inp" aria-label="Price unit"></select></div>
+          </label>
+          <label class="f"><span data-t="f_people">People sharing the cost</span>
+            <input id="tr_people" class="inp" type="number" min="1" step="1" inputmode="numeric">
+          </label>
+          <label class="f"><span data-t="f_tank">Tank / battery size (optional)</span>
+            <div class="inp-group"><input id="tr_t" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="tr_tu" class="inp" aria-label="Tank unit"></select></div>
+          </label>
+          <div class="f fuel-switch"><label class="switch"><input type="checkbox" id="tr_round"><span data-t="f_round">Round trip</span></label></div>
+        </div>
+      </div>
+      <div class="stats" id="tr_out" aria-live="polite"></div>
+    </section>
+
+    <!-- 4 · Compare -->
+    <section class="pane" data-pane="compare" hidden>
+      <p class="muted" data-t="f_cmp_sub">Which car is cheaper to run? Compare any two fuels — petrol against electric, for example.</p>
+      <div class="g2 fuel-cars">
+        <div class="card fuel-car fuel-car--a">
+          <h2 class="card__title" data-t="f_car_a">Car A</h2>
+          <div class="stack">
+            <label class="f"><span data-t="f_fuel">Fuel</span><select id="ca_fuel" class="inp"></select></label>
+            <label class="f"><span data-t="f_cons">Car's consumption</span>
+              <div class="inp-group"><input id="ca_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="ca_u" class="inp" aria-label="Consumption unit"></select></div>
+            </label>
+            <label class="f"><span data-t="f_price">Price</span>
+              <div class="inp-group"><input id="ca_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="ca_pu" class="inp" aria-label="Price unit"></select></div>
+            </label>
+          </div>
+        </div>
+        <div class="card fuel-car fuel-car--b">
+          <h2 class="card__title" data-t="f_car_b">Car B</h2>
+          <div class="stack">
+            <label class="f"><span data-t="f_fuel">Fuel</span><select id="cb_fuel" class="inp"></select></label>
+            <label class="f"><span data-t="f_cons">Car's consumption</span>
+              <div class="inp-group"><input id="cb_v" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="cb_u" class="inp" aria-label="Consumption unit"></select></div>
+            </label>
+            <label class="f"><span data-t="f_price">Price</span>
+              <div class="inp-group"><input id="cb_p" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="cb_pu" class="inp" aria-label="Price unit"></select></div>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="g2">
+          <label class="f"><span data-t="f_year_dist">Distance per year</span>
+            <div class="inp-group"><input id="c_dist" class="inp" type="text" inputmode="decimal" autocomplete="off"><select id="c_du" class="inp" aria-label="Distance unit"></select></div>
+          </label>
+          <label class="f"><span data-t="f_years">Years</span><input id="c_years" class="inp" type="number" min="1" step="1" inputmode="numeric"></label>
+        </div>
+      </div>
+      <div id="c_verdict" aria-live="polite"></div>
+      <div class="tbl-wrap">
+        <table class="tbl" id="c_table">
+          <thead><tr><th></th><th class="num" data-t="f_car_a">Car A</th><th class="num" data-t="f_car_b">Car B</th><th class="num" data-t="f_diff">Difference</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="howto">
+      <h2 data-t="howto">How to use</h2>
+      <ol>
+        <li data-t="f_how1">Pick what your car runs on: petrol, diesel, E85, LPG, CNG, hydrogen or electricity.</li>
+        <li data-t="f_how2">Type a number and pick its unit. Every other unit updates instantly, split into fuel used per distance (lower is better) and distance per fuel (higher is better). Click a value to copy it, or a unit name to convert from it.</li>
+        <li data-t="f_how3">Use <b>From a fill-up</b> to find your real consumption, <b>Trip cost</b> for cost and range, and <b>Compare two cars</b> to see which is cheaper to run.</li>
+      </ol>
+      <details><summary data-t="f_faq1_q">Why can't mpg be converted by multiplying by a fixed number?</summary><p data-t="f_faq1_a">mpg and km/L measure distance per unit of fuel, while L/100 km measures fuel per distance. They are inverses: L/100 km = 235.21 ÷ mpg (US), or 282.48 ÷ mpg (UK).</p></details>
+      <details><summary data-t="f_faq2_q">What is MPGe?</summary><p data-t="f_faq2_a">MPGe (miles per gallon equivalent) is the US EPA's figure for electric cars: 33.705 kWh counts as the energy of one gallon of petrol. Canada uses litres-equivalent per 100 km (Le/100 km), where 1 litre of petrol = 8.9 kWh.</p></details>
+      <details><summary data-t="f_faq3_q">What is the "mpg illusion"?</summary><p data-t="f_faq3_a">Going from 10 to 20 mpg saves more fuel than going from 30 to 50 mpg, because what you actually save depends on fuel used per distance. That's why the comparison shows litres and cost per 100 km, not just mpg.</p></details>
+      <details><summary data-t="f_faq4_q">Where do the energy and CO₂ figures come from?</summary><p data-t="f_faq4_a">We use typical lower heating values: petrol 8.9 kWh/L, diesel 9.9, E85 6.5, LPG 6.8, CNG 13.1 kWh/kg and hydrogen 33.3 kWh/kg. Real values vary a little by blend and country. Enter electric consumption as shown by your car or charger.</p></details>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
+
+  <script src="shared.js?v=20261114t"></script>
+  <script src="kit.js?v=20261114t"></script>
+  <script src="fuel.js?v=20261114w"></script>
+</body>
+</html>

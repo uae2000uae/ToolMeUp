@@ -834,3 +834,66 @@ html[dir="rtl"] .wget :is(input[type="url"], textarea, #wget_filename) { directi
 /* Category label on home cards in the "All" grid */
 .tcard__cat { margin-top: 2px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--h-text); }
 html[lang="ar"] .tcard__cat { letter-spacing: 0; text-transform: none; font-size: 12px; }
+
+/* ================= Tool-specific: Fuel & Energy Converter ================= */
+/* Fuel chips reuse .ucats; they're radios, so the checked one is highlighted */
+.ucats button[aria-checked="true"] { color: var(--h-text); border-color: var(--h); background: color-mix(in oklab, var(--h) 10%, var(--surface)); box-shadow: 0 6px 18px -10px var(--h); }
+.fuel .fchips { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.fuel-runs { margin: 0 0 8px; }
+@media (max-width: 560px) { .fuel .fchips { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; } .fuel .fchips button { padding: 8px 2px; font-size: 11px; line-height: 1.25; } }
+.ugroup { margin-top: 20px; }
+.ugroup__title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 0 0 10px; font-size: 15px; font-weight: 650; color: var(--fg); }
+.ugroup__title small { font-size: 12px; font-weight: 600; color: var(--text-2); }
+.ugroup__title::before { content: ""; align-self: center; width: 8px; height: 8px; border-radius: 3px; background: var(--h); }
+
+/* Energy scale: log bar from very efficient (start) to thirsty (end) */
+.escale { position: relative; padding: 30px 0 4px; }
+.escale__bar { position: relative; height: 12px; border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #84cc16 25%, #f59e0b 60%, #ef4444); }
+html[dir="rtl"] .escale__bar { background: linear-gradient(270deg, #22c55e, #84cc16 25%, #f59e0b 60%, #ef4444); }
+.escale__mark { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: var(--surface); border: 4px solid var(--fg);
+  translate: -50% -50%; transition: inset-inline-start .35s cubic-bezier(.2,.9,.3,1.2); box-shadow: var(--shadow); }
+html[dir="rtl"] .escale__mark { translate: 50% -50%; }
+.escale__mark b { position: absolute; bottom: calc(100% + 6px); inset-inline-start: 50%; translate: -50% 0; white-space: nowrap; font-size: 12px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px; background: var(--fg); color: var(--panel); }
+html[dir="rtl"] .escale__mark b { translate: 50% 0; }
+.escale__ticks { position: relative; height: 50px; margin-top: 6px; }
+.escale__tick { position: absolute; top: 0; translate: -50% 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 2px;
+  border: 0; background: transparent; color: var(--text-2); font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
+html[dir="rtl"] .escale__tick { translate: 50% 0; }
+.escale__tick::before { content: ""; width: 2px; height: 8px; border-radius: 1px; background: var(--border); }
+.escale__tick.is-low::before { height: 26px; }
+.escale__tick:hover { filter: none; color: var(--h-text); }
+.escale__tick:hover::before { background: var(--h); }
+.escale__plain { margin: 8px 0 0; min-height: 18px; line-height: 1.5; }
+.escale__pills { display: none; margin-top: 4px; }
+@media (max-width: 640px) {
+  .escale__ticks { height: 14px; }
+  .escale__tick span { display: none; }
+  .escale__tick.is-low::before { height: 8px; }
+  .escale__pills { display: flex; }
+}
+
+.fuel-fields { align-items: end; }
+.fuel-fields .inp-group > input { min-width: 0; flex: 1; }
+.fuel .inp-group select { max-width: 60%; font-size: 14px; }
+.fuel-switch { justify-content: center; min-height: 42px; }
+@media (max-width: 760px) { .fuel-fields, .fuel-cars { grid-template-columns: 1fr; } }
+.fuel-car--a .card__title, .fuel-car--b .card__title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.fuel-car--a .card__title::before, .fuel-car--b .card__title::before { content: "A"; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--h-strong); color: #fff; font-size: 12px; }
+.fuel-car--b .card__title::before { content: "B"; background: #0f766e; }
+html[lang="ar"] .fuel-car--a .card__title::before { content: "أ"; }
+html[lang="ar"] .fuel-car--b .card__title::before { content: "ب"; }
+.fuel #fl_out .stat__value small, .fuel #tr_out .stat__value small { white-space: nowrap; font-size: 14px; font-weight: 600; color: var(--text-2); }
+.fuel .stat__value[data-copy-text] { cursor: copy; }
+#c_table th[scope="row"] { font-size: 14px; font-weight: 600; color: var(--fg); text-transform: none; letter-spacing: 0; background: transparent; }
+
+/* Unit Converter: link box that opens the Fuel & Energy converter */
+.ucats > a.ulink { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; border-radius: var(--radius);
+  border: 1px dashed color-mix(in oklab, #f59e0b 60%, var(--border)); background: color-mix(in oklab, #f59e0b 6%, var(--surface));
+  color: var(--text-2); font-size: 13px; font-weight: 600; text-decoration: none; text-align: center; transition: all .15s; }
+.ucats > a.ulink:hover { color: var(--fg); border-style: solid; border-color: #f59e0b; }
+.ucats > a.ulink svg:first-child { color: #d97706; }
+.ulink__go { position: absolute; top: 6px; inset-inline-end: 8px; opacity: .55; }
+html[dir="rtl"] .ulink__go { transform: scaleX(-1); }
