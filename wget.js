@@ -1,6 +1,11 @@
 (function(){
   "use strict";
 
+  // Arabic via shared.js (falls back to English); {placeholders} are filled in both.
+  const T = (key, en, vars) => (window.ToolMeUp && window.ToolMeUp.t)
+    ? window.ToolMeUp.t(key, en, vars)
+    : String(en).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m));
+
   // ---------------------------------------------------------------------
   // UI wiring (only on pages that have the wget markup)
   // ---------------------------------------------------------------------
@@ -29,7 +34,7 @@
       return function (msg, isError = false) {
         if (!el) return;
         el.textContent = msg || '';
-        el.style.color = isError ? 'var(--bad, #b00020)' : '';
+        el.style.color = isError ? 'var(--bad-text, #b91c1c)' : '';
       };
     }
     function makeProgressSetter(el) {
@@ -47,8 +52,8 @@
 
     function parseUrl(raw, setter) {
       const url = (raw || '').trim();
-      if (!url) { setter('Please enter a URL.', true); return null; }
-      try { return new URL(url, location.href); } catch (_) { setter('Invalid URL.', true); return null; }
+      if (!url) { setter(T('wg_s_nourl', 'Please enter a URL.'), true); return null; }
+      try { return new URL(url, location.href); } catch (_) { setter(T('wg_s_badurl', 'Invalid URL.'), true); return null; }
     }
 
     // Body is ignored for GET — reflect that in the UI.
@@ -74,9 +79,9 @@
         try {
           const parsed = JSON.parse(rawHeaders);
           if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) headers = parsed;
-          else { setStatus('Headers must be a JSON object.', true); return; }
+          else { setStatus(T('wg_s_hdrobj', 'Headers must be a JSON object.'), true); return; }
         } catch (e) {
-          setStatus('Invalid headers JSON.', true); return;
+          setStatus(T('wg_s_hdrjson', 'Invalid headers JSON.'), true); return;
         }
       }
 
@@ -87,7 +92,7 @@
       dlController = new AbortController();
       btn.disabled = true;
       if (cancelBtn) cancelBtn.hidden = false;
-      setStatus('Starting download...');
+      setStatus(T('wg_s_start', 'Starting download...'));
       setProgress(0);
 
       try {
@@ -100,21 +105,21 @@
           onProgress: ({ loaded, total, percent }) => {
             if (total) {
               setProgress(percent);
-              setStatus(`Downloading: ${loaded}/${total} bytes (${percent.toFixed(1)}%)`);
+              setStatus(T('wg_s_prog', 'Downloading: {loaded}/{total} bytes ({pct}%)', { loaded, total, pct: percent.toFixed(1) }));
             } else {
               setProgress(null);
-              setStatus(`Downloading: ${loaded} bytes`);
+              setStatus(T('wg_s_prog_n', 'Downloading: {loaded} bytes', { loaded }));
             }
           }
         });
         setProgress(100);
-        setStatus(`Completed: saved as ${savedAs}`);
+        setStatus(T('wg_s_done', 'Completed: saved as {name}', { name: savedAs }));
       } catch (err) {
         if (err && err.name === 'AbortError') {
-          setStatus('Cancelled.');
+          setStatus(T('wg_s_cancel', 'Cancelled.'));
         } else {
           console.error(err);
-          setStatus(`Error: ${err.message || err}`, true);
+          setStatus(T('wg_s_err', 'Error: {msg}', { msg: err.message || err }), true);
         }
         if (prog) prog.hidden = true;
       } finally {
@@ -143,7 +148,7 @@
       zipController = new AbortController();
       siteBtn.disabled = true;
       if (zipCancelBtn) zipCancelBtn.hidden = false;
-      setZipStatus('Starting site crawl...');
+      setZipStatus(T('wg_z_start', 'Starting site crawl...'));
       setZipProgress(0);
 
       try {
@@ -155,17 +160,17 @@
           onProgress: ({ queued, processed, addedBytes, status }) => {
             const pct = Math.min(100, (processed / Math.max(1, Math.min(maxFiles, queued))) * 100);
             if (!isFinite(pct)) setZipProgress(null); else setZipProgress(pct);
-            setZipStatus(status || `Processed ${processed}/${Math.min(maxFiles, queued)} files, ${addedBytes} bytes`);
+            setZipStatus(status || T('wg_z_prog', 'Processed {done}/{all} files, {bytes} bytes', { done: processed, all: Math.min(maxFiles, queued), bytes: addedBytes }));
           }
         });
         setZipProgress(100);
-        setZipStatus(`Completed: ${processed} file(s) saved as ${zipName}`);
+        setZipStatus(T('wg_z_done', 'Completed: {n} file(s) saved as {name}', { n: processed, name: zipName }));
       } catch (err) {
         if (err && err.name === 'AbortError') {
-          setZipStatus('Cancelled.');
+          setZipStatus(T('wg_s_cancel', 'Cancelled.'));
         } else {
           console.error(err);
-          setZipStatus(`Error: ${err.message || err}`, true);
+          setZipStatus(T('wg_s_err', 'Error: {msg}', { msg: err.message || err }), true);
         }
         if (zipProg) zipProg.hidden = true;
       } finally {
@@ -416,7 +421,7 @@
       };
 
       const progress = () => {
-        if (onProgress) onProgress({ queued: queue.length + visited.size, processed, addedBytes, status: `Crawled ${processed} files` });
+        if (onProgress) onProgress({ queued: queue.length + visited.size, processed, addedBytes, status: T('wg_z_crawled', 'Crawled {n} files', { n: processed }) });
       };
 
       progress();
@@ -470,7 +475,7 @@
       }
 
       throwIfAborted();
-      if (onProgress) onProgress({ queued: queue.length + visited.size, processed, addedBytes, status: 'Creating ZIP...' });
+      if (onProgress) onProgress({ queued: queue.length + visited.size, processed, addedBytes, status: T('wg_z_zip', 'Creating ZIP...') });
       const zipBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 
       const pad = (n) => String(n).padStart(2, '0');

@@ -17,6 +17,11 @@
   const t = (key, en, vars) => window.ToolMeUp?.t?.(key, en, vars)
     ?? String(en).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m));
   const isRtl = () => window.ToolMeUp?.isRtl?.() === true;
+  // In-page dialogs and toasts from shared.js (styled, translated, RTL-aware);
+  // the native boxes are only a fallback if shared.js failed to load.
+  const askConfirm = (msg) => window.ToolMeUp?.confirm ? window.ToolMeUp.confirm(msg) : Promise.resolve(window.confirm(msg));
+  const askText = (msg, value) => window.ToolMeUp?.prompt ? window.ToolMeUp.prompt(msg, value) : Promise.resolve(window.prompt(msg, value));
+  const notify = (msg, bad) => window.ToolMeUp?.toast ? window.ToolMeUp.toast(msg, bad) : window.alert(msg);
   const rtlAttr = () => (isRtl() ? ' dir="rtl"' : '');
 
   // Units and conversions
@@ -501,7 +506,8 @@
   }
 
   // ---- Page options (top bar) --------------------------------------------
-  // opt_adv:       show spacer / width correction / bulge (else defaults)
+  // opt_simple:    ticked (default) hides spacer / width correction / bulge and
+  //                uses their defaults; unticked shows them. Saved as opts.adv.
   // opt_staggered: second (rear) column on the baseline and every setup
   const ADV_DEFAULTS = { spacer: 0, correction: 0, bulge: 5 };
   const ADV_FIELDS = ['spacer', 'correction', 'bulge'];
@@ -509,7 +515,7 @@
   const AXLE_FIELDS = ['rim_diam', 'rim_width', 'offset', 'spacer', 'tire', 'correction', 'bulge'];
   const MAX_SETUPS = 4;
   const MAX_SETUPS_STAGGERED = 2;
-  function advOn() { return !!document.getElementById('opt_adv')?.checked; }
+  function advOn() { const cb = document.getElementById('opt_simple'); return !!cb && !cb.checked; }
   function isStaggered() { return !!document.getElementById('opt_staggered')?.checked; }
   function maxSetups() { return isStaggered() ? MAX_SETUPS_STAGGERED : MAX_SETUPS; }
   const rearPrefix = (prefix) => `${prefix}_r`;
@@ -707,7 +713,7 @@
     const wrap = $("#comparison");
     const rtl = isRtl() ? ' dir="rtl"' : '';
     if (!base?.tireGeom) {
-      wrap.innerHTML = `<div class="small"${rtl}>${t('report_need_baseline', 'Enter and save a valid baseline to view results.')}</div>`;
+      wrap.innerHTML = `<div class="fit-empty"${rtl}><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/></svg><span>${t('report_need_baseline', 'Enter and save a valid baseline to view results.')}</span></div>`;
       return;
     }
     const valid = (entries || []).filter(e => e.s?.tireGeom && e.s?.wheelGeom && e.base?.tireGeom);
@@ -718,8 +724,8 @@
     // Baseline column(s) first, then each setup (axle)
     const stag = valid.some(e => e.axle);
     wrap.classList.toggle('is-staggered', stag);
-    const specs = [{ s: base, base, name: 'Baseline', group: 0, axle: stag ? 'front' : null }];
-    if (stag && base.rear?.tireGeom) specs.push({ s: base.rear, base: base.rear, name: 'Baseline', group: 0, axle: 'rear' });
+    const specs = [{ s: base, base, name: t('fit_baseline', 'Baseline'), group: 0, axle: stag ? 'front' : null }];
+    if (stag && base.rear?.tireGeom) specs.push({ s: base.rear, base: base.rear, name: t('fit_baseline', 'Baseline'), group: 0, axle: 'rear' });
     valid.forEach(e => specs.push(e));
     const cols = specs.map((c, i) => ({
       s: c.s, base: c.base, name: c.name, axle: c.axle, group: c.group,
@@ -770,37 +776,37 @@
 
     // --- Fitment Differences (not collapsible) ---
     const diffDefs = [
-      ['Ride Height Change', t('rep_ride_height_desc', 'How much the vehicle height changes due to tire diameter difference'),
+      [t('rep_ride_height', 'Ride Height Change'), t('rep_ride_height_desc', 'How much the vehicle height changes due to tire diameter difference'),
         c => displayDeltaSmart(c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
-      ['Wheel Arch Clearance Change', t('rep_arch_change_desc', 'Change in clearance of the tire to the wheel arch'),
+      [t('rep_arch_change', 'Wheel Arch Clearance Change'), t('rep_arch_change_desc', 'Change in clearance of the tire to the wheel arch'),
         c => displayDeltaSmart(-c.cmp.rideHeightDeltaMm, unitMode, 'mm')],
-      ['Final Wheel Arch Clearance', t('rep_arch_final_desc', 'Remaining gap between tire and wheel arch. Under 20 mm is tight, under 10 mm risks rubbing'),
+      [t('rep_arch_final', 'Final Wheel Arch Clearance'), t('rep_arch_final_desc', 'Remaining gap between tire and wheel arch. Under 20 mm is tight, under 10 mm risks rubbing'),
         c => {
           const arch = archClearance(c.base, c.s);
           if (!arch) return null;
           return markLevel(displayLengthSmart(arch.value, unitMode, 'mm'), arch.level);
         }],
-      ['Inner Clearance Change', t('rep_inner_change_desc', 'Change in clearance toward suspension'),
+      [t('rep_inner_change', 'Inner Clearance Change'), t('rep_inner_change_desc', 'Change in clearance toward suspension'),
         c => {
           if (c.cmp.innerMoveMm == null) return null;
           const v = displayDeltaSmart(-c.cmp.innerMoveMm, unitMode, 'mm');
           return c.checks.inner ? mark(v, c.checks.inner.pass) : v;
         }],
-      ['Outer Clearance Change', t('rep_outer_change_desc', 'Change in clearance toward fender'),
+      [t('rep_outer_change', 'Outer Clearance Change'), t('rep_outer_change_desc', 'Change in clearance toward fender'),
         c => {
           if (c.cmp.outerMoveMm == null) return null;
           const v = displayDeltaSmart(-c.cmp.outerMoveMm, unitMode, 'mm');
           return c.checks.outer ? mark(v, c.checks.outer.pass) : v;
         }],
-      ['Final Outer Clearance', t('rep_outer_final_desc', 'Clearance from the fender. Positive = out of fender line'),
+      [t('rep_outer_final', 'Final Outer Clearance'), t('rep_outer_final_desc', 'Clearance from the fender. Positive = out of fender line'),
         c => {
           if (!c.checks.outer) return null;
           const f = -c.checks.outer.value; // positive = out of fender line (warning)
           return mark(displayDeltaSmart(f, unitMode, 'mm'), f <= 0);
         }],
-      ['Speedometer Error Change', t('rep_speedo_change_desc', 'Difference in speedometer reading due to tire circumference change'),
+      [t('rep_speedo_change', 'Speedometer Error Change'), t('rep_speedo_change_desc', 'Difference in speedometer reading due to tire circumference change'),
         c => sign(-c.cmp.speedoErrPct, ' %')],
-      ['Final Speedometer Error', t('rep_speedo_final_desc', 'Speedometer reading error. Negative = reads slower than actual'),
+      [t('rep_speedo_final', 'Final Speedometer Error'), t('rep_speedo_final_desc', 'Speedometer reading error. Negative = reads slower than actual'),
         c => {
           const f = -c.cmp.speedoErrPct + (c.base.baseSpeedoError || 0);
           return markLevel(sign(f, ' %'), speedoErrorLevel(f));
@@ -809,15 +815,15 @@
 
     // --- Wheel Geometry (collapsible) ---
     const wheelDefs = [
-      ['Wheel Width', t('rep_wheel_width_desc', 'Rim width'),
+      [t('rep_wheel_width', 'Wheel Width'), t('rep_wheel_width_desc', 'Rim width'),
         c => displayLengthSmart(inToMm(c.s.rimWidthIn), unitMode, 'in')],
-      ['Wheel Diameter', t('rep_wheel_diam_desc', 'Rim diameter'),
+      [t('rep_wheel_diam', 'Wheel Diameter'), t('rep_wheel_diam_desc', 'Rim diameter'),
         c => displayLengthSmart(inToMm(c.s.rimDiamIn), unitMode, 'in')],
-      ['Offset', t('rep_offset_desc', 'Distance from wheel centerline to mounting face. Positive = wheel sits further inward'),
+      [t('rep_offset', 'Offset'), t('rep_offset_desc', 'Distance from wheel centerline to mounting face. Positive = wheel sits further inward'),
         c => displayLengthSmart(c.s.etMm, unitMode, 'mm')],
-      ['Backspacing', t('rep_backspacing_desc', 'Distance from hub mounting face to inner wheel lip'),
+      [t('rep_backspacing', 'Backspacing'), t('rep_backspacing_desc', 'Distance from hub mounting face to inner wheel lip'),
         c => displayLengthSmart(c.s.wheelGeom.backspacingMm, unitMode, 'mm')],
-      ['Poke', t('rep_poke_desc', 'How far the wheel sticks outward past the mounting face'),
+      [t('rep_poke', 'Poke'), t('rep_poke_desc', 'How far the wheel sticks outward past the mounting face'),
         c => displayLengthSmart(c.s.wheelGeom.frontspacingMm, unitMode, 'mm')]
     ];
 
@@ -826,18 +832,18 @@
       ? t('rep_revs_mile_desc', 'How many times the tire rotates per mile')
       : t('rep_revs_km_desc', 'How many times the tire rotates per km');
     const tireDefs = [
-      ['Overall Diameter', t('rep_od_desc', 'Total tire height from ground to top'),
+      [t('rep_od', 'Overall Diameter'), t('rep_od_desc', 'Total tire height from ground to top'),
         c => displayLengthSmart(c.s.tireGeom.overallDiaMm, unitMode, 'mm')],
-      ['Section Width', t('rep_section_width_desc', 'Maximum width of the tire (incl. bulge)'),
+      [t('rep_section_width', 'Section Width'), t('rep_section_width_desc', 'Maximum width of the tire (incl. bulge)'),
         c => displayLengthSmart(c.s.tireGeom.sectionWidthMm * (1 + (c.s.bulgePct || 0) / 100), unitMode, 'mm')],
-      ['Sidewall Height', t('rep_sidewall_desc', 'Height of the tire’s sidewall'),
+      [t('rep_sidewall', 'Sidewall Height'), t('rep_sidewall_desc', 'Height of the tire’s sidewall'),
         c => displayLengthSmart(c.s.tireGeom.sidewallMm, unitMode, 'mm')],
-      ['Circumference', t('rep_circumference_desc', 'Perimeter length of the tire'),
+      [t('rep_circumference', 'Circumference'), t('rep_circumference_desc', 'Perimeter length of the tire'),
         c => displayLengthSmart(c.s.tireGeom.circumferenceMm, unitMode, 'mm')],
-      ['Revolutions', revsDesc,
+      [t('rep_revs', 'Revolutions'), revsDesc,
         c => (unitMode === 'imperial')
-          ? `${c.s.tireGeom.revsPerMile.toFixed(0)} RpM`
-          : `${(1000000 / c.s.tireGeom.circumferenceMm).toFixed(0)} RpK`]
+          ? withUnit(c.s.tireGeom.revsPerMile.toFixed(0), 'u_rpm', 'RpM')
+          : withUnit((1000000 / c.s.tireGeom.circumferenceMm).toFixed(0), 'u_rpk', 'RpK')]
     ];
 
     // Restore open/closed state: current DOM wins (mid-session), else saved state (reload)
@@ -846,9 +852,9 @@
 
     wrap.innerHTML = `
       ${headHtml}
-      <section class="report-section"><h3 class="report-title">Fitment Differences</h3>${sectionTable(diffDefs)}</section>
-      <details class="report-section" data-key="wheel"${openState.wheel ? ' open' : ''}><summary class="report-title">Wheel Geometry</summary>${sectionTable(wheelDefs)}</details>
-      <details class="report-section" data-key="tire"${openState.tire ? ' open' : ''}><summary class="report-title">Tire Geometry</summary>${sectionTable(tireDefs)}</details>
+      <section class="report-section"><h3 class="report-title">${t('rep_sec_diff', 'Fitment Differences')}</h3>${sectionTable(diffDefs)}</section>
+      <details class="report-section" data-key="wheel"${openState.wheel ? ' open' : ''}><summary class="report-title">${t('rep_sec_wheel', 'Wheel Geometry')}</summary>${sectionTable(wheelDefs)}</details>
+      <details class="report-section" data-key="tire"${openState.tire ? ' open' : ''}><summary class="report-title">${t('rep_sec_tire', 'Tire Geometry')}</summary>${sectionTable(tireDefs)}</details>
     `;
     saveReportOpen(openState);
     wrap.querySelectorAll('details.report-section[data-key]').forEach(d => {
@@ -876,22 +882,20 @@
 
   // Smart display: when unitMode === 'both', show only the commonly used unit per field
   // preferUnit: 'mm' or 'in'
+  // Units go through t() (mm / in -> مم / إنش). In Arabic the number sits in a
+  // left-to-right isolate (U+2066..U+2069) so its sign stays attached
+  // ("+12 مم", never "12+ مم"); works in HTML and in canvas labels.
+  const withUnit = (num, unitKey, unitEn) => isRtl() ? `⁦${num}⁩ ${t(unitKey, unitEn)}` : `${num} ${t(unitKey, unitEn)}`;
   function displayLengthSmart(mm, unitMode, preferUnit) {
     if (mm == null || isNaN(mm)) return '';
-    if (unitMode === 'metric') return `${mm.toFixed(0)} mm`;
-    if (unitMode === 'imperial') return `${mmToIn(mm).toFixed(1)} in`;
-    // international: pick preferred unit
-    if (preferUnit === 'in') return `${mmToIn(mm).toFixed(1)} in`;
-    return `${mm.toFixed(0)} mm`;
+    const useIn = unitMode === 'imperial' || (unitMode !== 'metric' && preferUnit === 'in');
+    return useIn ? withUnit(mmToIn(mm).toFixed(1), 'u_in', 'in') : withUnit(mm.toFixed(0), 'u_mm', 'mm');
   }
   function displayDeltaSmart(mm, unitMode, preferUnit) {
     if (mm == null || isNaN(mm)) return '';
     const sign = mm >= 0 ? '+' : '';
-    if (unitMode === 'metric') return `${sign}${mm.toFixed(0)} mm`;
-    if (unitMode === 'imperial') return `${sign}${mmToIn(mm).toFixed(1)} in`;
-    // international: pick preferred unit
-    if (preferUnit === 'in') return `${sign}${mmToIn(mm).toFixed(1)} in`;
-    return `${sign}${mm.toFixed(0)} mm`;
+    const useIn = unitMode === 'imperial' || (unitMode !== 'metric' && preferUnit === 'in');
+    return useIn ? withUnit(sign + mmToIn(mm).toFixed(1), 'u_in', 'in') : withUnit(sign + mm.toFixed(0), 'u_mm', 'mm');
   }
 
   // Visualizations using canvas
@@ -1562,17 +1566,17 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     // Hub face label only when the hub line is shown
-    if (showHub) ctx.fillText('Hub', hubFaceX, marginY - 4);
+    if (showHub) ctx.fillText(t('cv_hub', 'Hub'), hubFaceX, marginY - 4);
     // Strut/Fender labels only if their lines exist
-    if (xStrutLabel != null) ctx.fillText('Strut', xStrutLabel, marginY - 4);
+    if (xStrutLabel != null) ctx.fillText(t('cv_strut', 'Strut'), xStrutLabel, marginY - 4);
     if (xFenderLabel != null) {
       // Left-aligned just right of its line so it never overlaps "Hub"
       // (the fender line usually sits only a few px from the hub face)
       ctx.textAlign = 'left';
       let fx = xFenderLabel + 3;
-      if (showHub) fx = Math.max(fx, hubFaceX + ctx.measureText('Hub').width / 2 + 4);
-      fx = Math.min(fx, W - ctx.measureText('Fender').width - 2);
-      ctx.fillText('Fender', fx, marginY - 4);
+      if (showHub) fx = Math.max(fx, hubFaceX + ctx.measureText(t('cv_hub', 'Hub')).width / 2 + 4);
+      fx = Math.min(fx, W - ctx.measureText(t('cv_fender', 'Fender')).width - 2);
+      ctx.fillText(t('cv_fender', 'Fender'), fx, marginY - 4);
     }
   }
 
@@ -1586,24 +1590,25 @@
     wrap.innerHTML = `
       <div class="setup-card-head">
         <h4>Setup</h4>
-        <button class="copy-baseline" type="button" title="Copy all values from the baseline setup">Get from baseline</button>
+        <button class="copy-baseline" type="button" title="Copy all values from the baseline setup" data-t-title="fit_copy_title"><span data-t="fit_copy">Get from baseline</span></button>
+        <button class="remove" type="button" title="Remove this setup" aria-label="Remove this setup" data-t-title="fit_remove" data-t-aria="fit_remove"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg></button>
       </div>
       <div class="grid two">
         <div>
-          <div class="field"><label>Rim diameter<input id="${id}_rim_diam" type="number" step="1" placeholder="in"></label></div>
-          <div class="field"><label>Rim width<input id="${id}_rim_width" type="number" step="1" placeholder="in"></label></div>
-          <div class="field"><label>Offset ET<input id="${id}_offset" type="number" step="1" placeholder="mm"></label></div>
-          <div class="field adv-field"><label>Spacer<input id="${id}_spacer" type="number" step="1" placeholder="mm"></label></div>
+          <div class="field"><label><span data-t="fit_rim_diam">Rim diameter</span><input id="${id}_rim_diam" type="number" step="1" placeholder="in" data-t-ph="u_in"></label></div>
+          <div class="field"><label><span data-t="fit_rim_width">Rim width</span><input id="${id}_rim_width" type="number" step="1" placeholder="in" data-t-ph="u_in"></label></div>
+          <div class="field"><label><span data-t="fit_offset">Offset ET</span><input id="${id}_offset" type="number" step="1" placeholder="mm" data-t-ph="u_mm"></label></div>
+          <div class="field adv-field"><label><span data-t="fit_spacer">Spacer</span><input id="${id}_spacer" type="number" step="1" placeholder="mm" data-t-ph="u_mm"></label></div>
         </div>
         <div>
-          <div class="field"><label>Tire size<span class="tire-wrap"><input id="${id}_tire" maxlength="6" placeholder="e.g., 235/45"><span class="tire-suffix" id="${id}_tire_suffix">R—</span></span></label></div>
-          <div class="field adv-field"><label>Width correction (%)<input id="${id}_correction" type="number" placeholder="%" step="1" min="-20" max="20"></label></div>
-          <div class="field adv-field"><label>Bulge (%)<input id="${id}_bulge" type="number" placeholder="%" step="1" min="0" max="10" value="5"></label></div>
+          <div class="field"><label><span data-t="fit_tire_size">Tire size</span><span class="tire-wrap"><input id="${id}_tire" maxlength="6" placeholder="---/--"><span class="tire-suffix" id="${id}_tire_suffix">R—</span></span></label></div>
+          <div class="field adv-field"><label><span data-t="fit_correction">Width correction (%)</span><input id="${id}_correction" type="number" placeholder="%" step="1" min="-20" max="20"></label></div>
+          <div class="field adv-field"><label><span data-t="fit_bulge">Bulge (%)</span><input id="${id}_bulge" type="number" placeholder="%" step="1" min="0" max="10" value="5"></label></div>
         </div>
       </div>
-      <div class="actions"><button class="remove" type="button">Remove</button></div>
     `;
     addRearInputs(wrap, id);
+    window.ToolMeUp?.translate?.(wrap); // data-t labels in the new card
     wrap.querySelector('.remove').addEventListener('click', () => {
       wrap.remove();
       renumberSetups();
@@ -1611,14 +1616,7 @@
     });
     // Copy all values from the baseline entries (both axles) into this card
     wrap.querySelector('.copy-baseline').addEventListener('click', () => {
-      [['base', id], [rearPrefix('base'), rearPrefix(id)]].forEach(([from, to]) => {
-        AXLE_FIELDS.forEach(suffix => {
-          const src = document.getElementById(`${from}_${suffix}`);
-          const dst = wrap.querySelector(`#${to}_${suffix}`);
-          if (src && dst) dst.value = src.value;
-        });
-      });
-      updSuffix();
+      copySetupValues('base', id);
       renderAll();
     });
     // Keep the R-suffix in the tire box synced with this card's rim diameter
@@ -1722,7 +1720,7 @@
     const stag = isStaggered();
     const out = [];
     setups.forEach((s, i) => {
-      const name = `Setup ${i + 1}`;
+      const name = t('fit_setup_n', 'Setup {n}', { n: i + 1 });
       const group = i + 1;
       if (stag) {
         out.push({ key: s.id, s, base: baseline, name, group, axle: 'front' });
@@ -1951,15 +1949,15 @@
   }
   // Switch front/rear mode. Turning it on trims extra setups (after asking)
   // and seeds empty rear columns from the front. Returns false if cancelled.
-  function setStaggered(on, opts = {}) {
+  async function setStaggered(on, opts = {}) {
     const cb = document.getElementById('opt_staggered');
     if (!cb) return false;
     if (on) {
       const cards = $$('#setups .setup-card');
       if (cards.length > MAX_SETUPS_STAGGERED) {
-        const ok = opts.noConfirm || confirm(
-          `Front/rear mode compares up to ${MAX_SETUPS_STAGGERED} setups. ` +
-          `Remove setups ${MAX_SETUPS_STAGGERED + 1}–${cards.length}?`);
+        const ok = opts.noConfirm || await askConfirm(t('fit_stag_trim_q',
+          'Front/rear mode compares up to {max} setups. Remove setups {from}–{to}?',
+          { max: MAX_SETUPS_STAGGERED, from: MAX_SETUPS_STAGGERED + 1, to: cards.length }));
         if (!ok) { cb.checked = false; document.body.classList.remove('fit-staggered'); return false; }
         cards.slice(MAX_SETUPS_STAGGERED).forEach(c => c.remove());
       }
@@ -1978,14 +1976,14 @@
     // Rear twins for the baseline inputs must exist before the baseline
     // input listeners are attached (initBaseline).
     addRearInputs($('#base'), 'base');
-    const adv = document.getElementById('opt_adv');
-    adv?.addEventListener('change', () => {
+    const simple = document.getElementById('opt_simple');
+    simple?.addEventListener('change', () => {
       applyAdvClass();
       saveBaseline();
     });
     const stag = document.getElementById('opt_staggered');
     stag?.addEventListener('change', () => setStaggered(stag.checked));
-    document.addEventListener('toolmeup:langchange', relabelAxleHeads);
+    document.addEventListener('toolmeup:langchange', () => { relabelAxleHeads(); renumberSetups(); updateSessionUI(); });
     applyAdvClass();
     // Hooks for oem-presets.js
     window.TMU = window.TMU || {};
@@ -2022,7 +2020,7 @@
 
   // Renumber visible setup headings by position (display only, not stored)
   function renumberSetups() {
-    $$('#setups .setup-card h4').forEach((h, i) => { h.textContent = `Setup ${i + 1}`; });
+    $$('#setups .setup-card h4').forEach((h, i) => { h.textContent = t('fit_setup_n', 'Setup {n}', { n: i + 1 }); });
     updateAddBtn();
   }
 
@@ -2033,24 +2031,40 @@
     const n = $$('#setups .setup-card').length;
     const max = maxSetups();
     btn.disabled = n >= max;
-    btn.title = btn.disabled ? `Maximum ${max} setups${isStaggered() ? ' in front/rear mode' : ''}` : '';
+    btn.title = btn.disabled ? (isStaggered() ? t('fit_max_stag', 'Maximum {max} setups in front/rear mode', { max }) : t('fit_max', 'Maximum {max} setups', { max })) : '';
     const note = document.getElementById('setupLimit');
     if (note) note.textContent = `${n} / ${max}`;
   }
 
   // Add setups
   let setupIdx = 1;
-  function addSetupCard() {
+  // opts.prefill: start the new card as a copy of the card above it (the
+  // baseline for the first setup), so the user only edits what changes.
+  // Session loads call this without prefill and fill the values themselves.
+  function addSetupCard(opts = {}) {
     if ($$('#setups .setup-card').length >= maxSetups()) { updateAddBtn(); return null; }
+    const prev = $$('#setups .setup-card').pop();
     const card = makeSetupCard(setupIdx++);
     $("#setups").appendChild(card);
+    if (opts.prefill) copySetupValues(prev ? prev.dataset.id : 'base', card.dataset.id);
     renumberSetups();
     return card;
+  }
+  // Copy every per-axle field (front and rear) from one block to another
+  function copySetupValues(fromPrefix, toPrefix) {
+    [[fromPrefix, toPrefix], [rearPrefix(fromPrefix), rearPrefix(toPrefix)]].forEach(([from, to]) => {
+      AXLE_FIELDS.forEach(suffix => {
+        const src = document.getElementById(`${from}_${suffix}`);
+        const dst = document.getElementById(`${to}_${suffix}`);
+        if (src && dst) dst.value = src.value;
+      });
+    });
+    updateTireSuffixes();
   }
   function initSetups() {
     const addBtn = $("#addSetup");
     addBtn.addEventListener('click', () => {
-      if (addSetupCard()) renderAll();
+      if (addSetupCard({ prefill: true })) renderAll();
     });
     // Programmatic add (session load); returns the card or null at the cap
     window.__addSetupCard = addSetupCard;
@@ -2129,8 +2143,8 @@
 
     // Options first: they decide how many setup cards fit and which fields count
     const opts = sess.opts || { adv: sessionUsesAdv(sess), staggered: false };
-    const advCb = document.getElementById('opt_adv');
-    if (advCb) advCb.checked = !!opts.adv;
+    const simpleCb = document.getElementById('opt_simple');
+    if (simpleCb) simpleCb.checked = !opts.adv;
     applyAdvClass();
     const stagCb = document.getElementById('opt_staggered');
     if (stagCb) stagCb.checked = !!opts.staggered;
@@ -2148,7 +2162,7 @@
       $('#base_inner_clear').value = sess.base.inner_clear || '';
       $('#base_outer_clear').value = sess.base.outer_clear || '';
       $('#base_arch_clear').value = (sess.base.arch_clear === '' || sess.base.arch_clear == null) ? 50 : sess.base.arch_clear;
-      $('#base_speedo_error').value = sess.base.speedo_error || '';
+      $('#base_speedo_error').value = sess.base.speedo_error || '0';
       $('#th_inner').value = sess.base.th_inner || '';
       $('#th_outer').value = sess.base.th_outer || '';
       writeAxleValues(rearPrefix('base'), sess.base.rear || {});
@@ -2202,7 +2216,7 @@
     const bar = document.getElementById('sessionNameBar');
     if (bar) {
       if (loadedSession) {
-        bar.textContent = `Session: ${loadedSession.name}`;
+        bar.textContent = t('ses_bar', 'Session: {name}', { name: loadedSession.name });
         bar.hidden = false;
       } else {
         bar.textContent = '';
@@ -2216,7 +2230,7 @@
     if (saveBtn) {
       const hasSetups = !!document.querySelector('#setups .setup-card');
       saveBtn.disabled = !hasSetups;
-      saveBtn.title = hasSetups ? '' : 'Add at least one setup before saving a session';
+      saveBtn.title = hasSetups ? '' : t('ses_need_setup', 'Add at least one setup before saving a session');
     }
   }
 
@@ -2225,49 +2239,49 @@
     updateSessionUI();
   }
 
-  function saveSession() {
+  async function saveSession() {
     const data = serializeSession();
-    const name = prompt('Save session as (name):', new Date().toLocaleString());
+    const name = await askText(t('ses_save_prompt', 'Save session as (name):'), new Date().toLocaleString());
     if (!name) return;
     const item = { id: Date.now(), name, ts: Date.now(), data };
     const arr = readSessions();
     arr.push(item);
     writeSessions(arr);
     setLoadedSession(item);
-    alert('Session saved.');
+    notify(t('ses_saved', 'Session saved.'));
   }
 
-  function overwriteSession() {
+  async function overwriteSession() {
     if (!loadedSession) return;
     const arr = readSessions();
     const item = arr.find(it => it.id === loadedSession.id);
     if (!item) {
-      alert('The loaded session no longer exists. Use Save Session instead.');
+      notify(t('ses_missing', 'The loaded session no longer exists. Use Save Session instead.'), true);
       setLoadedSession(null);
       return;
     }
-    if (!confirm(`Overwrite session "${item.name}" with the current values?`)) return;
+    if (!await askConfirm(t('ses_overwrite_q', 'Overwrite session "{name}" with the current values?', { name: item.name }))) return;
     item.data = serializeSession();
     item.ts = Date.now();
     writeSessions(arr);
-    alert('Session overwritten.');
+    notify(t('ses_overwritten', 'Session overwritten.'));
   }
 
   // Modal listing saved sessions with load / rename / delete
   function loadSession() {
     const arr = readSessions();
-    if (!arr.length) { alert('No saved sessions.'); return; }
+    if (!arr.length) { notify(t('ses_none', 'No saved sessions.')); return; }
 
     let overlay = document.getElementById('sessionModal');
     if (overlay) overlay.remove();
     overlay = document.createElement('div');
     overlay.id = 'sessionModal';
-    overlay.className = 'modal-overlay is-open';
+    overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal" role="dialog" aria-modal="true" aria-label="Saved sessions">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sessionModalTitle">
         <div class="modal__head">
-          <h3 class="modal__title">Saved Sessions</h3>
-          <button class="modal__close" type="button" aria-label="Close">&times;</button>
+          <h3 class="modal__title" id="sessionModalTitle">${t('ses_title', 'Saved sessions')}</h3>
+          <button class="modal__close" type="button" aria-label="${t('ui_close', 'Close')}">&times;</button>
         </div>
         <div class="modal__body">
           <div class="hint"${window.ToolMeUp?.lang?.() === 'ar' ? ' dir="rtl"' : ''}>${window.ToolMeUp?.hintText?.('hint_sessions') || 'Click a session name to load it.'}</div>
@@ -2275,9 +2289,8 @@
         </div>
       </div>`;
 
-    const close = () => overlay.remove();
-    overlay.querySelector('.modal__close').addEventListener('click', close);
-    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    // Opened (focus, Tab trap, Esc, inert page) once the list is built, below
+    let close = () => overlay.remove();
 
     const list = overlay.querySelector('.session-list');
     const rebuild = () => {
@@ -2288,10 +2301,10 @@
         const li = document.createElement('li');
         li.className = 'session-item';
         li.innerHTML = `
-          <button class="session-load" type="button" title="Load this session"></button>
+          <button class="session-load" type="button" title="${t('ses_load_one', 'Load this session')}"></button>
           <span class="session-date"></span>
-          <button class="session-icon rename" type="button" title="Rename">&#9998;</button>
-          <button class="session-icon delete" type="button" title="Delete">&#128465;</button>`;
+          <button class="session-icon rename" type="button" title="${t('ses_rename', 'Rename')}">&#9998;</button>
+          <button class="session-icon delete" type="button" title="${t('ses_delete', 'Delete')}">&#128465;</button>`;
         li.querySelector('.session-load').textContent = it.name;
         li.querySelector('.session-date').textContent = new Date(it.ts).toLocaleDateString();
         li.querySelector('.session-load').addEventListener('click', () => {
@@ -2299,8 +2312,8 @@
           setLoadedSession(it);
           close();
         });
-        li.querySelector('.rename').addEventListener('click', () => {
-          const newName = prompt('Rename session:', it.name);
+        li.querySelector('.rename').addEventListener('click', async () => {
+          const newName = await askText(t('ses_rename_prompt', 'Rename session:'), it.name);
           if (!newName || newName === it.name) return;
           const all = readSessions();
           const target = all.find(x => x.id === it.id);
@@ -2311,8 +2324,8 @@
           }
           rebuild();
         });
-        li.querySelector('.delete').addEventListener('click', () => {
-          if (!confirm(`Delete session "${it.name}"?`)) return;
+        li.querySelector('.delete').addEventListener('click', async () => {
+          if (!await askConfirm(t('ses_delete_q', 'Delete session "{name}"?', { name: it.name }))) return;
           writeSessions(readSessions().filter(x => x.id !== it.id));
           if (loadedSession && loadedSession.id === it.id) setLoadedSession(null);
           rebuild();
@@ -2322,10 +2335,17 @@
     };
     rebuild();
     document.body.appendChild(overlay);
+    if (window.ToolMeUp?.openDialog) close = window.ToolMeUp.openDialog(overlay, { remove: true, initial: '.session-load' });
+    else overlay.classList.add('is-open');
+    overlay.querySelector('.modal__close').addEventListener('click', () => close());
   }
 
-  // Autosave current working state to restore on reload
+  // Autosave current working state to restore on reload. Held off until
+  // tryAutoLoad() has run: start-up renders would otherwise save the page
+  // defaults over the stored state (e.g. options) before it is read back.
+  let autoSaveReady = false;
   function saveAutoState() {
+    if (!autoSaveReady) return;
     try {
       const data = serializeSession();
       localStorage.setItem(AUTO_KEY, JSON.stringify(data));
@@ -2342,8 +2362,8 @@
   }
 
   // Reset all fields: clear text boxes, restore HTML defaults, remove setups
-  function resetAllFields() {
-    if (!confirm('Reset all fields to their defaults?')) return;
+  async function resetAllFields() {
+    if (!await askConfirm(t('fit_reset_q', 'Reset all fields to their defaults?'))) return;
     // Remove all setup cards
     const setupsWrap = document.getElementById('setups');
     if (setupsWrap) setupsWrap.innerHTML = '';
@@ -2354,12 +2374,12 @@
     });
     // Speedometer error intentionally has no default value
     const spd = document.getElementById('base_speedo_error');
-    if (spd) spd.value = '';
+    if (spd) spd.value = '0';
     const preset = document.getElementById('presetSelect');
     if (preset) preset.selectedIndex = 0;
     // Options back to their defaults (advanced fields hidden, single column)
-    const advCb = document.getElementById('opt_adv');
-    if (advCb) advCb.checked = false;
+    const simpleCb = document.getElementById('opt_simple');
+    if (simpleCb) simpleCb.checked = true;
     applyAdvClass();
     const stagCb = document.getElementById('opt_staggered');
     if (stagCb) stagCb.checked = false;
@@ -2408,7 +2428,7 @@
       initSessionIO();
     }
     // Try to auto-load last working state only on the fitment page
-    if (hasFitment) tryAutoLoad();
+    if (hasFitment) { tryAutoLoad(); autoSaveReady = true; saveAutoState(); }
     // Re-render on resize/zoom so canvases match the new on-screen
     // resolution (browser zoom changes devicePixelRatio and fires resize)
     if (hasFitment) window.addEventListener('resize', debounce(renderAll, 100));

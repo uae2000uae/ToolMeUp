@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" data-theme="light" data-tool="fitment" class="compact">
+<html lang="en" data-theme="light" data-tool="fitment">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="boot.js?v=20261112p"></script>
+  <script src="boot.js?v=20261114a"></script>
   <title>Wheel & Tire Fitment Calculator — ToolMeUp</title>
   <meta name="description" content="Compare wheel and tire setups against a baseline: overall diameter, offset, spacers, inner/outer clearances and speedometer error. Runs entirely in your browser.">
   <meta name="theme-color" content="#2563eb">
@@ -18,86 +18,105 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113n">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114s">
 </head>
-<body>
+<body data-hue="amber">
   <!-- Shared top navigation: injected from base.html by shared.js -->
-  <header class="app-header" data-shared-header data-brand="ToolMeUp • Fitment Calculator"></header>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
 
-  <main class="container">
-    <div class="actions">
-	   <button id="loadSessionBtn" type="button" class="primary">Load Session</button>
-	   <button id="resetFieldsBtn" type="button">Reset All Fields</button>
+  <!-- Tool-page kit layout (ui.css .tp); data-hue on <body> so modals share the amber accent -->
+  <main class="container tp fit">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/></svg></div>
+      <div class="tp-head__text">
+        <h1 data-i18n="fit_title">Wheel &amp; Tire Fitment</h1>
+        <p data-i18n="fit_lead">Compare new wheel and tire setups against what's on your car now: offset, poke, clearances and speedometer error.</p>
+      </div>
+      <div class="tp-head__actions">
+        <button id="loadSessionBtn" type="button" class="btn btn--sm">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span data-t="fit_load">Load session</span>
+        </button>
+        <button id="resetFieldsBtn" type="button" class="btn btn--sm btn--ghost">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5"/></svg>
+          <span data-t="fit_reset">Reset</span>
+        </button>
+      </div>
     </div>
-	  <br>
     <div id="sessionNameBar" class="session-name" hidden></div>
-    <div class="fit-options" role="group" aria-label="Calculator options">
+    <div class="fit-options" role="group" aria-label="Calculator options" data-t-aria="fit_options">
       <label class="fit-opt">
-        <input type="checkbox" id="opt_adv">
-        <span class="fit-opt__text"><b data-i18n="opt_adv_title">Spacer, width correction &amp; bulge</b><small data-i18n="opt_adv_desc">Hidden fields use the defaults: no spacer, 0% correction, 5% bulge.</small></span>
+        <input type="checkbox" id="opt_simple" checked>
+        <span class="fit-opt__text"><b data-i18n="opt_simple_title">Simplify</b><small data-i18n="opt_simple_desc">Hides spacer, width correction and bulge, and uses the defaults: no spacer, 0% correction, 5% bulge.</small></span>
       </label>
       <label class="fit-opt">
         <input type="checkbox" id="opt_staggered">
         <span class="fit-opt__text"><b data-i18n="opt_stag_title">Different front &amp; rear sizes</b><small data-i18n="opt_stag_desc">Adds a rear column to every setup. Up to 2 setups in this mode.</small></span>
       </label>
     </div>
-    <section id="base" class="panel">
-      <h2>1) Baseline Setup</h2>
+    <section id="base" class="card fit-step">
+      <div class="fit-step__head">
+        <span class="fit-step__n" aria-hidden="true">1</span>
+        <div>
+          <h2 class="card__title" data-i18n="fit_s1_t">Baseline setup</h2>
+          <p class="card__sub" data-i18n="fit_s1_sub">The wheels and tires on your car today. Everything else is compared against this.</p>
+        </div>
+      </div>
       <div class="preset preset-row">
-        <select id="presetSelect">
-          <option value="">Preset samples</option>
+        <select id="presetSelect" aria-label="Preset sample sizes" data-t-aria="a11y_preset">
+          <option value="" data-t="fit_preset_samples">Preset samples</option>
           <option value="225/45R17">225/45R17 on 17x7.5 ET45</option>
           <option value="205/55R16">205/55R16 on 16x6.5 ET50</option>
           <option value="265/35R19">265/35R19 on 19x9 ET35</option>
         </select>
-        <button id="oemPresetBtn" type="button" class="primary" title="Load factory wheel/tire specs from the OEM database">OEM Presets…</button>
+        <button id="oemPresetBtn" type="button" class="btn" title="Load factory wheel/tire specs from the OEM database" data-t-title="fit_oem_title"><span data-t="fit_oem_btn">OEM Presets…</span></button>
       </div>
       <div class="grid two">
         <div>
-          <h3>Wheel</h3>
+          <h3 data-t="fit_h_wheel">Wheel</h3>
           <div class="field">
-            <label>Rim diameter
-              <input id="base_rim_diam" type="number" step="0.1" placeholder="in">
+            <label><span data-t="fit_rim_diam">Rim diameter</span>
+              <input id="base_rim_diam" type="number" step="0.1" placeholder="in" data-t-ph="u_in">
             </label>
           </div>
           <div class="field">
-            <label>Rim width
-              <input id="base_rim_width" type="number" step="0.1" placeholder="in">
+            <label><span data-t="fit_rim_width">Rim width</span>
+              <input id="base_rim_width" type="number" step="0.1" placeholder="in" data-t-ph="u_in">
             </label>
           </div>
           <div class="field">
-            <label>Offset ET
-              <input id="base_offset" type="number" step="1" placeholder="mm">
+            <label><span data-t="fit_offset">Offset ET</span>
+              <input id="base_offset" type="number" step="1" placeholder="mm" data-t-ph="u_mm">
             </label>
 			 <div class="hint" data-i18n="hint_offset">The distance (mm) from the wheel's mounting face to its centerline: a higher number tucks the wheel further inward, a lower or negative number pushes it outward.</div>
           </div>
           <div class="field adv-field">
-            <label>Spacer
-              <input id="base_spacer" type="number" step="1" placeholder="mm">
+            <label><span data-t="fit_spacer">Spacer</span>
+              <input id="base_spacer" type="number" step="1" placeholder="mm" data-t-ph="u_mm">
             </label>
 			 <div class="hint" data-i18n="hint_spacer">A plate (mm) fitted between the hub and wheel that pushes the whole wheel outward. Leave it empty if no spacer fitted.</div>
           </div>
         </div>
         <div>
-          <h3>Tire</h3>
-          <div class="field"><label>Tire size<span class="tire-wrap" ><input id="base_tire" placeholder="e.g., 235/45" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label>
+          <h3 data-t="fit_h_tire">Tire</h3>
+          <div class="field"><label><span data-t="fit_tire_size">Tire size</span><span class="tire-wrap"><input id="base_tire" placeholder="---/--" maxlength="6"><span class="tire-suffix" id="base_tire_suffix">R—</span></span></label>
 			 <div class="hint" data-i18n="hint_tire_size">The first number is the tire width in (mm); the second is  sidewall height as a (%) of that width. The R number is taken from your rim diameter.</div></div>
-          <div class="field adv-field"><label>Width correction (%)
+          <div class="field adv-field"><label><span data-t="fit_correction">Width correction (%)</span>
           <input id="base_correction" type="number" step="1" min="-20" max="20" placeholder="%"></label>
 			 <div class="hint" data-i18n="hint_correction">Some tire types run wider, this helps us make sure your tire is free from touching anything. Leave it 0 if you don't know yours</div>
 		  </div>
-          <div class="field adv-field"><label>Bulge (%)<input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label>
+          <div class="field adv-field"><label><span data-t="fit_bulge">Bulge (%)</span><input id="base_bulge" type="number" step="1" min="0" max="10" value="5"></label>
 			 <div class="hint" data-i18n="hint_bulge">Sidewall bulge past the rim edge, shown in the drawing. 5% is typical.</div>
 		  </div>
         </div>
 </div>
       <div class="grid two">
         <div>
-          <h3>Speedometer</h3>
-          <div class="field"><label>Current speedo error (%)<input id="base_speedo_error" type="number" placeholder="%" step="1"></label>
+          <h3 data-t="fit_h_speedo">Speedometer</h3>
+          <div class="field"><label><span data-t="fit_speedo_err">Current speedo error (%)</span><input id="base_speedo_error" type="number" placeholder="%" step="1" value="0"></label>
 <div class="hint">
 
     <div data-i18n="hint_speedo_intro">
@@ -116,57 +135,68 @@
 </div>
 </div>
 	<div>
-          <h3>Fender Clearance</h3>
-<div class="field"><label>Current tire clearance to wheel arch<input id="base_arch_clear" type="number" step="1" value="50" placeholder="mm"></label>
+          <h3 data-t="fit_h_fender">Fender Clearance</h3>
+<div class="field"><label><span data-t="fit_arch_clear">Current tire clearance to wheel arch</span><input id="base_arch_clear" type="number" step="1" value="50" placeholder="mm" data-t-ph="u_mm"></label>
 	 <div class="hint" data-i18n="hint_arch_clearance">The gap (mm) between the top of your current tire and the wheel arch / fender liner. Taller tires eat into this gap; we use it to warn you if the tire rubs.</div></div>
         </div>
       </div>
       <details class="advanced">
-        <summary class="advanced__summary">Advanced settings</summary>
+        <summary class="advanced__summary" data-t="fit_advanced">Advanced settings (optional)</summary>
       <div class="grid two">
         <div>
-          <h3>Vehicle Clearances (optional)</h3>
-          <div class="field"><label>Current inner clearance to strut<input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm"></label></div>
-          <div class="field"><label>Current outer clearance to fender<input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm"></label>
+          <h3 data-t="fit_h_vehicle">Vehicle Clearances</h3>
+          <div class="field"><label><span data-t="fit_inner_clear">Current inner clearance to strut</span><input id="base_inner_clear" type="number" step="1" value="15" placeholder="mm" data-t-ph="u_mm"></label></div>
+          <div class="field"><label><span data-t="fit_outer_clear">Current outer clearance to fender</span><input id="base_outer_clear" type="number" step="1" value="15" placeholder="mm" data-t-ph="u_mm"></label>
 				 <div class="hint" data-i18n="hint_clearance">This is helpfull to know how much space you have behind the wheel to use for wider wheels, to make sure tires don't touch the inside of the wheel or the outside fender. Providing this with setting the minimums help us warn you when you're too close or more.</div></div>
         </div>
         <div>
-          <h3>Thresholds</h3>
-          <div class="field"><label>Min inner clearance<input id="th_inner" type="number" step="1" value="10" placeholder="mm"></label></div>
-          <div class="field"><label>Min outer clearance<input id="th_outer" type="number" step="1" value="0" placeholder="mm"></label></div>
+          <h3 data-t="fit_h_thresholds">Thresholds</h3>
+          <div class="field"><label><span data-t="fit_min_inner">Min inner clearance</span><input id="th_inner" type="number" step="1" value="10" placeholder="mm" data-t-ph="u_mm"></label></div>
+          <div class="field"><label><span data-t="fit_min_outer">Min outer clearance</span><input id="th_outer" type="number" step="1" value="0" placeholder="mm" data-t-ph="u_mm"></label></div>
           <div class="hint" data-i18n="hint_thresholds">These are red-flag thresholds. We will calculate the clearance based on your provided current settings and will warn you if lines are crossed. Calculation will not be blocked.</div>
         </div>
       </div>
       </details>
     </section>
 
-    <section class="panel">
-      <h2>2) Compare Setups</h2>
-      <div id="setups"></div>
-      <div class="actions">
-        <button id="addSetup" type="button" class="green">+ Add Setup</button>
-        <span id="setupLimit" class="small muted-note"></span>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>3) Results & Visualizations</h2>
-      <div class="actions actions--between">
-        <div id="setupTabs" class="tabs"></div>
+    <section class="card fit-step">
+      <div class="fit-step__head">
+        <span class="fit-step__n" aria-hidden="true">2</span>
         <div>
-          <button id="saveSessionBtn" type="button" class="primary">Save Session</button>
-          <button id="overwriteSessionBtn" type="button" hidden>Overwrite Session</button>
+          <h2 class="card__title" data-i18n="fit_s2_t">Setups to compare</h2>
+          <p class="card__sub" data-i18n="fit_s2_sub">Add the wheel and tire combinations you are considering.</p>
         </div>
       </div>
-      <div class="grid two">
+      <div id="setups"></div>
+      <button id="addSetup" type="button" class="fit-add">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span data-t="fit_add_setup">Add setup</span>
+      </button>
+      <span id="setupLimit" class="small muted-note"></span>
+    </section>
+
+    <section class="card fit-step fit-results">
+      <div class="fit-step__head">
+        <span class="fit-step__n" aria-hidden="true">3</span>
+        <div>
+          <h2 class="card__title" data-i18n="fit_s3_t">Results</h2>
+          <p class="card__sub" data-i18n="fit_s3_sub">Drawings and measurements for the selected setup.</p>
+        </div>
+        <div class="fit-step__actions">
+          <button id="overwriteSessionBtn" type="button" class="btn btn--sm" hidden><span data-t="fit_overwrite">Overwrite session</span></button>
+          <button id="saveSessionBtn" type="button" class="btn btn--sm btn--primary"><span data-t="fit_save">Save session</span></button>
+        </div>
+      </div>
+      <div id="setupTabs" class="tabs"></div>
+      <div class="grid two fit-viz">
         <div>
           <div class="canvas-wrap">
             <canvas id="RimView" width="560" height="320" class="canvas"></canvas>
             <div class="canvas-controls">
-              <label class="cv-toggle cv-base"><input type="checkbox" id="rv_show_base" checked> Base</label>
-              <label class="cv-toggle cv-setup"><input type="checkbox" id="rv_show_setup" checked> Setup</label>
-              <label class="cv-toggle cv-refs"><input type="checkbox" id="rv_show_refs" checked> Strut/Fender</label>
-              <label class="cv-toggle cv-hub"><input type="checkbox" id="rv_show_hub" checked> Hub face</label>
+              <label class="cv-toggle cv-base"><input type="checkbox" id="rv_show_base" checked> <span data-t="fit_cv_base">Base</span></label>
+              <label class="cv-toggle cv-setup"><input type="checkbox" id="rv_show_setup" checked> <span data-t="fit_cv_setup">Setup</span></label>
+              <label class="cv-toggle cv-refs"><input type="checkbox" id="rv_show_refs" checked> <span data-t="fit_cv_refs">Strut/Fender</span></label>
+              <label class="cv-toggle cv-hub"><input type="checkbox" id="rv_show_hub" checked> <span data-t="fit_cv_hub">Hub face</span></label>
             </div>
           </div>
           <div class="caption" data-i18n="caption_rim_view">Wheel and tire cross-section comparison</div>
@@ -175,7 +205,7 @@
           <div class="canvas-wrap">
             <canvas id="sideView" width="560" height="320" class="canvas"></canvas>
             <div class="canvas-controls canvas-controls--top">
-              <label class="cv-toggle cv-fender"><input type="checkbox" id="sv_show_fender" checked> Show Fender</label>
+              <label class="cv-toggle cv-fender"><input type="checkbox" id="sv_show_fender" checked> <span data-t="fit_cv_fender">Show Fender</span></label>
             </div>
           </div>
           <div class="caption" data-i18n="caption_side_view">Tires side view comparison</div>
@@ -186,11 +216,11 @@
       <div class="actions actions--end">
         <div class="measurement">
           <label class="toggle">
-            <span class="small">Units</span>
+            <span class="small" data-t="fit_units">Units</span>
             <select id="unitToggle">
-              <option value="metric">Metric</option>
-              <option value="imperial">Imperial</option>
-              <option value="international" selected>International</option>
+              <option value="metric" data-t="fit_u_metric">Metric</option>
+              <option value="imperial" data-t="fit_u_imperial">Imperial</option>
+              <option value="international" selected data-t="fit_u_intl">International</option>
             </select>
           </label>
         </div>
@@ -201,11 +231,11 @@
   </main>
 
   <footer class="app-footer">
-    <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
+    <span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span>
   </footer>
 
-  <script src="shared.js?v=20261113i"></script>
-  <script src="app.js?v=20261113e"></script>
-  <script src="oem-presets.js?v=20261113a"></script>
+  <script src="shared.js?v=20261114r"></script>
+  <script src="app.js?v=20261114s"></script>
+  <script src="oem-presets.js?v=20261114r"></script>
 </body>
 </html>

@@ -32,6 +32,9 @@
   ];
 
   // ---- tiny helpers ----------------------------------------------------
+  // Arabic via shared.js; static parts of the modal carry data-t so the
+  // language button re-translates them in place.
+  function T(key, en, vars) { return (window.ToolMeUp && window.ToolMeUp.t) ? window.ToolMeUp.t(key, en, vars) : en; }
   function el(tag, attrs, html) {
     var e = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
@@ -54,10 +57,10 @@
     if (cache[url]) return Promise.resolve(cache[url]);
     return fetch(url, { headers: { Accept: "application/json" } }).then(function (r) {
       if (!r.ok) {
-        var msg = r.status === 403 ? "API key missing or invalid (403)."
-          : r.status === 404 ? "No data found (404)."
-          : r.status === 429 ? "API request limit reached (429). Try later."
-          : "Request failed (" + r.status + ").";
+        var msg = r.status === 403 ? T("oem_e403", "API key missing or invalid (403).")
+          : r.status === 404 ? T("oem_e404", "No data found (404).")
+          : r.status === 429 ? T("oem_e429", "API request limit reached (429). Try later.")
+          : T("oem_efail", "Request failed ({code}).", { code: r.status });
         return r.text().then(function () { throw new Error(msg); });
       }
       return r.json();
@@ -69,34 +72,34 @@
   var ui = null;
   function buildModal() {
     var overlay = el("div", { class: "modal-overlay", id: "oemModal", "aria-hidden": "true" });
-    var modal = el("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-label": "OEM Fitment Presets" });
+    var modal = el("div", { class: "modal", role: "dialog", "aria-modal": "true", "aria-labelledby": "oemModalTitle" });
 
     var header = el("div", { class: "modal__head" });
-    header.appendChild(el("h3", { class: "modal__title" }, "OEM Fitment Presets"));
-    var closeBtn = el("button", { type: "button", class: "modal__close", "aria-label": "Close" }, "&times;");
+    header.appendChild(el("h3", { class: "modal__title", id: "oemModalTitle", "data-t": "oem_title" }, "OEM Fitment Presets"));
+    var closeBtn = el("button", { type: "button", class: "modal__close", "aria-label": "Close", "data-t-aria": "ui_close" }, "&times;");
     header.appendChild(closeBtn);
 
     var body = el("div", { class: "modal__body" });
     body.innerHTML =
-      '<p class="hint">Pick a vehicle to load its factory (OE) wheel &amp; tire spec. Data: Wheel-Size Fitment API.</p>' +
+      '<p class="hint" data-t="oem_intro">Pick a vehicle to load its factory (OE) wheel &amp; tire spec. Data: Wheel-Size Fitment API.</p>' +
       '<div class="oem-grid">' +
-        '<label class="oem-field">Region<select id="oemRegion"></select></label>' +
-        '<label class="oem-field">Make<select id="oemMake" disabled></select></label>' +
-        '<label class="oem-field">Model<select id="oemModel" disabled></select></label>' +
-        '<label class="oem-field">Year<select id="oemYear" disabled></select></label>' +
-        '<label class="oem-field">Trim / Engine<select id="oemTrim" disabled></select></label>' +
+        '<label class="oem-field"><span data-t="oem_region">Region</span><select id="oemRegion"></select></label>' +
+        '<label class="oem-field"><span data-t="oem_make">Make</span><select id="oemMake" disabled></select></label>' +
+        '<label class="oem-field"><span data-t="oem_model">Model</span><select id="oemModel" disabled></select></label>' +
+        '<label class="oem-field"><span data-t="oem_year">Year</span><select id="oemYear" disabled></select></label>' +
+        '<label class="oem-field"><span data-t="oem_trim">Trim / Engine</span><select id="oemTrim" disabled></select></label>' +
       '</div>' +
       '<div id="oemStatus" class="oem-status" role="status"></div>' +
       '<div id="oemFitments" class="oem-fitments"></div>' +
       '<div class="oem-capture">' +
-        '<div class="oem-capture__title">Capture into baseline</div>' +
-        '<label class="toggle"><input type="checkbox" id="oemApplyWheel" checked> <span>Wheel (rim diameter, width, offset)</span></label>' +
-        '<label class="toggle"><input type="checkbox" id="oemApplyTire" checked> <span>Tire (size)</span></label>' +
+        '<div class="oem-capture__title" data-t="oem_capture">Capture into baseline</div>' +
+        '<label class="toggle"><input type="checkbox" id="oemApplyWheel" checked> <span data-t="oem_cap_wheel">Wheel (rim diameter, width, offset)</span></label>' +
+        '<label class="toggle"><input type="checkbox" id="oemApplyTire" checked> <span data-t="oem_cap_tire">Tire (size)</span></label>' +
       '</div>';
 
     var footer = el("div", { class: "modal__foot" });
-    var cancel = el("button", { type: "button", class: "" }, "Cancel");
-    var apply = el("button", { type: "button", class: "primary", id: "oemApply", disabled: "disabled" }, "Apply to Baseline");
+    var cancel = el("button", { type: "button", class: "", "data-t": "oem_cancel" }, "Cancel");
+    var apply = el("button", { type: "button", class: "primary", id: "oemApply", disabled: "disabled", "data-t": "oem_apply" }, "Apply to Baseline");
     footer.appendChild(cancel);
     footer.appendChild(apply);
 
@@ -105,6 +108,7 @@
     modal.appendChild(footer);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
+    if (window.ToolMeUp && window.ToolMeUp.translate) window.ToolMeUp.translate(overlay);
 
     ui = {
       overlay: overlay,
@@ -121,14 +125,17 @@
     };
 
     // Region options
-    REGIONS.forEach(function (r) { ui.region.appendChild(opt(r[0], r[1])); });
+    REGIONS.forEach(function (r) {
+      var o = opt(r[0], T("oem_r_" + r[0], r[1]));
+      o.dataset.en = r[1]; o.setAttribute("data-t", "oem_r_" + r[0]);
+      ui.region.appendChild(o);
+    });
     ui.region.value = "usdm";
 
     // Events
-    closeBtn.addEventListener("click", close);
-    cancel.addEventListener("click", close);
-    overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && isOpen()) close(); });
+    // Backdrop clicks and Esc are handled by ToolMeUp.openDialog (see open())
+    closeBtn.addEventListener("click", function () { close(); });
+    cancel.addEventListener("click", function () { close(); });
 
     ui.region.addEventListener("change", onRegion);
     ui.make.addEventListener("change", onMake);
@@ -153,7 +160,7 @@
   }
   function fillSelect(sel, items, valueKey, labelFn) {
     sel.innerHTML = "";
-    sel.appendChild(opt("", "Select…"));
+    sel.appendChild(opt("", T("oem_select", "Select…")));
     items.forEach(function (it) {
       sel.appendChild(opt(typeof it === "object" ? it[valueKey] : it, labelFn(it)));
     });
@@ -167,60 +174,60 @@
 
   // ---- cascade ---------------------------------------------------------
   function onRegion() {
-    resetSelect(ui.make, "Make");
-    resetSelect(ui.model, "Model");
-    resetSelect(ui.year, "Year");
-    resetSelect(ui.trim, "Trim / Engine");
+    resetSelect(ui.make, T("oem_make", "Make"));
+    resetSelect(ui.model, T("oem_model", "Model"));
+    resetSelect(ui.year, T("oem_year", "Year"));
+    resetSelect(ui.trim, T("oem_trim", "Trim / Engine"));
     clearFitments();
     if (!ui.region.value) return;
-    setStatus("Loading makes…", "busy");
+    setStatus(T("oem_l_makes", "Loading makes…"), "busy");
     fetchJSON(API + "makes/?region=" + enc(ui.region.value)).then(function (j) {
       var items = rows(j);
       fillSelect(ui.make, items, "slug", function (m) { return m.name || m.name_en || m.slug; });
-      setStatus(items.length ? "" : "No makes returned for this region.");
+      setStatus(items.length ? "" : T("oem_n_makes", "No makes returned for this region."));
     }).catch(err);
   }
   function onMake() {
-    resetSelect(ui.model, "Model");
-    resetSelect(ui.year, "Year");
-    resetSelect(ui.trim, "Trim / Engine");
+    resetSelect(ui.model, T("oem_model", "Model"));
+    resetSelect(ui.year, T("oem_year", "Year"));
+    resetSelect(ui.trim, T("oem_trim", "Trim / Engine"));
     clearFitments();
     if (!ui.make.value) return;
-    setStatus("Loading models…", "busy");
+    setStatus(T("oem_l_models", "Loading models…"), "busy");
     fetchJSON(API + "models/?make=" + enc(ui.make.value) + "&region=" + enc(ui.region.value)).then(function (j) {
       var items = rows(j);
       fillSelect(ui.model, items, "slug", function (m) { return m.name || m.name_en || m.slug; });
-      setStatus(items.length ? "" : "No models returned.");
+      setStatus(items.length ? "" : T("oem_n_models", "No models returned."));
     }).catch(err);
   }
   function onModel() {
-    resetSelect(ui.year, "Year");
-    resetSelect(ui.trim, "Trim / Engine");
+    resetSelect(ui.year, T("oem_year", "Year"));
+    resetSelect(ui.trim, T("oem_trim", "Trim / Engine"));
     clearFitments();
     if (!ui.model.value) return;
-    setStatus("Loading years…", "busy");
+    setStatus(T("oem_l_years", "Loading years…"), "busy");
     fetchJSON(API + "years/?make=" + enc(ui.make.value) + "&model=" + enc(ui.model.value) + "&region=" + enc(ui.region.value)).then(function (j) {
       var items = rows(j).map(function (y) {
         if (typeof y === "object") return y.slug || y.year || y.name;
         return y;
       });
       fillSelect(ui.year, items, null, function (y) { return String(y); });
-      setStatus(items.length ? "" : "No years returned.");
+      setStatus(items.length ? "" : T("oem_n_years", "No years returned."));
     }).catch(err);
   }
   function onYear() {
-    resetSelect(ui.trim, "Trim / Engine");
+    resetSelect(ui.trim, T("oem_trim", "Trim / Engine"));
     clearFitments();
     if (!ui.year.value) return;
-    setStatus("Loading fitments…", "busy");
+    setStatus(T("oem_l_fits", "Loading fitments…"), "busy");
     var url = API + "search/by_model/?make=" + enc(ui.make.value) +
       "&model=" + enc(ui.model.value) + "&year=" + enc(ui.year.value) +
       "&region=" + enc(ui.region.value);
     fetchJSON(url).then(function (j) {
       currentTrims = rows(j);
-      if (!currentTrims.length) { setStatus("No fitment records for this vehicle."); return; }
+      if (!currentTrims.length) { setStatus(T("oem_n_fits", "No fitment records for this vehicle.")); return; }
       ui.trim.innerHTML = "";
-      ui.trim.appendChild(opt("", "Select…"));
+      ui.trim.appendChild(opt("", T("oem_select", "Select…")));
       currentTrims.forEach(function (t, i) {
         ui.trim.appendChild(opt(String(i), trimLabel(t)));
       });
@@ -244,7 +251,7 @@
     if (t.engine && (t.engine.name || t.engine.type)) parts.push(t.engine.name || t.engine.type);
     var yrs = (t.start_year || "") + (t.end_year ? "–" + t.end_year : "");
     if (yrs) parts.push("[" + yrs + "]");
-    return parts.join(" ") || (t.slug || "Fitment");
+    return parts.join(" ") || (t.slug || T("oem_fitment", "Fitment"));
   }
 
   // ---- fitment options -------------------------------------------------
@@ -262,10 +269,10 @@
     var wheels = Array.isArray(t.wheels) ? t.wheels : [];
     var oe = wheels.filter(function (w) { return w.is_stock; });
     var list = oe.length ? oe : wheels; // fall back to all if none flagged
-    if (!list.length) { setStatus("This trim has no wheel data."); return; }
+    if (!list.length) { setStatus(T("oem_n_wheels", "This trim has no wheel data.")); return; }
 
     var wrap = el("div", { class: "oem-fit-list" });
-    wrap.appendChild(el("div", { class: "oem-capture__title" }, oe.length ? "Factory (OE) fitments" : "Available fitments"));
+    wrap.appendChild(el("div", { class: "oem-capture__title" }, oe.length ? T("oem_oe_fits", "Factory (OE) fitments") : T("oem_all_fits", "Available fitments")));
     list.forEach(function (w, i) {
       var staggered = isStaggeredFitment(w);
       var id = "oemFit" + i;
@@ -274,7 +281,7 @@
         '<input type="radio" name="oemFit" value="' + i + '" id="' + id + '">' +
         '<span class="oem-fit__body">' +
           '<span class="oem-fit__main">' + esc(fmtCorner(w.front)) + '</span>' +
-          (staggered ? '<span class="oem-fit__rear">Rear: ' + esc(fmtCorner(w.rear)) + '</span>' : '') +
+          (staggered ? '<span class="oem-fit__rear">' + esc(T("oem_rear", "Rear:")) + ' ' + esc(fmtCorner(w.rear)) + '</span>' : '') +
           (w.is_stock ? '<span class="badge good">OE</span>' : '') +
         '</span>';
       row.querySelector("input").addEventListener("change", function () {
@@ -328,7 +335,7 @@
     }
   }
 
-  function applyToBaseline() {
+  async function applyToBaseline() {
     if (!selectedFitment) return;
     var f = selectedFitment.front || {};
     var changed = [];
@@ -337,7 +344,7 @@
     // A staggered factory fitment switches the calculator to front/rear
     // mode (the user may decline if it would remove setups).
     if (isStaggeredFitment(selectedFitment) && tmu.setStaggered && !(tmu.isStaggered && tmu.isStaggered())) {
-      tmu.setStaggered(true);
+      await tmu.setStaggered(true);
     }
     fillAxle("base", f, changed);
     // Rear column: the factory rear corner, or the front one for a square fitment
@@ -358,17 +365,23 @@
   // ---- misc ------------------------------------------------------------
   function enc(s) { return encodeURIComponent(s); }
   function setVal(id, v) { var e = document.getElementById(id); if (e) e.value = v; }
-  function err(e) { setStatus((e && e.message) || "Something went wrong.", "bad"); }
+  function err(e) { setStatus((e && e.message) || T("oem_err", "Something went wrong."), "bad"); }
 
-  function isOpen() { return ui && ui.overlay.classList.contains("is-open"); }
+  // Focus, Tab trap, Esc, backdrop click and the inert page come from
+  // ToolMeUp.openDialog (shared.js); closeDialog is the function it returns.
+  var closeDialog = null;
   function open() {
     if (!ui) buildModal();
-    ui.overlay.classList.add("is-open");
-    ui.overlay.setAttribute("aria-hidden", "false");
+    if (window.ToolMeUp && window.ToolMeUp.openDialog) {
+      closeDialog = window.ToolMeUp.openDialog(ui.overlay, { initial: "#oemRegion", onClose: function () { closeDialog = null; } });
+    } else {
+      ui.overlay.classList.add("is-open");
+    }
     if (!ui.make.options.length || ui.make.disabled) onRegion();
   }
   function close() {
-    if (ui) { ui.overlay.classList.remove("is-open"); ui.overlay.setAttribute("aria-hidden", "true"); }
+    if (closeDialog) closeDialog();
+    else if (ui) ui.overlay.classList.remove("is-open");
   }
 
   btn.addEventListener("click", open);

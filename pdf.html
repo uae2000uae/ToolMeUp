@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="boot.js?v=20261112p"></script>
+  <script src="boot.js?v=20261114a"></script>
   <title>Merge PDF & Split PDF Free — Combine, Extract or Remove Pages | ToolMeUp</title>
   <meta name="description" content="Merge PDF files in any order, split a PDF into single pages or chunks, extract or delete pages. Free and private: your PDFs are processed in your browser and never uploaded.">
   <meta name="theme-color" content="#2563eb">
@@ -15,10 +15,9 @@
   <link rel="icon" href="favicon.ico?v=2" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113n">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114s">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"PDF Merge & Split","applicationCategory":"BusinessApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Merge PDFs, split PDFs and extract or remove pages without uploading files."}
   </script>
@@ -89,7 +88,7 @@
           <button type="button" class="act" id="s_extract"><b data-t="p_extract">Extract selected</b><span data-t="p_extract_s">Selected pages → one PDF</span></button>
           <button type="button" class="act" id="s_remove"><b data-t="p_remove">Remove selected</b><span data-t="p_remove_s">Everything except selected → one PDF</span></button>
           <div class="act act--n"><b data-t="p_every">Split every</b>
-            <div class="row"><input id="s_n" class="inp w-num" type="number" min="1" value="1" inputmode="numeric"><span data-t="p_pages_word">pages</span><button type="button" class="btn btn--sm btn--primary" id="s_split" data-t="p_split_zip">ZIP</button></div>
+            <div class="row"><input id="s_n" aria-label="Pages per file" data-t-aria="a11y_s_n" class="inp w-num" type="number" min="1" value="1" inputmode="numeric"><span data-t="p_pages_word">pages</span><button type="button" class="btn btn--sm btn--primary" id="s_split" data-t="p_split_zip">ZIP</button></div>
           </div>
         </div>
       </div>
@@ -111,7 +110,7 @@
 
   <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
 
-  <script src="shared.js?v=20261113i"></script>
+  <script src="shared.js?v=20261114r"></script>
   <script src="kit.js?v=20261112p"></script>
   <script src="vendor/pdf-lib-1.17.1.min.js?v=1"></script>
   <script src="vendor/jszip-3.10.1.min.js?v=1"></script>

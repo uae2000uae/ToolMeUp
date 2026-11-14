@@ -26,6 +26,7 @@
   // href:  page to open
   // icon:  SVG path data (24x24, stroked)
   // tags:  extra keywords (English + Arabic); not used by the UI since search was removed
+  // newUntil: optional "YYYY-MM-DD"; the card shows a "New" badge until that date
   // en/ar: { name, title, desc }
   const TOOLS = [
     {
@@ -36,35 +37,35 @@
       ar: { name: "المقاسات", title: "مقاسات الجنوط والإطارات", desc: "قارن تركيبات الجنوط والإطارات مع تركيبك الحالي: الأوفست، الفواصل، الخلوص، البروز وخطأ العداد مع رسومات حيّة." }
     },
     {
-      id: "tires", cat: "automotive", href: "tires.html", isNew: true,
+      id: "tires", cat: "automotive", href: "tires.html", newUntil: "2026-12-12",
       icon: "M12 2a10 10 0 100 20 10 10 0 000-20zm0 5a5 5 0 110 10 5 5 0 010-10zM4.5 12H7m10 0h2.5M12 4.5V7m0 10v2.5",
       tags: "tire size compare speedometer speedo error gps diameter إطار عداد سرعة مقارنة",
       en: { name: "Tire Size", title: "Tire Size & Speedometer", desc: "Compare two tire sizes side by side and see how a new size changes your speedometer reading." },
       ar: { name: "مقاس الإطار", title: "مقاس الإطار وعدّاد السرعة", desc: "قارن مقاسين للإطارات جنباً إلى جنب، واعرف كيف يغيّر المقاس الجديد قراءة عدّاد السرعة." }
     },
     {
-      id: "calculators", cat: "calc", href: "calculators.html", isNew: true,
+      id: "calculators", cat: "calc", href: "calculators.html", newUntil: "2026-12-12",
       icon: "M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2zm1 3h8v3H8V6zm0 6h.01M12 12h.01M16 12h.01M8 15h.01M12 15h.01M16 15h.01M8 18h.01M12 18h.01M16 18h.01",
       tags: "calculator percent percentage loan mortgage interest bmi video resolution aspect ratio حاسبة نسبة قرض فائدة كتلة",
       en: { name: "Calculators", title: "Calculator Suite", desc: "Basic, percentage, loan & interest, video ratio & resolution, and BMI calculators in one place." },
       ar: { name: "الحاسبات", title: "مجموعة الحاسبات", desc: "حاسبة أساسية، النسبة المئوية، القروض والفائدة، نسبة أبعاد الفيديو والدقة، ومؤشر كتلة الجسم في مكان واحد." }
     },
     {
-      id: "units", cat: "calc", href: "units.html", isNew: true,
+      id: "units", cat: "calc", href: "units.html", newUntil: "2026-12-12",
       icon: "M4 7h11m0 0l-3-3m3 3l-3 3M20 17H9m0 0l3-3m-3 3l3 3",
       tags: "unit converter length weight mass temperature speed volume area pressure data fuel mpg l/100km km/l psi bar kpa hp kw horsepower torque nm lb-ft celsius fahrenheit km miles kg lb gallon litre liter inch cm feet gb mb تحويل وحدات طول وزن حرارة سرعة ضغط حصان عزم",
       en: { name: "Units", title: "Unit Converter", desc: "Convert length, weight, temperature, speed, volume, area, pressure, data and fuel economy — see every unit at once." },
       ar: { name: "الوحدات", title: "محوّل الوحدات", desc: "حوّل الطول والوزن والحرارة والسرعة والحجم والمساحة والضغط والبيانات واستهلاك الوقود — وشاهد كل الوحدات دفعة واحدة." }
     },
     {
-      id: "datetime", cat: "time", href: "datetime.html", isNew: true,
+      id: "datetime", cat: "time", href: "datetime.html", newUntil: "2026-12-12",
       icon: "M12 7v5l3 2M12 3a9 9 0 100 18 9 9 0 000-18z",
       tags: "time zone world clock countdown timer age birthday date difference days between المنطقة الزمنية عد تنازلي عمر",
       en: { name: "Date & Time", title: "Date & Time Tools", desc: "World clock and time zone planner, countdown timer, age calculator and days between dates." },
       ar: { name: "التاريخ والوقت", title: "أدوات التاريخ والوقت", desc: "ساعة عالمية ومخطط للمناطق الزمنية، عدّ تنازلي، حاسبة العمر، والأيام بين تاريخين." }
     },
     {
-      id: "devtools", cat: "dev", href: "devtools.html", isNew: true,
+      id: "devtools", cat: "dev", href: "devtools.html", newUntil: "2026-12-12",
       icon: "M8 9l-4 3 4 3m8-6l4 3-4 3M13.5 5l-3 14",
       tags: "json formatter validator regex tester base64 encode decode uuid guid lorem ipsum مطور",
       en: { name: "Dev Tools", title: "Developer Tools", desc: "JSON formatter & validator, regex tester, Base64 encode/decode, UUID generator and lorem ipsum." },
@@ -78,21 +79,21 @@
       ar: { name: "Wget", title: "أداة التنزيل Wget", desc: "اجلب رابطاً بطريقة وترويسات ومحتوى مخصّص، أو انسخ موقعاً ثابتاً إلى ملف ZIP." }
     },
     {
-      id: "qr", cat: "media", href: "qr.html", isNew: true,
+      id: "qr", cat: "media", href: "qr.html", newUntil: "2026-12-12",
       icon: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2",
       tags: "qr code generator wifi url link vcard barcode رمز كيو آر واي فاي",
       en: { name: "QR Code", title: "QR Code Generator", desc: "Turn text, links, Wi-Fi details or contacts into a QR code. Pick colors and download PNG or SVG." },
       ar: { name: "رمز QR", title: "مولّد رمز QR", desc: "حوّل النصوص والروابط وبيانات الواي فاي وجهات الاتصال إلى رمز QR. اختر الألوان ونزّله PNG أو SVG." }
     },
     {
-      id: "images", cat: "media", href: "images.html", isNew: true,
+      id: "images", cat: "media", href: "images.html", newUntil: "2026-12-12",
       icon: "M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5M15.5 9.5h.01",
       tags: "image compress resize shrink jpg jpeg png webp photo batch ضغط صور تصغير",
       en: { name: "Images", title: "Image Compressor & Resizer", desc: "Shrink and resize photos in batches with a before/after preview. Download one by one or as a ZIP." },
       ar: { name: "الصور", title: "ضغط الصور وتغيير حجمها", desc: "قلّل حجم الصور وغيّر أبعادها دفعة واحدة مع معاينة قبل/بعد. نزّلها منفردة أو في ملف ZIP." }
     },
     {
-      id: "pdf", cat: "media", href: "pdf.html", isNew: true,
+      id: "pdf", cat: "media", href: "pdf.html", newUntil: "2026-12-12",
       icon: "M7 3h7l5 5v13H7zM14 3v5h5M9.5 13h5M9.5 17h5",
       tags: "pdf merge combine split extract pages دمج تقسيم صفحات",
       en: { name: "PDF", title: "PDF Merge & Split", desc: "Combine PDFs in any order, or split and extract pages — your files never leave your device." },
@@ -126,6 +127,219 @@
     hint_speedo_asper: "بحسب إعداداتك، ",
     hint_thresholds: "هذه حدود التحذير. سنحسب الخلوص بناءً على إعداداتك الحالية المُدخلة وسنحذّرك عند تجاوز الحدود. لن يتم إيقاف الحساب.",
     hint_sessions: "اختر اسم الجلسة لتحميلها.",
+    fit_title: "مقاسات الجنوط والإطارات",
+    fit_lead: "قارن تركيبات الجنوط والإطارات الجديدة مع ما هو مركّب على سيارتك الآن: الأوفست، البروز، الخلوص وخطأ العداد.",
+    fit_s1_t: "التركيب الحالي",
+    fit_s1_sub: "الجنوط والإطارات المركّبة على سيارتك اليوم. تتم مقارنة كل شيء بها.",
+    fit_s2_t: "تركيبات للمقارنة",
+    fit_s2_sub: "أضف تركيبات الجنوط والإطارات التي تفكّر فيها.",
+    fit_s3_t: "النتائج",
+    fit_s3_sub: "الرسومات والقياسات للتركيب المحدد.",
+    ui_ok: "موافق",
+    home_all_tools: "جميع الأدوات",
+    ui_cancel: "إلغاء",
+    skip_link: "انتقل إلى المحتوى",
+    // ---- Fitment page: controls, labels, report, sessions ----
+    ui_close: "إغلاق",
+    u_in: "إنش",
+    u_mm: "مم",
+    u_rpm: "دورة/ميل",
+    u_rpk: "دورة/كم",
+    fit_load: "تحميل جلسة",
+    fit_reset: "إعادة تعيين",
+    fit_reset_q: "هل تريد إعادة جميع الحقول إلى قيمها الافتراضية؟",
+    fit_options: "خيارات الحاسبة",
+    fit_preset_samples: "أمثلة جاهزة",
+    fit_oem_btn: "مقاسات المصنع…",
+    fit_oem_title: "حمّل مواصفات الجنط والإطار الأصلية من قاعدة بيانات المصنع",
+    fit_h_wheel: "الجنط",
+    fit_h_tire: "الإطار",
+    fit_h_speedo: "عداد السرعة",
+    fit_h_fender: "خلوص الرفرف",
+    fit_h_vehicle: "خلوص المركبة",
+    fit_h_thresholds: "حدود التحذير",
+    fit_rim_diam: "قطر الجنط",
+    fit_rim_width: "عرض الجنط",
+    fit_offset: "الأوفست ET",
+    fit_spacer: "الفاصل (سبيسر)",
+    fit_tire_size: "مقاس الإطار",
+    fit_correction: "تصحيح العرض (%)",
+    fit_bulge: "الانتفاخ (%)",
+    fit_speedo_err: "خطأ العداد الحالي (%)",
+    fit_arch_clear: "الخلوص الحالي بين الإطار وقوس العجلة",
+    fit_advanced: "إعدادات متقدمة (اختياري)",
+    fit_inner_clear: "الخلوص الداخلي الحالي حتى المساعد",
+    fit_outer_clear: "الخلوص الخارجي الحالي حتى الرفرف",
+    fit_min_inner: "أدنى خلوص داخلي",
+    fit_min_outer: "أدنى خلوص خارجي",
+    fit_add_setup: "إضافة تركيب",
+    fit_max: "الحد الأقصى {max} تركيبات",
+    fit_max_stag: "الحد الأقصى {max} تركيبات في وضع الأمام والخلف",
+    fit_stag_trim_q: "وضع الأمام والخلف يقارن حتى {max} تركيبات. هل تريد حذف التركيبات من {from} إلى {to}؟",
+    fit_setup_n: "التركيب {n}",
+    fit_baseline: "الحالي",
+    fit_copy: "نسخ من الحالي",
+    fit_copy_title: "انسخ جميع القيم من التركيب الحالي",
+    fit_remove: "حذف هذا التركيب",
+    fit_save: "حفظ الجلسة",
+    fit_overwrite: "استبدال الجلسة",
+    fit_cv_base: "الحالي",
+    fit_cv_setup: "التركيب",
+    fit_cv_refs: "المساعد/الرفرف",
+    fit_cv_hub: "وجه المحور",
+    fit_cv_fender: "إظهار الرفرف",
+    cv_hub: "المحور",
+    cv_strut: "المساعد",
+    cv_fender: "الرفرف",
+    fit_units: "الوحدات",
+    fit_u_metric: "متري",
+    fit_u_imperial: "إمبراطوري",
+    fit_u_intl: "دولي",
+    rep_sec_diff: "فروقات المقاسات",
+    rep_sec_wheel: "أبعاد الجنط",
+    rep_sec_tire: "أبعاد الإطار",
+    rep_ride_height: "تغيّر ارتفاع السيارة",
+    rep_arch_change: "تغيّر خلوص قوس العجلة",
+    rep_arch_final: "خلوص قوس العجلة النهائي",
+    rep_inner_change: "تغيّر الخلوص الداخلي",
+    rep_outer_change: "تغيّر الخلوص الخارجي",
+    rep_outer_final: "الخلوص الخارجي النهائي",
+    rep_speedo_change: "تغيّر خطأ العداد",
+    rep_speedo_final: "خطأ العداد النهائي",
+    rep_wheel_width: "عرض الجنط",
+    rep_wheel_diam: "قطر الجنط",
+    rep_offset: "الأوفست",
+    rep_backspacing: "المسافة الخلفية (Backspacing)",
+    rep_poke: "البروز",
+    rep_od: "القطر الكلي",
+    rep_section_width: "عرض المقطع",
+    rep_sidewall: "ارتفاع الجدار الجانبي",
+    rep_circumference: "المحيط",
+    rep_revs: "عدد الدورات",
+    ses_title: "الجلسات المحفوظة",
+    ses_need_setup: "أضف تركيباً واحداً على الأقل قبل حفظ الجلسة",
+    ses_bar: "الجلسة: {name}",
+    ses_save_prompt: "احفظ الجلسة باسم:",
+    ses_saved: "تم حفظ الجلسة.",
+    ses_missing: "الجلسة المحمّلة لم تعد موجودة. استخدم «حفظ الجلسة» بدلاً من ذلك.",
+    ses_overwrite_q: "هل تريد استبدال الجلسة «{name}» بالقيم الحالية؟",
+    ses_overwritten: "تم استبدال الجلسة.",
+    ses_none: "لا توجد جلسات محفوظة.",
+    ses_load_one: "تحميل هذه الجلسة",
+    ses_rename: "إعادة تسمية",
+    ses_rename_prompt: "الاسم الجديد للجلسة:",
+    ses_delete: "حذف",
+    ses_delete_q: "هل تريد حذف الجلسة «{name}»؟",
+    // ---- Fitment: OEM presets dialog ----
+    oem_title: "مقاسات المصنع",
+    oem_intro: "اختر سيارة لتحميل مقاس الجنط والإطار الأصلي (OE) لها. البيانات من Wheel-Size Fitment API.",
+    oem_region: "المنطقة",
+    oem_make: "الشركة المصنّعة",
+    oem_model: "الطراز",
+    oem_year: "سنة الصنع",
+    oem_trim: "الفئة / المحرك",
+    oem_select: "اختر…",
+    oem_capture: "نقل إلى التركيب الحالي",
+    oem_cap_wheel: "الجنط (القطر، العرض، الأوفست)",
+    oem_cap_tire: "الإطار (المقاس)",
+    oem_cancel: "إلغاء",
+    oem_apply: "تطبيق على التركيب الحالي",
+    oem_l_makes: "جارٍ تحميل الشركات…",
+    oem_l_models: "جارٍ تحميل الطرازات…",
+    oem_l_years: "جارٍ تحميل السنوات…",
+    oem_l_fits: "جارٍ تحميل المقاسات…",
+    oem_n_makes: "لا توجد شركات لهذه المنطقة.",
+    oem_n_models: "لا توجد طرازات.",
+    oem_n_years: "لا توجد سنوات.",
+    oem_n_fits: "لا توجد سجلات مقاسات لهذه السيارة.",
+    oem_n_wheels: "لا توجد بيانات جنوط لهذه الفئة.",
+    oem_fitment: "مقاس",
+    oem_oe_fits: "مقاسات المصنع (OE)",
+    oem_all_fits: "المقاسات المتاحة",
+    oem_rear: "الخلفي:",
+    oem_err: "حدث خطأ ما.",
+    oem_e403: "مفتاح الواجهة البرمجية مفقود أو غير صالح (403).",
+    oem_e404: "لم يتم العثور على بيانات (404).",
+    oem_e429: "تم بلوغ حد الطلبات (429). حاول لاحقاً.",
+    oem_efail: "فشل الطلب ({code}).",
+    oem_r_usdm: "الولايات المتحدة (USDM)",
+    oem_r_cdm: "كندا",
+    oem_r_mxndm: "المكسيك",
+    oem_r_ladm: "أمريكا الوسطى والجنوبية",
+    oem_r_eudm: "أوروبا (EUDM)",
+    oem_r_rus: "روسيا وما حولها",
+    oem_r_jdm: "اليابان (JDM)",
+    oem_r_chdm: "الصين",
+    oem_r_skdm: "كوريا الجنوبية",
+    oem_r_sam: "جنوب شرق آسيا",
+    oem_r_medm: "الشرق الأوسط",
+    oem_r_nadm: "شمال أفريقيا",
+    oem_r_sadm: "جنوب أفريقيا",
+    oem_r_audm: "أوقيانوسيا (AUDM)",
+    // ---- Accessible names for inputs labelled only by a sentence or placeholder ----
+    a11y_pct_a1: "النسبة المئوية",
+    a11y_pct_a2: "من القيمة",
+    a11y_pct_b1: "القيمة الجزئية",
+    a11y_pct_b2: "القيمة الكلية",
+    a11y_pct_c1: "من القيمة",
+    a11y_pct_c2: "إلى القيمة",
+    a11y_pct_d1: "القيمة الأصلية",
+    a11y_pct_d2: "نسبة التغيّر",
+    a11y_cmp_aw: "عرض الدقة A",
+    a11y_cmp_ah: "ارتفاع الدقة A",
+    a11y_cmp_bw: "عرض الدقة B",
+    a11y_cmp_bh: "ارتفاع الدقة B",
+    a11y_j_in: "مُدخل JSON",
+    a11y_r_pat: "نمط التعبير النمطي",
+    a11y_b_in: "النص المراد ترميزه أو فك ترميزه",
+    a11y_u_check: "UUID المراد فحصه",
+    a11y_tz_add: "أضف مدينة أو منطقة زمنية",
+    a11y_ad_date: "تاريخ البداية",
+    a11y_ad_sign: "إضافة أو طرح",
+    a11y_ad_n: "المقدار",
+    a11y_ad_unit: "الوحدة",
+    a11y_s_n: "عدد الصفحات لكل ملف",
+    a11y_preset: "مقاسات جاهزة",
+    // ---- Wget page ----
+    wg_title: "أداة التنزيل Wget",
+    wg_lead: "اجلب رابطاً بالطريقة والترويسات والمحتوى التي تختارها، أو انسخ موقعاً ثابتاً إلى ملف ZIP — مباشرة من المتصفح.",
+    wg_dl_t: "تنزيل ملف",
+    wg_dl_sub: "اجلب رابطاً واحداً واحفظه على جهازك. الطريقة والترويسات والمحتوى اختيارية.",
+    wg_url: "الرابط",
+    wg_method: "الطريقة",
+    wg_filename: "اسم الملف (اختياري)",
+    wg_auto: "تلقائي",
+    wg_adv: "متقدم: الترويسات والمحتوى",
+    wg_headers: "الترويسات (كائن JSON)",
+    wg_body: "المحتوى",
+    wg_body_ph: "محتوى الطلب (لا يُرسل مع GET)",
+    wg_dl_btn: "تنزيل الملف",
+    wg_cancel: "إلغاء",
+    wg_cors: "الروابط من نطاقات أخرى تعمل فقط إذا سمح الخادم بـ CORS؛ وإلا سيحظر المتصفح الطلب.",
+    wg_zip_t: "نسخ موقع إلى ملف ZIP",
+    wg_zip_sub: "يزحف إلى صفحة ويتبع روابطها وملفاتها ضمن الحدود أدناه، ثم يجمع كل شيء في ملف ZIP واحد.",
+    wg_start_url: "رابط البداية",
+    wg_depth: "أقصى عمق",
+    wg_files: "أقصى عدد ملفات",
+    wg_same: "النطاق نفسه فقط",
+    wg_zip_btn: "تنزيل الموقع كملف ZIP",
+    wg_zip_note: "يعمل بشكل أفضل مع المحتوى الثابت من النطاق نفسه. لا يمكن نسخ الموارد المقيّدة بـ CORS أو المحمية بتسجيل الدخول من المتصفح.",
+    wg_legal: "نزّل فقط المحتوى الذي تملكه أو يحق لك الوصول إليه. تُرسل الطلبات من متصفحك باستخدام شبكتك وأي بيانات اعتماد أو ترويسات تضيفها — أنت مسؤول عن طريقة استخدامك لهذه الأداة وعن الالتزام بشروط خدمة الموقع المستهدف والقوانين المعمول بها. لا تستخدمها للوصول إلى مواد غير مصرّح لك باسترجاعها.",
+    wg_s_nourl: "يرجى إدخال رابط.",
+    wg_s_badurl: "رابط غير صالح.",
+    wg_s_hdrobj: "يجب أن تكون الترويسات كائن JSON.",
+    wg_s_hdrjson: "صيغة JSON للترويسات غير صالحة.",
+    wg_s_start: "جارٍ بدء التنزيل...",
+    wg_s_prog: "جارٍ التنزيل: {loaded}/{total} بايت ({pct}%)",
+    wg_s_prog_n: "جارٍ التنزيل: {loaded} بايت",
+    wg_s_done: "اكتمل: حُفظ باسم {name}",
+    wg_s_cancel: "تم الإلغاء.",
+    wg_s_err: "خطأ: {msg}",
+    wg_z_start: "جارٍ بدء الزحف إلى الموقع...",
+    wg_z_prog: "تمت معالجة {done}/{all} ملفات، {bytes} بايت",
+    wg_z_done: "اكتمل: حُفظ {n} ملف باسم {name}",
+    wg_z_crawled: "تم الزحف إلى {n} ملفات",
+    wg_z_zip: "جارٍ إنشاء ملف ZIP...",
     caption_rim_view: "مقارنة المقطع العرضي للجنط والإطار",
     caption_side_view: "مقارنة الإطارات من المنظر الجانبي",
     alert_speedo: "سرعة العداد مقابل الأقمار الاصطناعية: {pct}% أي، عندما يعرض عداد السرعة {indicated} كم/س، تكون سرعتك الفعلية (GPS) {actual} كم/س",
@@ -154,8 +368,8 @@
     rep_circumference_desc: "طول محيط الإطار",
     rep_revs_mile_desc: "عدد دورات الإطار في الميل الواحد",
     rep_revs_km_desc: "عدد دورات الإطار في الكيلومتر الواحد",
-    opt_adv_title: "الفاصل (سبيسر)، تصحيح العرض والانتفاخ",
-    opt_adv_desc: "عند إخفائها تُستخدم القيم الافتراضية: بلا فاصل، تصحيح 0%، انتفاخ 5%.",
+    opt_simple_title: "تبسيط",
+    opt_simple_desc: "يخفي الفاصل (سبيسر) وتصحيح العرض والانتفاخ، ويستخدم القيم الافتراضية: بلا فاصل، تصحيح 0%، انتفاخ 5%.",
     opt_stag_title: "مقاسات مختلفة للأمام والخلف",
     opt_stag_desc: "يضيف عموداً خلفياً لكل تركيب. حتى تركيبين في هذا الوضع.",
     axle_front: "أمامي",
@@ -227,7 +441,6 @@
     try { localStorage.setItem(LANG_KEY, lang); } catch (_) { /* ignore */ }
   }
   function currentLang() { return storedLang() === "ar" ? "ar" : "en"; }
-  function isFullI18n() { return document.documentElement.getAttribute("data-i18n") === "full"; }
 
   // Swap text/attributes of marked elements. English originals are cached
   // on first touch so switching back restores them exactly.
@@ -262,10 +475,9 @@
   }
   function applyLang(lang) {
     const root = document.documentElement;
-    if (isFullI18n()) {
-      root.setAttribute("lang", lang === "ar" ? "ar" : "en");
-      root.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-    }
+    // Arabic is always right-to-left, even on partly translated pages.
+    root.setAttribute("lang", lang === "ar" ? "ar" : "en");
+    root.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
     translateTree(document, lang);
     renderToolLinks();
     renderHome();
@@ -360,13 +572,17 @@
 
   // ---- Home page -------------------------------------------------------
   let homeCat = "";
-  function cardHtml(x) {
+  // "New" badges expire on their own, so they keep meaning something.
+  function isNew(x) { return !!x.newUntil && new Date() < new Date(x.newUntil + "T00:00:00"); }
+  function cardHtml(x, withCat) {
+    const cat = withCat ? CATEGORIES.find(function (c) { return c.id === x.cat; }) : null;
     return '<a class="tcard" href="' + x.href + '" data-hue="' + hueOf(x) + '">' +
       '<span class="tcard__icon">' + iconSvg(x.icon, 24) + "</span>" +
       '<span class="tcard__body">' +
         '<span class="tcard__title">' + esc(L(x, "title")) +
-          (x.isNew ? ' <span class="pill pill--new">' + esc(t("home_new", "New")) + "</span>" : "") + "</span>" +
+          (isNew(x) ? ' <span class="pill pill--new">' + esc(t("home_new", "New")) + "</span>" : "") + "</span>" +
         '<span class="tcard__desc">' + esc(L(x, "desc")) + "</span>" +
+        (cat ? '<span class="tcard__cat">' + esc(currentLang() === "ar" ? cat.ar : cat.en) + "</span>" : "") +
       "</span>" +
       '<span class="tcard__go" aria-hidden="true">' + iconSvg("M5 12h14m-5-5l5 5-5 5", 18) + "</span>" +
     "</a>";
@@ -393,8 +609,14 @@
           return '<a class="recent" href="' + x.href + '" data-hue="' + hueOf(x) + '">' + iconSvg(x.icon, 18) + "<span>" + esc(L(x, "name")) + "</span></a>";
         }).join("") + "</div></section>";
     }
+    // "All": one dense grid, each card labelled with its category. Category
+    // sections only when a filter chip is on (or the URL has #category).
+    if (!homeCat) {
+      html += '<section class="tsection"><h2 class="tsection__title">' + esc(t("home_all_tools", "All tools")) + "</h2>" +
+        '<div class="tgrid">' + list.map(function (x) { return cardHtml(x, true); }).join("") + "</div></section>";
+    }
     CATEGORIES.forEach(function (c) {
-      if (homeCat && homeCat !== c.id) return;
+      if (!homeCat || homeCat !== c.id) return;
       const items = list.filter(function (x) { return x.cat === c.id; });
       if (!items.length) return;
       html += '<section class="tsection" id="' + c.id + '"><h2 class="tsection__title" data-hue="' + c.hue + '">' +
@@ -477,6 +699,7 @@
   }
 
   function init() {
+    addSkipLink();
     loadSharedHeader().then(function () {
       wireThemeToggle();
       wireLangToggle();
@@ -492,6 +715,111 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
+
+  // ---- Accessible dialogs, confirm / prompt and toasts -------------------
+  // openDialog(overlay): focus moves into the dialog, Tab stays inside it,
+  // Esc and backdrop clicks close it, the page behind is inert, and focus
+  // returns to whatever opened it. Returns close().
+  // ask() replaces window.confirm / prompt with the same in-page dialog, so
+  // it is styled, translated, follows RTL and works where native boxes are
+  // blocked (some embeds). Resolves true/false (confirm) or text/null (prompt).
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  function openDialog(overlay, opts) {
+    opts = opts || {};
+    const opener = document.activeElement;
+    const dialog = overlay.querySelector('[role="dialog"]') || overlay;
+    const others = Array.from(document.body.children).filter(function (el) { return el !== overlay && !el.inert; });
+    others.forEach(function (el) { el.inert = true; });
+    overlay.classList.add("is-open");
+    overlay.setAttribute("aria-hidden", "false");
+    const focusables = function () {
+      return Array.from(dialog.querySelectorAll(FOCUSABLE)).filter(function (el) { return el.getClientRects().length; });
+    };
+    let closed = false;
+    function close(result) {
+      if (closed) return;
+      closed = true;
+      document.removeEventListener("keydown", onKey, true);
+      overlay.removeEventListener("click", onBackdrop);
+      others.forEach(function (el) { el.inert = false; });
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden", "true");
+      if (opts.remove) overlay.remove();
+      if (opener && opener.focus && document.contains(opener)) opener.focus({ preventScroll: true });
+      if (opts.onClose) opts.onClose(result);
+    }
+    function onKey(e) {
+      if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); return; }
+      if (e.key !== "Tab") return;
+      const f = focusables();
+      if (!f.length) { e.preventDefault(); return; }
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    function onBackdrop(e) { if (e.target === overlay) close(); }
+    document.addEventListener("keydown", onKey, true);
+    overlay.addEventListener("click", onBackdrop);
+    const target = (opts.initial && dialog.querySelector(opts.initial)) || focusables()[0];
+    setTimeout(function () { if (target) target.focus({ preventScroll: true }); if (target && target.select && opts.select) target.select(); }, 30);
+    return close;
+  }
+  function ask(message, o) {
+    o = o || {};
+    return new Promise(function (resolve) {
+      const overlay = document.createElement("div");
+      overlay.className = "modal-overlay";
+      const isPrompt = o.prompt !== undefined && o.prompt !== null;
+      overlay.innerHTML =
+        '<div class="modal modal--ask" role="' + (isPrompt ? "dialog" : "alertdialog") + '" aria-modal="true" aria-labelledby="askMsg">' +
+          '<div class="modal__body">' +
+            '<p class="ask__msg" id="askMsg"></p>' +
+            (isPrompt ? '<input class="inp ask__input" type="text" aria-labelledby="askMsg">' : "") +
+          "</div>" +
+          '<div class="modal__foot">' +
+            '<button type="button" class="btn ask__cancel">' + esc(o.cancel || t("ui_cancel", "Cancel")) + "</button>" +
+            '<button type="button" class="btn btn--primary ask__ok">' + esc(o.ok || t("ui_ok", "OK")) + "</button>" +
+          "</div>" +
+        "</div>";
+      overlay.querySelector(".ask__msg").textContent = message;
+      const input = overlay.querySelector(".ask__input");
+      if (input) input.value = o.prompt;
+      document.body.appendChild(overlay);
+      let result = isPrompt ? null : false;
+      const close = openDialog(overlay, {
+        remove: true, initial: isPrompt ? ".ask__input" : ".ask__ok", select: isPrompt,
+        onClose: function () { resolve(result); }
+      });
+      const ok = function () { result = isPrompt ? input.value.trim() || null : true; close(); };
+      overlay.querySelector(".ask__ok").addEventListener("click", ok);
+      overlay.querySelector(".ask__cancel").addEventListener("click", function () { close(); });
+      if (input) input.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); ok(); } });
+    });
+  }
+  let toastHost = null;
+  function toast(msg, bad) {
+    if (window.Kit && window.Kit.toast) return window.Kit.toast(msg, bad);
+    if (!toastHost) { toastHost = document.createElement("div"); toastHost.className = "toast-host"; toastHost.setAttribute("aria-live", "polite"); document.body.appendChild(toastHost); }
+    const el = document.createElement("div");
+    el.className = "toast" + (bad ? " is-bad" : "");
+    el.textContent = msg;
+    toastHost.appendChild(el);
+    setTimeout(function () { el.remove(); }, 2600);
+  }
+
+  // ---- Skip link: first stop for keyboard users, jumps past the header ----
+  function addSkipLink() {
+    const main = document.querySelector("main");
+    if (!main || document.querySelector(".skip-link")) return;
+    if (!main.id) main.id = "main";
+    if (!main.hasAttribute("tabindex")) main.setAttribute("tabindex", "-1");
+    const a = document.createElement("a");
+    a.className = "skip-link";
+    a.href = "#" + main.id;
+    a.setAttribute("data-t", "skip_link");
+    a.textContent = "Skip to content";
+    document.body.insertBefore(a, document.body.firstChild);
+  }
 
   // ---- Public API --------------------------------------------------------
   window.ToolMeUp = {
@@ -509,6 +837,10 @@
       Object.keys(en || {}).forEach(function (k) { EXTRA_EN[k] = en[k]; });
     },
     // Re-translate a freshly rendered DOM subtree.
-    translate: function (root) { translateTree(root || document, currentLang()); }
+    translate: function (root) { translateTree(root || document, currentLang()); },
+    openDialog: openDialog,
+    confirm: function (msg, o) { return ask(msg, o); },
+    prompt: function (msg, value, o) { return ask(msg, Object.assign({}, o, { prompt: value == null ? "" : String(value) })); },
+    toast: toast
   };
 })();

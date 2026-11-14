@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="boot.js?v=20261112p"></script>
+  <script src="boot.js?v=20261114a"></script>
   <title>Time Zone Converter, Countdown Timer, Age Calculator & Days Between Dates | ToolMeUp</title>
   <meta name="description" content="Free date & time tools: world clock and time zone meeting planner, shareable countdown timer, age calculator with Hijri date, days between dates, business days and date add/subtract.">
   <meta name="theme-color" content="#2563eb">
@@ -15,10 +15,9 @@
   <link rel="icon" href="favicon.ico?v=2" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113n">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114s">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"Date & Time Tools","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Time zone converter, countdown timer, age calculator and days between dates."}
   </script>
@@ -52,7 +51,7 @@
             <p class="card__sub" data-t="d_zones_sub">Drag the slider to shift time and see it everywhere at once.</p>
           </div>
           <div class="row">
-            <input id="tz_add" class="inp" list="tz_list" data-t-ph="d_add_ph" placeholder="Add a city or time zone…" autocomplete="off">
+            <input id="tz_add" aria-label="Add a city or time zone" data-t-aria="a11y_tz_add" class="inp" list="tz_list" data-t-ph="d_add_ph" placeholder="Add a city or time zone…" autocomplete="off">
             <datalist id="tz_list"></datalist>
           </div>
         </div>
@@ -133,10 +132,10 @@
       <div class="card">
         <h2 class="card__title" data-t="d_add_t">Add or subtract</h2>
         <div class="row mt">
-          <input id="ad_date" class="inp w-auto" type="date">
-          <select id="ad_sign" class="inp w-auto"><option value="1">+</option><option value="-1">−</option></select>
-          <input id="ad_n" class="inp w-num" type="number" value="30" min="0" inputmode="numeric">
-          <select id="ad_unit" class="inp w-auto">
+          <input id="ad_date" aria-label="Start date" data-t-aria="a11y_ad_date" class="inp w-auto" type="date">
+          <select id="ad_sign" aria-label="Add or subtract" data-t-aria="a11y_ad_sign" class="inp w-auto"><option value="1">+</option><option value="-1">−</option></select>
+          <input id="ad_n" aria-label="Amount" data-t-aria="a11y_ad_n" class="inp w-num" type="number" value="30" min="0" inputmode="numeric">
+          <select id="ad_unit" aria-label="Unit" data-t-aria="a11y_ad_unit" class="inp w-auto">
             <option value="d" data-t="d_u_days">days</option><option value="w" data-t="d_u_weeks">weeks</option>
             <option value="m" data-t="d_u_months">months</option><option value="y" data-t="d_u_years">years</option>
             <option value="bd" data-t="d_u_bdays">business days</option>
@@ -161,7 +160,7 @@
 
   <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
 
-  <script src="shared.js?v=20261113i"></script>
+  <script src="shared.js?v=20261114r"></script>
   <script src="kit.js?v=20261112p"></script>
   <script src="datetime.js?v=20261112p"></script>
 </body>

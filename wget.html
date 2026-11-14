@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en" data-theme="light" data-tool="wget" class="compact">
+<html lang="en" data-theme="light" data-tool="wget">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="boot.js?v=20261112p"></script>
+  <script src="boot.js?v=20261114a"></script>
   <title>Wget Downloader — ToolMeUp</title>
   <meta name="description" content="Fetch a URL with a custom method, headers and body, or mirror a same-origin static site to a ZIP — entirely in your browser.">
   <meta name="theme-color" content="#2563eb">
@@ -18,27 +18,34 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113n">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114s">
 </head>
-<body>
+<body data-hue="violet">
   <!-- Shared top navigation: injected from base.html by shared.js -->
-  <header class="app-header" data-shared-header data-brand="ToolMeUp • Wget Downloader"></header>
+  <header class="app-header" data-shared-header data-brand="ToolMeUp"></header>
 
-  <main class="container">
+  <!-- Tool-page kit layout (ui.css .tp), Developer category colour (violet on <body>) -->
+  <main class="container tp wget">
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <div class="tp-head">
+      <div class="tp-head__icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v10m0 0l-4-4m4 4l4-4M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2"/></svg></div>
+      <div>
+        <h1 data-t="wg_title">Wget Downloader</h1>
+        <p data-t="wg_lead">Fetch a URL with your own method, headers and body, or mirror a static site into a ZIP — right from the browser.</p>
+      </div>
+    </div>
+
     <!-- ============ Single file download ============ -->
-    <section class="panel">
-      <h2>Download a File</h2>
-      <p class="hint">Fetch a single URL and save it to your device. Method, headers and body are optional.</p>
-
-      <div class="field field--wide"><label>URL<input id="wget_url" type="url" inputmode="url" spellcheck="false" placeholder="https://example.com/file.pdf"></label></div>
-
-      <div class="grid two">
-        <div class="field">
-          <label>Method
-            <select id="wget_method">
+    <section class="card">
+      <h2 class="card__title" data-t="wg_dl_t">Download a File</h2>
+      <p class="card__sub" data-t="wg_dl_sub">Fetch a single URL and save it to your device. Method, headers and body are optional.</p>
+      <div class="stack">
+        <label class="f"><span data-t="wg_url">URL</span><input id="wget_url" class="inp" type="url" inputmode="url" spellcheck="false" placeholder="https://example.com/file.pdf"></label>
+        <div class="g2">
+          <label class="f"><span data-t="wg_method">Method</span>
+            <select id="wget_method" class="inp">
               <option>GET</option>
               <option>POST</option>
               <option>PUT</option>
@@ -46,71 +53,54 @@
               <option>DELETE</option>
             </select>
           </label>
+          <label class="f"><span data-t="wg_filename">Filename (optional)</span><input id="wget_filename" class="inp" spellcheck="false" placeholder="auto-detect" data-t-ph="wg_auto"></label>
         </div>
-        <div class="field"><label>Filename (optional)<input id="wget_filename" spellcheck="false" placeholder="auto-detect"></label></div>
-      </div>
-
-      <details class="advanced">
-        <summary class="advanced__summary">Advanced: headers &amp; body</summary>
-        <div class="grid two">
-          <div class="field field--wide"><label>Headers (JSON object)<textarea id="wget_headers" rows="4" spellcheck="false" placeholder='{"Authorization":"Bearer ..."}'></textarea></label></div>
-          <div class="field field--wide"><label>Body<textarea id="wget_body" rows="4" spellcheck="false" placeholder="Request body (not sent with GET)"></textarea></label></div>
+        <details class="advanced">
+          <summary class="advanced__summary" data-t="wg_adv">Advanced: headers &amp; body</summary>
+          <div class="g2 mt">
+            <label class="f"><span data-t="wg_headers">Headers (JSON object)</span><textarea id="wget_headers" class="area mono" rows="4" spellcheck="false" placeholder='{"Authorization":"Bearer ..."}'></textarea></label>
+            <label class="f"><span data-t="wg_body">Body</span><textarea id="wget_body" class="area mono" rows="4" spellcheck="false" placeholder="Request body (not sent with GET)" data-t-ph="wg_body_ph"></textarea></label>
+          </div>
+        </details>
+        <div class="row">
+          <button id="wget_download" type="button" class="btn btn--primary" data-t="wg_dl_btn">Download File</button>
+          <button id="wget_cancel" type="button" class="btn" hidden data-t="wg_cancel">Cancel</button>
+          <progress id="wget_progress" max="100" value="0" class="wget-progress" hidden></progress>
+          <span id="wget_status" class="muted small2" role="status"></span>
         </div>
-      </details>
-
-      <div class="actions actions--wrap">
-        <div class="btn-row">
-          <button id="wget_download" type="button" class="primary">Download File</button>
-          <button id="wget_cancel" type="button" hidden>Cancel</button>
-        </div>
-        <progress id="wget_progress" max="100" value="0" class="wget-progress" hidden></progress>
-        <span id="wget_status" class="hint" role="status"></span>
-      </div>
-
-      <div class="hint mt-6">
-        Cross-origin URLs only work if the server allows CORS; otherwise the browser blocks the request.
+        <p class="muted small2 wget-note" data-t="wg_cors">Cross-origin URLs only work if the server allows CORS; otherwise the browser blocks the request.</p>
       </div>
     </section>
 
     <!-- ============ Site mirror to ZIP ============ -->
-    <section class="panel">
-      <h2>Mirror a Site to ZIP</h2>
-      <p class="hint">Crawl a page, follow its links and assets up to the limits below, and package everything into a single ZIP.</p>
-
-      <div class="field field--wide"><label>Start URL<input id="zip_url" type="url" inputmode="url" spellcheck="false" placeholder="https://example.com/"></label></div>
-
-      <div class="grid three">
-        <div class="field"><label>Max depth<input id="wget_max_depth" type="number" min="0" step="1" value="2"></label></div>
-        <div class="field"><label>Max files<input id="wget_max_files" type="number" min="1" step="1" value="200"></label></div>
-        <div class="field"><label class="toggle"><input type="checkbox" id="wget_same_origin" checked> <span>Same origin only</span></label></div>
-      </div>
-
-      <div class="actions actions--wrap">
-        <div class="btn-row">
-          <button id="wget_site_zip" type="button" class="primary">Download Site as ZIP</button>
-          <button id="zip_cancel" type="button" hidden>Cancel</button>
+    <section class="card">
+      <h2 class="card__title" data-t="wg_zip_t">Mirror a Site to ZIP</h2>
+      <p class="card__sub" data-t="wg_zip_sub">Crawl a page, follow its links and assets up to the limits below, and package everything into a single ZIP.</p>
+      <div class="stack">
+        <label class="f"><span data-t="wg_start_url">Start URL</span><input id="zip_url" class="inp" type="url" inputmode="url" spellcheck="false" placeholder="https://example.com/"></label>
+        <div class="g3 wget-limits">
+          <label class="f"><span data-t="wg_depth">Max depth</span><input id="wget_max_depth" class="inp" type="number" min="0" step="1" value="2"></label>
+          <label class="f"><span data-t="wg_files">Max files</span><input id="wget_max_files" class="inp" type="number" min="1" step="1" value="200"></label>
+          <label class="switch"><input type="checkbox" id="wget_same_origin" checked><span data-t="wg_same">Same origin only</span></label>
         </div>
-        <progress id="zip_progress" max="100" value="0" class="wget-progress" hidden></progress>
-        <span id="zip_status" class="hint" role="status"></span>
-      </div>
-
-      <div class="hint mt-6">
-        Works best for same-origin static content. CORS-restricted and login-protected resources cannot be mirrored from the browser.
+        <div class="row">
+          <button id="wget_site_zip" type="button" class="btn btn--primary" data-t="wg_zip_btn">Download Site as ZIP</button>
+          <button id="zip_cancel" type="button" class="btn" hidden data-t="wg_cancel">Cancel</button>
+          <progress id="zip_progress" max="100" value="0" class="wget-progress" hidden></progress>
+          <span id="zip_status" class="muted small2" role="status"></span>
+        </div>
+        <p class="muted small2 wget-note" data-t="wg_zip_note">Works best for same-origin static content. CORS-restricted and login-protected resources cannot be mirrored from the browser.</p>
       </div>
     </section>
 
-    <p class="disclaimer">
-      Only download content you own or have the right to access. Requests run from your browser using your network and any
-      credentials or headers you supply — you are responsible for how you use this tool and for complying with the target
-      site's terms of service and applicable law. Do not use it to access material you are not authorized to retrieve.
-    </p>
+    <p class="note small2" data-t="wg_legal">Only download content you own or have the right to access. Requests run from your browser using your network and any credentials or headers you supply — you are responsible for how you use this tool and for complying with the target site's terms of service and applicable law. Do not use it to access material you are not authorized to retrieve.</p>
   </main>
 
   <footer class="app-footer">
-    <div>Static HTML/CSS/JS • Runs entirely in your browser</div>
+    <span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span>
   </footer>
 
-  <script src="shared.js?v=20261113i"></script>
-  <script src="wget.js?v=20261112a"></script>
+  <script src="shared.js?v=20261114r"></script>
+  <script src="wget.js?v=20261114r"></script>
 </body>
 </html>

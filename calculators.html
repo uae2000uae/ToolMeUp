@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="boot.js?v=20261112p"></script>
+  <script src="boot.js?v=20261114a"></script>
   <title>Calculator Suite — Percentage, Loan, Interest, BMI & Video Ratio | ToolMeUp</title>
   <meta name="description" content="Free online calculators: basic calculator, percentage calculator, loan & mortgage payment with amortization, simple & compound interest, video aspect ratio & resolution comparison, and BMI.">
   <meta name="theme-color" content="#2563eb">
@@ -15,10 +15,9 @@
   <link rel="icon" href="favicon.ico?v=2" sizes="any">
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261113h">
-  <link rel="stylesheet" href="ui.css?v=20261113n">
+  <link rel="preload" href="static/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css?v=20261114r">
+  <link rel="stylesheet" href="ui.css?v=20261114s">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","name":"Calculator Suite","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Basic, percentage, loan & interest, video ratio and BMI calculators."}
   </script>
@@ -82,28 +81,28 @@
       <div class="card">
         <div class="pct-row">
           <span data-t="c_pct_a1">What is</span>
-          <input id="pct_a1" class="inp" type="number" step="any" inputmode="decimal" placeholder="15">
+          <input id="pct_a1" aria-label="Percentage" data-t-aria="a11y_pct_a1" class="inp" type="number" step="any" inputmode="decimal" placeholder="15">
           <span data-t="c_pct_a2">% of</span>
-          <input id="pct_a2" class="inp" type="number" step="any" inputmode="decimal" placeholder="200">
+          <input id="pct_a2" aria-label="Of value" data-t-aria="a11y_pct_a2" class="inp" type="number" step="any" inputmode="decimal" placeholder="200">
           <output id="pct_a_out" class="pct-out">—</output>
         </div>
         <div class="pct-row">
-          <input id="pct_b1" class="inp" type="number" step="any" inputmode="decimal" placeholder="30">
+          <input id="pct_b1" aria-label="Part value" data-t-aria="a11y_pct_b1" class="inp" type="number" step="any" inputmode="decimal" placeholder="30">
           <span data-t="c_pct_b">is what % of</span>
-          <input id="pct_b2" class="inp" type="number" step="any" inputmode="decimal" placeholder="200">
+          <input id="pct_b2" aria-label="Whole value" data-t-aria="a11y_pct_b2" class="inp" type="number" step="any" inputmode="decimal" placeholder="200">
           <output id="pct_b_out" class="pct-out">—</output>
         </div>
         <div class="pct-row">
           <span data-t="c_pct_c1">% change from</span>
-          <input id="pct_c1" class="inp" type="number" step="any" inputmode="decimal" placeholder="120">
+          <input id="pct_c1" aria-label="From value" data-t-aria="a11y_pct_c1" class="inp" type="number" step="any" inputmode="decimal" placeholder="120">
           <span data-t="c_pct_c2">to</span>
-          <input id="pct_c2" class="inp" type="number" step="any" inputmode="decimal" placeholder="150">
+          <input id="pct_c2" aria-label="To value" data-t-aria="a11y_pct_c2" class="inp" type="number" step="any" inputmode="decimal" placeholder="150">
           <output id="pct_c_out" class="pct-out">—</output>
         </div>
         <div class="pct-row">
-          <input id="pct_d1" class="inp" type="number" step="any" inputmode="decimal" placeholder="80">
+          <input id="pct_d1" aria-label="Starting value" data-t-aria="a11y_pct_d1" class="inp" type="number" step="any" inputmode="decimal" placeholder="80">
           <span data-t="c_pct_d">increased / decreased by</span>
-          <input id="pct_d2" class="inp" type="number" step="any" inputmode="decimal" placeholder="25">
+          <input id="pct_d2" aria-label="Change in percent" data-t-aria="a11y_pct_d2" class="inp" type="number" step="any" inputmode="decimal" placeholder="25">
           <span>%</span>
           <output id="pct_d_out" class="pct-out">—</output>
         </div>
@@ -191,8 +190,8 @@
       <div class="card">
         <h2 class="card__title" data-t="c_cmp_t">Compare two resolutions</h2>
         <div class="g2">
-          <div class="f"><span class="f__label">A</span><div class="row"><input id="cmp_aw" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="1920"><span>×</span><input id="cmp_ah" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="1080"></div></div>
-          <div class="f"><span class="f__label">B</span><div class="row"><input id="cmp_bw" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="3840"><span>×</span><input id="cmp_bh" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="2160"></div></div>
+          <div class="f"><span class="f__label">A</span><div class="row"><input id="cmp_aw" aria-label="Resolution A width" data-t-aria="a11y_cmp_aw" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="1920"><span>×</span><input id="cmp_ah" aria-label="Resolution A height" data-t-aria="a11y_cmp_ah" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="1080"></div></div>
+          <div class="f"><span class="f__label">B</span><div class="row"><input id="cmp_bw" aria-label="Resolution B width" data-t-aria="a11y_cmp_bw" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="3840"><span>×</span><input id="cmp_bh" aria-label="Resolution B height" data-t-aria="a11y_cmp_bh" class="inp vid-in" type="number" min="1" inputmode="numeric" placeholder="2160"></div></div>
         </div>
         <p id="cmp_info" class="note mt" hidden></p>
         <div class="vid-stage mt" id="cmp_stage" hidden><canvas id="cmp_canvas" width="900" height="380"></canvas></div>
@@ -253,7 +252,7 @@
 
   <footer class="app-footer"><span data-t="footer_text">Static HTML/CSS/JS • Runs entirely in your browser • No tracking</span></footer>
 
-  <script src="shared.js?v=20261113i"></script>
+  <script src="shared.js?v=20261114r"></script>
   <script src="kit.js?v=20261112p"></script>
   <script src="calculators.js?v=20261112p"></script>
 </body>
