@@ -34,7 +34,7 @@
     f_fill_empty: "أدخل المسافة والكمية لترى استهلاكك الحقيقي.",
     // Trip
     f_trip_t: "كم ستكلّف رحلتك؟", f_trip_sub: "أدخل المسافة واستهلاك سيارتك وسعر الوقود أو الكهرباء.",
-    f_trip_dist: "مسافة الرحلة", f_round: "ذهاب وعودة", f_cons: "استهلاك السيارة", f_price: "السعر", f_people: "عدد الركاب لتقسيم التكلفة",
+    f_trip_dist: "مسافة الرحلة", f_round: "ذهاب وعودة", f_cons: "استهلاك السيارة", f_price: "السعر", f_cur: "العملة (اختياري، 3 أحرف)", f_people: "عدد الركاب لتقسيم التكلفة",
     f_tank: "سعة الخزان / البطارية (اختياري)",
     f_need: "الكمية المطلوبة", f_total: "تكلفة الرحلة", f_each: "لكل شخص", f_co2: "CO₂ من العادم",
     f_range: "المدى بخزان ممتلئ", f_stops: "{n} تعبئة أثناء الرحلة", f_stops0: "بدون تعبئة أثناء الرحلة",
@@ -210,6 +210,11 @@
   const fuel = () => fuelOf(S.fuel);
   const pos = (s) => { const v = K.parse(s); return Number.isFinite(v) && v > 0 ? v : NaN; };
   const money = (n) => K.fmt(n, n >= 100 ? 0 : 2);
+  // Currency is cosmetic only: a label shown after every cost, never used in maths.
+  S.cur = typeof S.cur === "string" ? S.cur.slice(0, 3) : "";
+  const withCur = (s) => (S.cur.trim() ? s + " " + S.cur.trim() : s);
+  const moneyC = (n) => withCur(money(n));
+  const curHtml = (s) => TM.esc(s) + (S.cur.trim() ? " <small>" + TM.esc(S.cur.trim()) + "</small>" : "");
   const plain = (s) => String(s).replace(/,/g, "");
 
   // ---- Rendering helpers ----
@@ -320,8 +325,8 @@
     let html = ids.map((id, i) => { const u = byId(id), v = K.smart(fromE(u, f, e)); return stat(uname(u), v + " <small>" + TM.esc(u.sym) + "</small>", "", i === 0, v); }).join("");
     if (Number.isFinite(paid)) {
       const per = paid / dist;
-      html += stat(t("f_cost100", "Cost per 100 {d}", { d: dName(S.du) }), money(per * 100), "", false, money(per * 100));
-      html += stat(t("f_cost1", "Cost per {d}", { d: dName(S.du) }), K.fmt(per, 3), "", false, K.fmt(per, 3));
+      html += stat(t("f_cost100", "Cost per 100 {d}", { d: dName(S.du) }), curHtml(money(per * 100)), "", false, money(per * 100));
+      html += stat(t("f_cost1", "Cost per {d}", { d: dName(S.du) }), curHtml(K.fmt(per, 3)), "", false, K.fmt(per, 3));
     }
     out.innerHTML = html;
     $("fl_go").hidden = false;
@@ -352,8 +357,8 @@
       TM.esc(t("f_km_total", "{n} {d} in total", { n: K.fmt(km / DU[S.du], 0), d: dName(S.du) })), false, K.fmt(qty, 2));
     if (Number.isFinite(pr)) {
       const cost = qty * pr;
-      html = stat(t("f_total", "Trip cost"), money(cost), people > 1 ? TM.esc(money(cost / people) + " " + t("f_each", "per person")) : "", true, money(cost)) + html;
-      html += stat(t("f_cost100", "Cost per 100 {d}", { d: dName(S.du) }), money((cost / km) * DU[S.du] * 100), "", false, money((cost / km) * DU[S.du] * 100));
+      html = stat(t("f_total", "Trip cost"), curHtml(money(cost)), people > 1 ? TM.esc(moneyC(cost / people) + " " + t("f_each", "per person")) : "", true, money(cost)) + html;
+      html += stat(t("f_cost100", "Cost per 100 {d}", { d: dName(S.du) }), curHtml(money((cost / km) * DU[S.du] * 100)), "", false, money((cost / km) * DU[S.du] * 100));
     }
     if (f.co2 > 0) { const kg = (e * km) / f.mj * f.co2; html += stat(t("f_co2", "Tailpipe CO₂"), K.fmt(kg, kg < 10 ? 1 : 0) + " <small>kg</small>", "", false, K.fmt(kg, 1)); }
     const tv = pos(tk.v);
@@ -399,9 +404,9 @@
     ];
     const hasCost = Number.isFinite(A.cost) && Number.isFinite(B.cost);
     if (hasCost) {
-      rows.push([t("f_r_cost100", "Cost per 100 {d}", { d: d }), money(per100(A)), money(per100(B)), diff(per100(A), per100(B), money)]);
-      rows.push([t("f_r_year", "Cost per year"), money(A.cost), money(B.cost), diff(A.cost, B.cost, money)]);
-      rows.push([t("f_r_years", "Cost over {n} years", { n: years }), money(A.cost * years), money(B.cost * years), diff(A.cost * years, B.cost * years, money)]);
+      rows.push([t("f_r_cost100", "Cost per 100 {d}", { d: d }), moneyC(per100(A)), moneyC(per100(B)), diff(per100(A), per100(B), moneyC)]);
+      rows.push([t("f_r_year", "Cost per year"), moneyC(A.cost), moneyC(B.cost), diff(A.cost, B.cost, moneyC)]);
+      rows.push([t("f_r_years", "Cost over {n} years", { n: years }), moneyC(A.cost * years), moneyC(B.cost * years), diff(A.cost * years, B.cost * years, moneyC)]);
     }
     rows.push([t("f_r_co2", "CO₂ per year (kg)"), K.fmt(A.co2, 0), K.fmt(B.co2, 0), diff(A.co2, B.co2, (x) => K.fmt(x, 0))]);
     body.innerHTML = rows.map((r) => "<tr><th scope=\"row\">" + TM.esc(r[0]) + "</th>" + r.slice(1).map((c) => '<td class="num" dir="ltr">' + TM.esc(c) + "</td>").join("") + "</tr>").join("");
@@ -409,7 +414,7 @@
     if (hasCost) {
       const lo = A.cost <= B.cost ? [nA, A, B] : [nB, B, A], save1 = lo[2].cost - lo[1].cost, pct = lo[2].cost ? (save1 / lo[2].cost) * 100 : 0;
       head = pct < 1 ? t("f_v_same", "Both cars cost about the same to run.")
-        : t("f_v_cheaper", "{car} is cheaper by {sum} a year ({pct}% less) — {total} over {n} years.", { car: lo[0], sum: money(save1), pct: K.fmt(pct, 0), total: money(save1 * years), n: years });
+        : t("f_v_cheaper", "{car} is cheaper by {sum} a year ({pct}% less) — {total} over {n} years.", { car: lo[0], sum: moneyC(save1), pct: K.fmt(pct, 0), total: moneyC(save1 * years), n: years });
     }
     const ex = A.e <= B.e ? [nA, B.e / A.e] : [nB, A.e / B.e];
     if (ex[1] >= 1.05) sub = t("f_v_energy", "{car} uses {x}× less energy.", { car: ex[0], x: K.fmt(ex[1], 1) });
@@ -429,6 +434,15 @@
   K.ready(() => {
     ["fl_du", "tr_du", "c_du"].forEach((id) => { $(id).innerHTML = duOptions(); $(id).addEventListener("change", () => setDu($(id).value)); });
     K.tabs("fuel", (id) => { $("f_fuelbar").hidden = id === "compare"; });
+    const curs = Array.from(document.querySelectorAll("[data-cur]"));
+    curs.forEach((el) => {
+      el.value = S.cur;
+      el.addEventListener("input", () => {
+        S.cur = el.value.toUpperCase().slice(0, 3); save();
+        curs.forEach((o) => { if (o !== el) o.value = S.cur; });
+        calcFill(); calcTrip(); calcCmp();
+      });
+    });
 
     $("f_fuels").addEventListener("click", (e) => { const b = e.target.closest("[data-fuel]"); if (b) setFuel(b.dataset.fuel); });
     $("f_fuels").addEventListener("keydown", (e) => {

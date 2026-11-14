@@ -878,6 +878,11 @@ html[dir="rtl"] .escale__tick { translate: 50% 0; }
 .fuel-fields .inp-group > input { min-width: 0; flex: 1; }
 .fuel .inp-group select { max-width: 60%; font-size: 14px; }
 .fuel-switch { justify-content: center; min-height: 42px; }
+/* Cosmetic currency label between the price and its unit */
+.fuel .inp-group > .fuel-cur { flex: none !important; width: 4.4em !important; min-width: 0; margin-inline-start: -1px; border-radius: 0; text-align: center; text-transform: uppercase; font-weight: 600; padding-inline: 6px; }
+.fuel .inp-group > .fuel-cur:last-child { border-start-end-radius: var(--radius-sm); border-end-end-radius: var(--radius-sm); }
+.fuel .inp-group > input:not(.fuel-cur) { min-width: 0; flex: 1; }
+.fuel .tbl td small, .fuel .stat__value small { font-size: 14px; font-weight: 600; color: var(--text-2); }
 @media (max-width: 760px) { .fuel-fields, .fuel-cars { grid-template-columns: 1fr; } }
 .fuel-car--a .card__title, .fuel-car--b .card__title { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 .fuel-car--a .card__title::before, .fuel-car--b .card__title::before { content: "A"; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
