@@ -180,7 +180,7 @@ Kept for comparison. The code and transfer numbers improved after gzip and bundl
 
 **One-time setup** (how it was done / for a new project):
 1. Create a Firebase project. Recommended: a **separate project on the free Spark plan**, so usage has hard caps and can never bill. If you add Firebase to the existing `toolmeup` GCP project instead, it inherits that project's billing (Blaze): the free quotas still apply, but overage would bill.
-2. Authentication → Sign-in method → enable **Google**. Authentication → Settings → Authorized domains: add `toolmeup-qdyz5ldcyq-uc.a.run.app` (and any custom domain). `localhost` is there by default.
+2. Authentication → Sign-in method → enable **Google**. Authentication → Settings → Authorized domains: add **both** Cloud Run URLs, `toolmeup-qdyz5ldcyq-uc.a.run.app` and `toolmeup-704451076533.us-central1.run.app` (both are live; missing one gives `auth/unauthorized-domain`), plus any custom domain. `localhost` is there by default.
 3. Firestore Database → Create database (production mode, a US region such as `us-central1`). Rules tab → paste `firestore.rules` → Publish.
 4. Project settings → Your apps → add a **Web app** → copy the `firebaseConfig` object into `FIREBASE_CONFIG` in `account.js`, bump `ACCOUNT_V` in `shared.js`, and deploy.
 5. Optional: in Google Cloud console → APIs & Services → Credentials, restrict the auto-created browser API key to your domains (HTTP referrers).
